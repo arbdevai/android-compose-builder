@@ -3,7 +3,7 @@
 Android Launcher Icon Generator (Pure Python - No External Dependencies)
 Menghasilkan Adaptive Vector Icons (ic_launcher_background.xml, ic_launcher_foreground.xml)
 serta file raster PNG presisi ke seluruh folder mipmap (mdpi sampai xxxhdpi).
-Bebas 'AI Slop' - desain bersih, geometris, flat fintech/modern.
+Bebas 'AI Slop' - desain bersih, geometris, konsisten dengan tema aplikasi.
 """
 
 import os
@@ -11,6 +11,7 @@ import sys
 import zlib
 import struct
 import math
+import argparse
 
 DENSITIES = {
     "mipmap-mdpi": 48,
@@ -19,6 +20,15 @@ DENSITIES = {
     "mipmap-xxhdpi": 144,
     "mipmap-xxxhdpi": 192,
 }
+
+def hex_to_rgb(hex_str, default=(203, 24, 27)):
+    clean = hex_str.strip().lstrip("#")
+    if len(clean) == 6:
+        try:
+            return tuple(int(clean[i:i+2], 16) for i in (0, 2, 4))
+        except ValueError:
+            pass
+    return default
 
 def create_png(width, height, draw_func):
     """Membuat file PNG mentah menggunakan modul zlib bawaan Python."""
@@ -44,7 +54,13 @@ def create_png(width, height, draw_func):
 
     return png_header + ihdr + idat + iend
 
-def default_app_icon_painter(primary_rgb=(8, 76, 148), secondary_rgb=(10, 132, 255), accent_rgb=(255, 159, 10), is_round=False):
+def default_app_icon_painter(
+    primary_rgb=(163, 17, 20),
+    secondary_rgb=(203, 24, 27),
+    accent_rgb=(255, 255, 255),
+    arc_rgb=(255, 218, 214),
+    is_round=False
+):
     """Fungsi render icon modern: Squircle/Circle + WiFi arcs + Fast Lightning."""
     def painter(x, y, w, h):
         cx, cy = w / 2.0, h / 2.0
@@ -69,7 +85,7 @@ def default_app_icon_painter(primary_rgb=(8, 76, 148), secondary_rgb=(10, 132, 2
         if not inside_mask:
             return 0, 0, 0, 0
 
-        # Gradient latar belakang halus (Royal Blue ke Navy)
+        # Gradient latar belakang halus (Crimson Dark ke Crimson Vibrant)
         norm_y = y / float(h)
         bg_r = int(primary_rgb[0] * (1.0 - norm_y * 0.3) + secondary_rgb[0] * (norm_y * 0.3))
         bg_g = int(primary_rgb[1] * (1.0 - norm_y * 0.3) + secondary_rgb[1] * (norm_y * 0.3))
@@ -83,20 +99,19 @@ def default_app_icon_painter(primary_rgb=(8, 76, 148), secondary_rgb=(10, 132, 2
             bg_b = min(255, int(bg_b * depth_factor))
 
         # Gambar simbol Wifi Arcs & Lightning
-        # Arc 1
         wifi_center_y = cy + h * 0.12
         w_dy = y - wifi_center_y
         w_dist = math.sqrt(dx * dx + w_dy * w_dy)
         angle = math.atan2(w_dy, dx)
 
-        # Arc 1 (Atas)
+        # Arc 1 (Atas - Pure White)
         if -2.5 < angle < -0.64 and abs(w_dist - w * 0.34) <= (w * 0.038):
             return 255, 255, 255, 255
-        # Arc 2 (Tengah)
+        # Arc 2 (Tengah - Soft Rose/White Glow)
         if -2.5 < angle < -0.64 and abs(w_dist - w * 0.22) <= (w * 0.034):
-            return 56, 189, 248, 255
+            return arc_rgb[0], arc_rgb[1], arc_rgb[2], 255
 
-        # Simbol Kilat FinTech di tengah/kanan
+        # Simbol Kilat / Fiber Pulse di tengah/kanan
         lx = (x - cx) / float(w)
         ly = (y - cy) / float(h)
         # Segitiga atas kilat
@@ -112,35 +127,46 @@ def default_app_icon_painter(primary_rgb=(8, 76, 148), secondary_rgb=(10, 132, 2
 
     return painter
 
-def generate_icons(res_dir):
+def generate_icons(
+    res_dir,
+    primary_hex="#A31114",
+    secondary_hex="#CB181B",
+    accent_hex="#FFFFFF",
+    arc_hex="#FFDAD6"
+):
     """Menghasilkan seluruh icon XML dan raster PNG di folder res/ aplikasi."""
     drawable_dir = os.path.join(res_dir, "drawable")
     anydpi_dir = os.path.join(res_dir, "mipmap-anydpi-v26")
     os.makedirs(drawable_dir, exist_ok=True)
     os.makedirs(anydpi_dir, exist_ok=True)
 
+    primary_rgb = hex_to_rgb(primary_hex, default=(163, 17, 20))
+    secondary_rgb = hex_to_rgb(secondary_hex, default=(203, 24, 27))
+    accent_rgb = hex_to_rgb(accent_hex, default=(255, 255, 255))
+    arc_rgb = hex_to_rgb(arc_hex, default=(255, 218, 214))
+
     # 1. Tulis ic_launcher_background.xml
-    bg_xml = """<?xml version="1.0" encoding="utf-8"?>
+    bg_xml = f"""<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
     <path
-        android:fillColor="#084C94"
+        android:fillColor="{primary_hex}"
         android:pathData="M0,0h108v108h-108z" />
     <path
-        android:fillColor="#0A84FF"
+        android:fillColor="{secondary_hex}"
         android:pathData="M54,18 A36,36 0 1 0 54,90 A36,36 0 1 0 54,18 Z"
-        android:strokeAlpha="0.12"
-        android:fillAlpha="0.15" />
+        android:strokeAlpha="0.25"
+        android:fillAlpha="0.35" />
 </vector>
 """
     with open(os.path.join(drawable_dir, "ic_launcher_background.xml"), "w") as fp:
         fp.write(bg_xml)
 
     # 2. Tulis ic_launcher_foreground.xml
-    fg_xml = """<?xml version="1.0" encoding="utf-8"?>
+    fg_xml = f"""<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
@@ -151,23 +177,23 @@ def generate_icons(res_dir):
         android:scaleY="0.8"
         android:translateX="10.8"
         android:translateY="10.8">
-        <!-- WiFi Arc 1 -->
+        <!-- WiFi Arc 1 (Crisp White) -->
         <path
             android:fillColor="#00000000"
             android:strokeColor="#FFFFFF"
             android:strokeWidth="5.5"
             android:strokeLineCap="round"
             android:pathData="M 32,46 A 26,26 0 0 1 76,46" />
-        <!-- WiFi Arc 2 -->
+        <!-- WiFi Arc 2 (Themed Accent Glow) -->
         <path
             android:fillColor="#00000000"
-            android:strokeColor="#38BDF8"
+            android:strokeColor="{arc_hex}"
             android:strokeWidth="5"
             android:strokeLineCap="round"
             android:pathData="M 40,55 A 16,16 0 0 1 68,55" />
-        <!-- Lightning Payment Icon -->
+        <!-- Fiber Optic Pulse / Fast Lightning -->
         <path
-            android:fillColor="#FF9F0A"
+            android:fillColor="{accent_hex}"
             android:pathData="M 57,48 L 47,63 L 53,63 L 49,76 L 62,59 L 56,59 Z" />
     </group>
 </vector>
@@ -188,8 +214,20 @@ def generate_icons(res_dir):
         fp.write(adaptive_xml)
 
     # 4. Generate raster PNGs untuk setiap folder mipmap
-    painter_sq = default_app_icon_painter(is_round=False)
-    painter_rd = default_app_icon_painter(is_round=True)
+    painter_sq = default_app_icon_painter(
+        primary_rgb=primary_rgb,
+        secondary_rgb=secondary_rgb,
+        accent_rgb=accent_rgb,
+        arc_rgb=arc_rgb,
+        is_round=False
+    )
+    painter_rd = default_app_icon_painter(
+        primary_rgb=primary_rgb,
+        secondary_rgb=secondary_rgb,
+        accent_rgb=accent_rgb,
+        arc_rgb=arc_rgb,
+        is_round=True
+    )
 
     for folder_name, size in DENSITIES.items():
         folder_path = os.path.join(res_dir, folder_name)
@@ -203,14 +241,28 @@ def generate_icons(res_dir):
         with open(os.path.join(folder_path, "ic_launcher_round.png"), "wb") as fp:
             fp.write(png_rd)
 
-    print(f"Berhasil membuat launcher icons di: {res_dir}")
+    print(f"Berhasil menghasilkan launcher icons tema ({primary_hex}/{secondary_hex}) di: {res_dir}")
 
 def main():
-    res_dir = sys.argv[1] if len(sys.argv) > 1 else "app/src/main/res"
-    if not os.path.exists(res_dir):
-        print(f"Folder res tidak ditemukan: {res_dir}")
+    parser = argparse.ArgumentParser(description="Android Adaptive & Raster Icon Generator")
+    parser.add_argument("res_dir", nargs="?", default="app/src/main/res", help="Path to res directory")
+    parser.add_argument("--primary", default="#A31114", help="Primary brand color hex (e.g. #A31114)")
+    parser.add_argument("--secondary", default="#CB181B", help="Secondary brand color hex (e.g. #CB181B)")
+    parser.add_argument("--accent", default="#FFFFFF", help="Accent icon symbol color hex (e.g. #FFFFFF)")
+    parser.add_argument("--arc", default="#FFDAD6", help="Inner arc color hex (e.g. #FFDAD6)")
+    args = parser.parse_args()
+
+    if not os.path.exists(args.res_dir):
+        print(f"Folder res tidak ditemukan: {args.res_dir}")
         sys.exit(1)
-    generate_icons(res_dir)
+
+    generate_icons(
+        res_dir=args.res_dir,
+        primary_hex=args.primary,
+        secondary_hex=args.secondary,
+        accent_hex=args.accent,
+        arc_hex=args.arc
+    )
 
 if __name__ == "__main__":
     main()
