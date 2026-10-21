@@ -22,7 +22,18 @@ When working on Android projects with this repository or when the `android-compo
 - Use concise, direct, professional language.
 - Prohibit hyperbole, overly informal slang ("kak", "bestie", "bobob cantik"), and dramatic copy.
 
-## 5. Build & CI/CD
+## 5. Build & CI/CD (Anti-Hallucination)
 - Never run heavy local Gradle commands (`./gradlew assembleRelease`).
 - Rely on GitHub Actions CI for building signed APKs.
-- Monitor workflow runs with a 1-minute interval: `gh run watch <RUN_ID> --interval 60`.
+- Monitor workflow runs with a strict 1-minute interval: `gh run watch <RUN_ID> --interval 60`.
+- Never claim or hallucinate build success without verified output from `gh run view` or GitHub APIs.
+
+## 6. In-App Updater & Storage Hygiene
+- Automatically clean up legacy APK installers before downloading new versions and upon successful launch.
+- Check file existence before triggering download to avoid duplicate bandwidth usage.
+
+## 7. Pre-Flight Syntax & Type Verification
+- Run `python3 scripts/verify_kotlin_syntax.py .` before commit.
+- Never call suspend functions directly in non-suspending Compose lambdas without `LaunchedEffect` or `coroutineScope.launch`.
+- Never access properties directly on `kotlin.Result<T>` without `.getOrNull()` / `.getOrThrow()`.
+- Ensure common Compose modifier extension imports (`Modifier.border`, `Modifier.clip`, etc.) and internal cross-package symbols are properly imported.

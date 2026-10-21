@@ -214,8 +214,31 @@ Untuk menjamin aplikasi tidak pernah force close / crash akibat perubahan di sis
 
 ---
 
-## 9. Logic In-App Updater yang Kebal Bug
+## 9. Logic In-App Updater yang Kebal Bug & Bersih Storage
 
+- **Pembersihan Otomatis File APK Lama (Anti-Sampah & Anti-Penumpukan APK):**
+  - **JANGAN PERNAH** membiarkan file-file APK installer menumpuk di memori perangkat pengguna (`devbox-v1.0.9.apk`, `devbox-v1.0.10.apk`, dll.) setiap kali update dirilis. File APK yang menumpuk dapat menguras ratusan MB memori pengguna secara diam-diam.
+  - **Auto-Cleanup Saat Cek & Unduh:** Sebelum memulai pengunduhan versi baru, `UpdateManager` **WAJIB** memindai direktori unduhan (`downloadDir`) dan menghapus seluruh file APK usang dari versi sebelumnya.
+  - **Auto-Cleanup Pasca-Update Berhasil:** Saat aplikasi dibuka dan versi yang berjalan sudah sama dengan atau lebih baru dari file APK yang ada di storage (artinya instalasi pembaruan telah sukses), hapus installer APK tersebut secara otomatis.
+  - **Contoh Implementasi Standar:**
+    ```kotlin
+    fun cleanupOldApks(context: Context, keepVersion: String? = null) {
+        try {
+            val downloadDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+                ?: context.cacheDir
+            val keepFileName = if (keepVersion != null) "app-$keepVersion.apk" else null
+
+            downloadDir.listFiles { file -> file.isFile && file.name.endsWith(".apk") }?.forEach { file ->
+                if (keepFileName == null || file.name != keepFileName) {
+                    val deleted = file.delete()
+                    Log.i("UpdateManager", "Membersihkan APK usang: ${file.name} (dihapus: $deleted)")
+                }
+            }
+        } catch (e: Exception) {
+            Log.w("UpdateManager", "Gagal membersihkan APK lama: ${e.message}")
+        }
+    }
+    ```
 - **Cek File Sebelum Unduh (Anti Double-Download):**
   - Sebelum memicu `DownloadManager`, periksa apakah file APK untuk versi target sudah pernah diunduh dan valid di penyimpanan lokal. Jika sudah ada, langsung arahkan ke instalasi tanpa mengunduh ulang.
 - **Pantau Status DownloadManager:**
@@ -249,9 +272,13 @@ Untuk menjamin aplikasi tidak pernah force close / crash akibat perubahan di sis
 
 ## 11. Proses Build & CI/CD GitHub Actions (Zero Local Build & Anti-Boncos API)
 
-- **DILARANG BUILD LOKAL:**
+- **DILARANG BUILD LOKAL & RESPON INSTAN:**
   - **JANGAN SEKALI-KALI** menjalankan perintah gradle lokal (seperti `./gradlew assembleRelease` atau `./gradlew compileDebugKotlin` atau perintah `gradlew` lainnya) di workspace. Ini dilarang keras karena membuang resource dan kuota lokal.
+  - Saat pengguna meminta "build", AI **WAJIB LANGSUNG** memvalidasi sintaks, membuat commit release berawalan `"Release v..."`, dan melakukan `git push` ke GitHub Actions CI. Jangan pernah berputar-putar di workspace lokal sebelum push.
   - Semua proses kompilasi didelegasikan penuh ke GitHub Actions CI.
+- **DILARANG MEMBERIKAN DATA BOHONGAN / STATUS HALUSINASI:**
+  - AI **DILARANG KERAS** mengklaim, menebak, atau berasumsi bahwa build CI sudah berhasil / APK rilis sudah terbit tanpa bukti nyata dari output perintah resmi (`gh run view`, `gh release view`, atau API GitHub).
+  - Jika perintah status gagal dieksekusi (misal kendala PTY atau jaringan), AI wajib menyatakan secara transparan dan jujur bahwa status belum bisa diverifikasi, **BUKAN** mengarang bahwa build sudah sukses.
 - **Pembaruan Versi (Auto-Bump):**
   - Setiap rilis baru, wajib menaikkan `versionCode` dan `versionName` di `app/build.gradle.kts`.
 - **Git Push Aman Tanpa Password Prompt:**
@@ -263,26 +290,37 @@ Untuk menjamin aplikasi tidak pernah force close / crash akibat perubahan di sis
   - **JANGAN PERNAH** menggunakan `git push origin main --tags` atau membuat tag git secara manual di lokal.
   - Cukup buat commit di branch `main` dengan pesan yang diawali kata `"Release v..."` (contoh: `git commit -m "Release v1.0.3 - Penambahan fitur..."`), lalu push ke `main`.
   - Workflow GitHub Actions akan mendeteksi pesan commit ini, membangun signed APK, dan otomatis membuat GitHub Release serta Git Tag dalam satu siklus build.
-- **Pemantauan Proaktif CI dengan Interval 1 Menit (Anti-Boncos API):**
-  - **ATURAN WAJIB KUOTA:** Pantau workflow build GitHub Actions dengan **interval 60 detik (1 menit)** agar tidak menguras kuota GitHub API:
+- **Pemantauan Proaktif CI dengan Interval Mutlak 1 Menit (Anti-Boncos API):**
+  - **ATURAN WAJIB KUOTA:** Pantau workflow build GitHub Actions dengan **interval tepat 60 detik (1 menit)** agar tidak menguras kuota GitHub API:
     ```bash
     gh run watch <RUN_ID> --interval 60
     ```
-  - Jika build CI gagal (X), gunakan `gh run view <RUN_ID> --log-failed` untuk membaca log error, perbaiki kodenya langsung, lalu push perbaikan dengan commit release.
-  - Setelah build sukses, unduh release APK ke direktori proyek (`gh release download <TAG> --pattern "*.apk" --dir .`) dan laporkan link serta ukuran file kepada pengguna.
+  - **DILARANG KERAS** menggunakan interval cepat di bawah 60 detik (seperti `--interval 10` atau loop polling cepat).
+  - Jika build CI gagal (X), gunakan `gh run view <RUN_ID> --log-failed` untuk membaca log error yang sesungguhnya, perbaiki kodenya langsung, lalu push perbaikan dengan commit release baru.
+  - Hanya setelah output resmi menyatakan `completed with 'success'`, unduh release APK atau laporkan link rilis serta ukuran file riil kepada pengguna.
 
 ---
 
 ## 12. Pre-Flight Linter Sebelum Push (Zero-CI-Failure)
 
-Untuk mencegah kegagalan build di GitHub Actions akibat kesalahan sintaks sepele:
-- AI **WAJIB** menjalankan skrip validasi sintaks sebelum melakukan commit:
-  ```bash
-  # Menggunakan skrip lokal di dalam skill / repo:
-  python3 scripts/verify_kotlin_syntax.py .
-  # Atau dari konfigurasi global:
-  python3 ~/.gemini/config/skills/android-compose-builder/scripts/verify_kotlin_syntax.py .
-  ```
+Untuk mencegah kegagalan build di GitHub Actions akibat kesalahan sintaks, tipe data, atau coroutine scope:
+- **Verifikasi Coroutine Scope & Suspend Functions dalam Compose:**
+  - **DILARANG** memanggil fungsi `suspend` (seperti `ScrollState.scrollTo`, `animateScrollTo`, `SnackbarHostState.showSnackbar`, dsb.) langsung di dalam regular non-suspending lambda (seperti `onValueChange`, `onClick`, `onKeyEvent`).
+  - Semua fungsi `suspend` wajib dipanggil di dalam `LaunchedEffect` atau dibungkus `coroutineScope.launch { ... }` dari `rememberCoroutineScope()`.
+- **Verifikasi Objek `kotlin.Result<T>`:**
+  - **DILARANG** mengakses properti atau fungsi tipe yang dibungkus langsung pada variabel `Result<T>` (misal: `res.stdout` atau `res.exitCode`).
+  - Wajib diekstrak melalui `.getOrNull()?.prop`, `.getOrThrow().prop`, atau `res.fold(...)`. Skrip pre-flight linter secara otomatis mendeteksi pelanggaran ini.
+- **Verifikasi Import Ekstensi Modifier Compose:**
+  - Fungsi ekstensi umum pada `Modifier` seperti `.border(...)`, `.clip(...)`, `.clickable(...)`, dan `.background(...)` wajib mengimpor paket `androidx.compose.foundation.*` atau `androidx.compose.ui.draw.*`. Skrip linter secara otomatis memeriksa keberadaan import ini.
+- **Verifikasi Scope Variabel `it` dalam Lambda Berparameter:**
+  - **DILARANG** menggunakan kata kunci `it` di dalam lambda yang sudah memiliki parameter bernama eksplisit (seperti `{ keyCode -> ... }`, `{ sess -> ... }`, atau `{ reader -> ... }`) kecuali di dalam inner lambda lokal (seperti `.let { ... }`, `.also { ... }`, atau `onValueChange = { ... }`). Penggunaan `it` liar tanpa deklarasi menyebabkan compiler error `Unresolved reference 'it'`.
+- **Verifikasi Resolusi Referensi Class/Object Antar Package:**
+  - Setiap pemanggilan nama class atau singleton object internal proyek antar-package (misal `RootExecutor`, `ChrootManager`, `TerminalSessionManager`, dll.) **WAJIB** memiliki deklarasi import spesifik atau wildcard yang valid (`import com.arbdev.devbox.data.RootExecutor` atau `import com.arbdev.devbox.data.*`). Skrip linter secara otomatis memindai seluruh deklarasi tipe di proyek dan memastikan tidak ada simbol yang tak ter-resolve.
+- **Validasi Sintaks Wajib:**
+  - AI **WAJIB** menjalankan skrip validasi sintaks sebelum melakukan commit:
+    ```bash
+    python3 ~/.gemini/config/skills/android-compose-builder/scripts/verify_kotlin_syntax.py .
+    ```
 - Periksa konsistensi simbol warna (`Color.kt`) dan dependensi ikon sebelum commit.
 - Pastikan seluruh file `.kt` dan `.xml` lolos verifikasi sebelum menjalankan `git commit` dan `git push`.
 

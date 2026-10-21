@@ -15,5 +15,10 @@ This project and skill adhere to the `android-compose-builder` standard for high
    - Result<T> return type in repository layer.
 4. **Professional UI Microcopy:**
    - Clear, clean, professional tone. No AI boilerplate or exaggerated filler text.
-5. **No Local Gradle Heavy Builds:**
+5. **No Local Gradle Heavy Builds & Truthful Status:**
    - Delegate building and release signing to GitHub Actions CI (`gh run watch --interval 60`).
+   - Never report unverified or hallucinated build/release statuses.
+6. **In-App Updater Storage Hygiene:**
+   - Auto-clean legacy APK installers from download directories to preserve user storage.
+7. **Pre-Flight Linter (Zero-CI-Failure):**
+   - Run `verify_kotlin_syntax.py` before commit to validate coroutine boundaries, `Result<T>` unpacking, modifier imports, and cross-package symbol imports.

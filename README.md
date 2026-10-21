@@ -49,8 +49,21 @@ curl -fsSL https://raw.githubusercontent.com/arbdevai/android-compose-builder/ma
    - Dilarang menjalankan proses kompilasi gradle berat di mesin lokal.
    - Pendelegasian penuh ke GitHub Actions CI untuk build signed APK.
    - Pemantauan build wajib dengan interval minimal 60 detik (`gh run watch --interval 60`) untuk melindungi kuota GitHub API.
+   - Anti-halusinasi status CI: dilarang mengklaim rilis sukses tanpa bukti verifikasi resmi dari `gh run view` / `gh release view`.
 
-7. **1-Click Starter Kit**:
+7. **In-App Updater & Storage Hygiene**:
+   - Pembersihan otomatis file installer APK lama di folder unduhan (`downloadDir`) sebelum mengunduh rilis baru atau setelah instalasi pembaruan berhasil.
+   - Proteksi anti double-download untuk menghemat kuota pengguna.
+
+8. **Pre-Flight Linter (Zero-CI-Failure)**:
+   - Skrip linter mandiri `verify_kotlin_syntax.py` untuk mendeteksi potensi error CI sebelum commit:
+     - Keseimbangan tanda kurung kurawal/bracket dengan pemahaman literal string dan komentar.
+     - Deteksi panggilan suspend function ilegal pada non-suspending Compose lambdas.
+     - Validasi pembongkaran anggota `kotlin.Result<T>`.
+     - Validasi impor ekstensi Modifier Compose (`Modifier.border`, `Modifier.clip`, dsb.).
+     - Validasi resolusi referensi class internal antar-package.
+
+9. **1-Click Starter Kit**:
    - Skrip otomasi `init_compose_project.py` untuk menginisiasi repositori baru lengkap dengan Material3, Navigation, ViewModel, Network Client, CI workflow, dan template Skeleton Screen.
 
 ---
