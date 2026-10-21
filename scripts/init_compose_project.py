@@ -526,7 +526,10 @@ local.properties
     if os.path.exists(icon_script):
         subprocess.run([sys.executable, icon_script, res_dir], check=False)
 
-    print(f"Selesai! Proyek '{app_name}' siap digunakan.")
+    print(f"\nSelesai! Struktur proyek '{app_name}' berhasil dibuat.")
+    print("Petunjuk Signing Release Keystore (Anti-Muter-Muter):")
+    print("  Jalankan perintah berikut untuk generate keystore dan pasang GitHub Secrets dalam 3 detik:")
+    print(f"  python3 {os.path.join(script_dir, 'setup_release_keystore.py')}\n")
 
 def main():
     parser = argparse.ArgumentParser(description="Inisiasi Proyek Android Compose Baru")

@@ -22,3 +22,6 @@ This project and skill adhere to the `android-compose-builder` standard for high
    - Auto-clean legacy APK installers from download directories to preserve user storage.
 7. **Pre-Flight Linter (Zero-CI-Failure):**
    - Run `verify_kotlin_syntax.py` before commit to validate coroutine boundaries, `Result<T>` unpacking, modifier imports, and cross-package symbol imports.
+8. **Release Keystore & Signing (Anti-Muter-Muter):**
+   - Install `keytool` immediately via `sudo apt update && sudo apt install -y openjdk-17-jre-headless` if missing.
+   - Use `setup_release_keystore.py` to auto-generate non-interactive keystore and configure GitHub Secrets.

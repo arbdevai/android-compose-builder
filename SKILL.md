@@ -301,7 +301,39 @@ Untuk menjamin aplikasi tidak pernah force close / crash akibat perubahan di sis
 
 ---
 
-## 12. Pre-Flight Linter Sebelum Push (Zero-CI-Failure)
+## 12. Manajemen Signing Keystore Release (Anti-Muter-Muter & Zero Hesitation)
+
+- **LARANGAN KERAS BERPUTAR-PUTAR KETIKA KEYTOOL TIDAK TERPASANG:**
+  - Jika AI memerlukan `keytool` namun perintah tidak ditemukan (`keytool: command not found`), **DILARANG KERAS** berputar-putar mencoba cara alternatif aneh (seperti menulis script openssl rumit, membuat fake certificate, menggunakan debug signing untuk rilis, atau bertanya bingung ke pengguna).
+  - Cukup jalankan perintah instalasi paket headless dalam 1 baris:
+    ```bash
+    sudo apt-get update && sudo apt-get install -y openjdk-17-jre-headless
+    ```
+- **SOLUSI 1-BARIS OTOMATIS (SANGAT DIREKOMENDASIKAN):**
+  - Gunakan skrip bawaan skill yang otomatis mengecek/menginstall `keytool`, membuat keystore non-interaktif, dan mengunggah 4 secret ke GitHub (`gh secret set`):
+    ```bash
+    python3 scripts/setup_release_keystore.py
+    # Atau dari path global:
+    python3 ~/.gemini/config/skills/android-compose-builder/scripts/setup_release_keystore.py
+    ```
+- **MANUAL NON-INTERAKTIF (JIKA DIPERLUKAN):**
+  - **DILARANG KERAS** menjalankan `keytool -genkeypair` tanpa flag `-noprompt` dan `-dname` karena akan membekukan terminal dalam prompt interaktif ("What is your name?").
+  - Perintah standar non-interaktif:
+    ```bash
+    keytool -genkeypair -v -keystore release.keystore -alias releaseKey -keyalg RSA -keysize 2048 -validity 10000 -storepass "$SECRET_PASS" -keypass "$SECRET_PASS" -dname "CN=Android App, OU=Mobile, O=Arbdev, C=ID" -noprompt
+    ```
+  - Unggah 4 rahasia ke GitHub Secrets:
+    ```bash
+    gh secret set KEYSTORE_BASE64 -b "$(base64 -w 0 release.keystore)"
+    gh secret set KEYSTORE_PASSWORD -b "$SECRET_PASS"
+    gh secret set KEY_ALIAS -b "releaseKey"
+    gh secret set KEY_PASSWORD -b "$SECRET_PASS"
+    ```
+  - Pastikan `*.keystore` sudah terdaftar di `.gitignore` agar file fisik tidak bocor ke repositori publik.
+
+---
+
+## 13. Pre-Flight Linter Sebelum Push (Zero-CI-Failure)
 
 Untuk mencegah kegagalan build di GitHub Actions akibat kesalahan sintaks, tipe data, atau coroutine scope:
 - **Verifikasi Coroutine Scope & Suspend Functions dalam Compose:**
@@ -326,7 +358,7 @@ Untuk mencegah kegagalan build di GitHub Actions akibat kesalahan sintaks, tipe 
 
 ---
 
-## 13. 1-Click Starter Kit (Memulai Proyek Baru dari Nol)
+## 14. 1-Click Starter Kit (Memulai Proyek Baru dari Nol)
 
 Jika pengguna meminta inisiasi proyek Android baru di direktori kosong:
 1. Jalankan skrip starter kit otomatis:
@@ -338,6 +370,10 @@ Jika pengguna meminta inisiasi proyek Android baru di direktori kosong:
    ```
 2. Buat repositori Git lokal (`git init`).
 3. Buat repositori GitHub publik (`gh repo create <nama-repo> --public --source=. --remote=origin`).
-4. Generate keystore signing rilis (`keytool -genkeypair ...`), encode ke Base64, dan masukkan ke GitHub Secrets (`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`).
+4. Generate keystore & unggah GitHub Secrets secara otomatis dalam 3 detik:
+   ```bash
+   python3 scripts/setup_release_keystore.py
+   # Atau: python3 ~/.gemini/config/skills/android-compose-builder/scripts/setup_release_keystore.py
+   ```
 5. Lakukan commit pertama berawalan `"Release v1.0.0 - Inisiasi Proyek"` dan push ke `origin main`.
 6. Pantau build CI dengan interval 60 detik sampai signed APK release v1.0.0 selesai dan siap diunduh.

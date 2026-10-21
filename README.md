@@ -63,8 +63,9 @@ curl -fsSL https://raw.githubusercontent.com/arbdevai/android-compose-builder/ma
      - Validasi impor ekstensi Modifier Compose (`Modifier.border`, `Modifier.clip`, dsb.).
      - Validasi resolusi referensi class internal antar-package.
 
-9. **1-Click Starter Kit**:
+9. **1-Click Starter Kit & Instant Keystore Setup**:
    - Skrip otomasi `init_compose_project.py` untuk menginisiasi repositori baru lengkap dengan Material3, Navigation, ViewModel, Network Client, CI workflow, dan template Skeleton Screen.
+   - Skrip `setup_release_keystore.py` (anti-muter-muter): otomatis mendeteksi/menginstall `keytool` (`openjdk-17-jre-headless`), membuat release keystore non-interaktif, meng-encode Base64, dan mengunggah 4 rahasia signing ke GitHub Secrets dalam 3 detik.
 
 ---
 
@@ -160,6 +161,7 @@ android-compose-builder/
 ├── README.md                 # Dokumentasi panduan
 └── scripts/
     ├── init_compose_project.py      # Starter kit inisiasi proyek Compose dari nol
+    ├── setup_release_keystore.py    # Auto-generator release keystore & GitHub secrets
     ├── generate_launcher_icons.py   # Generator Adaptive Vector & PNG Mipmap
     └── verify_kotlin_syntax.py      # Pre-flight linter sintaks Kotlin & XML
 ```
