@@ -120,17 +120,27 @@ cd /path/ke/proyek/android/anda
 ./install.sh --check
 ```
 
-### 6. Uninstall
+### 6. Auto-Update di Background (Mirip Skill Resmi)
+Aktifkan sinkronisasi otomatis agar skill selalu ter-update di background setiap terminal dibuka:
+```bash
+./install.sh --auto-update       # Mengaktifkan background auto-update hook di shell profile
+./install.sh --disable-auto-update # Menonaktifkan auto-update hook
+./install.sh --update            # Melakukan update instan ke commit GitHub terbaru
+```
+
+### 7. Uninstall
 ```bash
 ./install.sh --uninstall
 ```
 
-### 7. Pengguna Windows / Tanpa Bash
+### 8. Pengguna Windows / Tanpa Bash
 Gunakan installer Python mandiri:
 ```bash
 python3 install.py
 python3 install.py --all
 python3 install.py --workspace
+python3 install.py --auto-update
+python3 install.py --update
 ```
 
 ---
