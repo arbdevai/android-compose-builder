@@ -55,12 +55,15 @@ curl -fsSL https://raw.githubusercontent.com/arbdevai/android-compose-builder/ma
    - Pembersihan otomatis file installer APK lama di folder unduhan (`downloadDir`) sebelum mengunduh rilis baru atau setelah instalasi pembaruan berhasil.
    - Proteksi anti double-download untuk menghemat kuota pengguna.
 
-8. **Pre-Flight Linter (Zero-CI-Failure)**:
-   - Skrip linter mandiri `verify_kotlin_syntax.py` untuk mendeteksi potensi error CI sebelum commit:
+8. **Pre-Flight Linter & Memory-Safe Validator (Zero-CI-Failure & Anti-Leak)**:
+   - Skrip linter mandiri `verify_kotlin_syntax.py` untuk mendeteksi potensi error CI dan kebocoran memori sebelum commit:
      - Keseimbangan tanda kurung kurawal/bracket dengan pemahaman literal string dan komentar.
      - Deteksi panggilan suspend function ilegal pada non-suspending Compose lambdas.
      - Validasi pembongkaran anggota `kotlin.Result<T>`.
      - Validasi impor ekstensi Modifier Compose (`Modifier.border`, `Modifier.clip`, dsb.).
+     - Validasi `DisposableEffect` wajib memiliki `onDispose { ... }` (mencegah listener leak fatal).
+     - Advisory peringatan memori non-blocking (`collectAsStateWithLifecycle`, deteksi `GlobalScope`, context leak).
+     - **Sistem Pengecualian Anti-Membabi Buta**: Mendukung `// @validator-ignore`, `// @validator-ignore-file`, `@Suppress`, serta auto-ignore untuk folder `legacy/`, `vendor/`, `thirdparty/`, dan `generated/` agar tidak merusak kode yang kepemilikannya tidak jelas.
      - Validasi resolusi referensi class internal antar-package.
 
 9. **1-Click Starter Kit & Instant Keystore Setup**:

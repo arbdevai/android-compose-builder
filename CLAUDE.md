@@ -32,11 +32,14 @@ When working on Android projects with this repository or when the `android-compo
 - Automatically clean up legacy APK installers before downloading new versions and upon successful launch.
 - Check file existence before triggering download to avoid duplicate bandwidth usage.
 
-## 7. Pre-Flight Syntax & Type Verification
+## 7. Pre-Flight Syntax & Memory-Safe Verification
 - Run `python3 scripts/verify_kotlin_syntax.py .` before commit.
 - Never call suspend functions directly in non-suspending Compose lambdas without `LaunchedEffect` or `coroutineScope.launch`.
 - Never access properties directly on `kotlin.Result<T>` without `.getOrNull()` / `.getOrThrow()`.
 - Ensure common Compose modifier extension imports (`Modifier.border`, `Modifier.clip`, etc.) and internal cross-package symbols are properly imported.
+- Always include `onDispose { ... }` in `DisposableEffect` to prevent listener leaks.
+- Prefer `collectAsStateWithLifecycle()` over `collectAsState()`.
+- Use `// @validator-ignore` or `// @validator-ignore-file` for legacy or ambiguous third-party code without breaking architecture.
 
 ## 8. Release Keystore & Signing (Zero Hesitation)
 - Never spin in circles or hesitate if `keytool` is missing; install it instantly: `sudo apt-get update && sudo apt-get install -y openjdk-17-jre-headless`.

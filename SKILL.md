@@ -333,28 +333,57 @@ Untuk menjamin aplikasi tidak pernah force close / crash akibat perubahan di sis
 
 ---
 
-## 13. Pre-Flight Linter Sebelum Push (Zero-CI-Failure)
+## 13. Pre-Flight Linter & Memory-Safe Validator (Zero-CI-Failure & Anti-Leak)
 
-Untuk mencegah kegagalan build di GitHub Actions akibat kesalahan sintaks, tipe data, atau coroutine scope:
+Untuk mencegah kegagalan build di GitHub Actions dan kebocoran memori (Memory Leak) saat aplikasi berjalan:
+
+### A. Aturan Wajib & Hard Errors (Memblokir CI Build - Exit 1):
+- **Keseimbangan Tanda Kurung & Sintaks XML:**
+  - Tokenizer kurung kurawal, kurung siku, dan kurung biasa dengan pemahaman literal string dan komentar.
+  - File XML (res/drawables, values, AndroidManifest.xml) wajib well-formed.
+- **Proteksi Listener & DisposableEffect:**
+  - **DILARANG** memanggil `DisposableEffect` tanpa menyertakan blok pembersihan `onDispose { ... }`. Melewatkan `onDispose` adalah pelanggaran fatal yang membocorkan callback/listener di memori selamanya.
 - **Verifikasi Coroutine Scope & Suspend Functions dalam Compose:**
   - **DILARANG** memanggil fungsi `suspend` (seperti `ScrollState.scrollTo`, `animateScrollTo`, `SnackbarHostState.showSnackbar`, dsb.) langsung di dalam regular non-suspending lambda (seperti `onValueChange`, `onClick`, `onKeyEvent`).
   - Semua fungsi `suspend` wajib dipanggil di dalam `LaunchedEffect` atau dibungkus `coroutineScope.launch { ... }` dari `rememberCoroutineScope()`.
 - **Verifikasi Objek `kotlin.Result<T>`:**
   - **DILARANG** mengakses properti atau fungsi tipe yang dibungkus langsung pada variabel `Result<T>` (misal: `res.stdout` atau `res.exitCode`).
-  - Wajib diekstrak melalui `.getOrNull()?.prop`, `.getOrThrow().prop`, atau `res.fold(...)`. Skrip pre-flight linter secara otomatis mendeteksi pelanggaran ini.
+  - Wajib diekstrak melalui `.getOrNull()?.prop`, `.getOrThrow().prop`, atau `res.fold(...)`.
 - **Verifikasi Import Ekstensi Modifier Compose:**
-  - Fungsi ekstensi umum pada `Modifier` seperti `.border(...)`, `.clip(...)`, `.clickable(...)`, dan `.background(...)` wajib mengimpor paket `androidx.compose.foundation.*` atau `androidx.compose.ui.draw.*`. Skrip linter secara otomatis memeriksa keberadaan import ini.
+  - Fungsi ekstensi umum pada `Modifier` seperti `.border(...)`, `.clip(...)`, `.clickable(...)`, dan `.background(...)` wajib mengimpor paket `androidx.compose.foundation.*` atau `androidx.compose.ui.draw.*`.
 - **Verifikasi Scope Variabel `it` dalam Lambda Berparameter:**
-  - **DILARANG** menggunakan kata kunci `it` di dalam lambda yang sudah memiliki parameter bernama eksplisit (seperti `{ keyCode -> ... }`, `{ sess -> ... }`, atau `{ reader -> ... }`) kecuali di dalam inner lambda lokal (seperti `.let { ... }`, `.also { ... }`, atau `onValueChange = { ... }`). Penggunaan `it` liar tanpa deklarasi menyebabkan compiler error `Unresolved reference 'it'`.
+  - **DILARANG** menggunakan kata kunci `it` di dalam lambda yang sudah memiliki parameter bernama eksplisit (seperti `{ keyCode -> ... }`, `{ sess -> ... }`, atau `{ reader -> ... }`) kecuali di dalam inner lambda lokal.
 - **Verifikasi Resolusi Referensi Class/Object Antar Package:**
-  - Setiap pemanggilan nama class atau singleton object internal proyek antar-package (misal `RootExecutor`, `ChrootManager`, `TerminalSessionManager`, dll.) **WAJIB** memiliki deklarasi import spesifik atau wildcard yang valid (`import com.arbdev.devbox.data.RootExecutor` atau `import com.arbdev.devbox.data.*`). Skrip linter secara otomatis memindai seluruh deklarasi tipe di proyek dan memastikan tidak ada simbol yang tak ter-resolve.
-- **Validasi Sintaks Wajib:**
-  - AI **WAJIB** menjalankan skrip validasi sintaks sebelum melakukan commit:
-    ```bash
-    python3 ~/.gemini/config/skills/android-compose-builder/scripts/verify_kotlin_syntax.py .
-    ```
-- Periksa konsistensi simbol warna (`Color.kt`) dan dependensi ikon sebelum commit.
-- Pastikan seluruh file `.kt` dan `.xml` lolos verifikasi sebelum menjalankan `git commit` dan `git push`.
+  - Setiap pemanggilan nama class atau singleton object internal proyek antar-package wajib memiliki deklarasi import spesifik atau wildcard yang valid.
+
+### B. Soft Warnings (Advisory Memory Leak & Lifecycle - Non-Blocking, Exit 0):
+- **Pencegahan Kebocoran StateFlow di Background:**
+  - Prioritaskan `collectAsStateWithLifecycle()` dari `androidx.lifecycle.compose` dibanding `collectAsState()` biasa agar pengumpulan Flow otomatis berhenti saat aplikasi berada di background.
+- **Larangan Unmanaged Coroutines (`GlobalScope`):**
+  - Hindari `GlobalScope.launch` / `GlobalScope.async` di luar scope terkontrol karena tidak terikat lifecycle Composable/ViewModel.
+- **Pencegahan Activity Context Leak:**
+  - Dilarang menyimpan referensi `Context`, `Activity`, atau `View` di dalam `companion object` / static `var`.
+  - Di dalam ViewModel, gunakan `AndroidViewModel(application)` atau `context.applicationContext`, bukan instance `Activity` langsung.
+
+### C. Sistem Pengecualian / Suppression (Anti-Membabi Buta):
+Agar validator tidak merusak atau memblokir kode legacy / third-party / vendor yang kepemilikannya tidak jelas:
+- **Auto-Ignore Direktori Khusus:**
+  - Direktori `legacy/`, `vendor/`, `thirdparty/`, `third_party/`, `generated/`, `build/`, `.gradle/`, `.git/` otomatis diabaikan dari inspeksi.
+- **Pengecualian Per Baris (Line-Level Ignore):**
+  - Cukup tambahkan komentar `// @validator-ignore` (atau `// @validator-ignore: <tag>`) pada baris terkait atau baris di atasnya.
+  - Mendukung juga anotasi Kotlin standar `@Suppress(...)`.
+- **Pengecualian Satu File Penuh (File-Level Ignore):**
+  - Letakkan `// @validator-ignore-file` pada baris atas file legacy / pihak ketiga.
+  - **AI DILARANG** membabi buta mengubah kode warisan/third-party yang tidak jelas kepemilikannya; gunakan tag pengecualian jika kode tersebut memang sengaja dipertahankan.
+
+### D. Eksekusi Validator Wajib:
+- AI **WAJIB** menjalankan skrip validasi sintaks sebelum melakukan commit:
+  ```bash
+  python3 scripts/verify_kotlin_syntax.py .
+  # Atau dari path global:
+  python3 ~/.gemini/config/skills/android-compose-builder/scripts/verify_kotlin_syntax.py .
+  ```
+- Pastikan seluruh file lolos verifikasi sebelum menjalankan `git commit` dan `git push`.
 
 ---
 

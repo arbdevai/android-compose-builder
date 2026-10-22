@@ -17,9 +17,11 @@ All AI coding agents (Antigravity CLI, Claude Code, Codex CLI, Cursor, Copilot) 
 6. **In-App Updater & Storage Hygiene**:
    - Automatic cleanup of legacy APK files from download directories to prevent device storage bloat.
    - Pre-check local files to prevent redundant downloads.
-7. **Zero-CI-Failure Pre-Flight Verification**:
+7. **Zero-CI-Failure & Memory-Safe Pre-Flight Verification**:
    - Mandatory execution of `verify_kotlin_syntax.py` before commit/push.
-   - Verifies coroutine suspend boundaries, `kotlin.Result` extraction, Compose modifier imports, and cross-package symbol resolution.
+   - Verifies coroutine suspend boundaries, `kotlin.Result` extraction, Compose modifier imports, cross-package symbol resolution, and `DisposableEffect` cleanups.
+   - Non-blocking advisory for memory leaks (`collectAsStateWithLifecycle`, context leaks).
+   - Non-blind suppression via `// @validator-ignore` and `// @validator-ignore-file` to respect legacy/third-party code ownership.
 8. **Release Keystore & Signing (Anti-Muter-Muter)**:
    - Zero hesitation when `keytool` is missing: install immediately (`sudo apt update && sudo apt install -y openjdk-17-jre-headless`).
    - Run `python3 scripts/setup_release_keystore.py` or use non-interactive `keytool -genkeypair -noprompt -dname "..."` to configure GitHub Secrets (`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`) in one step.
