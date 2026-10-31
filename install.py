@@ -49,25 +49,28 @@ def copy_skill(source_dir: Path, target_dir: Path):
 
 def deploy_skill(source_dir: Path, target_dir: Path, use_symlink: bool = True):
     target_dir.parent.mkdir(parents=True, exist_ok=True)
-    if use_symlink:
-        if target_dir.is_symlink() or target_dir.exists():
-            if target_dir.is_symlink():
-                target_dir.unlink()
-            else:
-                shutil.rmtree(target_dir)
-        try:
-            target_dir.symlink_to(source_dir, target_is_directory=True)
-            print(f"    Linked: {target_dir} -> {source_dir} (Live Sync)")
-            return
-        except Exception as e:
-            print(f"    \033[33m[!] Symlink creation failed ({e}), falling back to copy.\033[0m")
-    
     if target_dir.is_symlink():
         target_dir.unlink()
     elif target_dir.exists():
         shutil.rmtree(target_dir)
+
+    if use_symlink:
+        try:
+            target_dir.mkdir(parents=True, exist_ok=True)
+            for item in source_dir.iterdir():
+                if item.name in ("web", ".git", ".github"):
+                    continue
+                dest = target_dir / item.name
+                dest.symlink_to(item.resolve(), target_is_directory=item.is_dir())
+            print(f"    Linked: {target_dir} -> {source_dir} (Live Sync, Web Excluded)")
+            return
+        except Exception as e:
+            print(f"    \033[33m[!] Symlink creation failed ({e}), falling back to copy.\033[0m")
+            if target_dir.exists():
+                shutil.rmtree(target_dir)
+    
     copy_skill(source_dir, target_dir)
-    print(f"    Copied: {target_dir}")
+    print(f"    Copied: {target_dir} (Web Excluded)")
 
 def enable_autoupdate_hook():
     home = Path.home()

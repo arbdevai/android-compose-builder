@@ -201,9 +201,11 @@ prepare_source() {
             echo -e "    Updating existing repository at ${INSTALL_BASE_DIR}..."
             git -C "$INSTALL_BASE_DIR" pull --quiet
         else
-            echo -e "    Cloning ${REPO_URL} into ${INSTALL_BASE_DIR}..."
+            echo -e "    Cloning ${REPO_URL} into ${INSTALL_BASE_DIR} (excluding web files)..."
             rm -rf "$INSTALL_BASE_DIR"
-            git clone --quiet "$REPO_URL" "$INSTALL_BASE_DIR"
+            git clone --filter=blob:none --no-checkout --depth 1 "$REPO_URL" "$INSTALL_BASE_DIR"
+            git -C "$INSTALL_BASE_DIR" sparse-checkout set --no-cone '/*' '!/web' '!/web/*'
+            git -C "$INSTALL_BASE_DIR" checkout main
         fi
         SOURCE_DIR="$INSTALL_BASE_DIR"
     fi
@@ -262,14 +264,19 @@ copy_skill_files() {
 deploy_skill() {
     local target_dir="$1"
     mkdir -p "$(dirname "$target_dir")"
+    rm -rf "$target_dir"
     if [ "$USE_SYMLINK" = true ]; then
-        rm -rf "$target_dir"
-        ln -sfn "$SOURCE_DIR" "$target_dir"
-        echo -e "    Linked: $target_dir -> $SOURCE_DIR (Live Sync)"
+        mkdir -p "$target_dir"
+        for item in "$SOURCE_DIR"/*; do
+            local base_name="$(basename "$item")"
+            if [ "$base_name" != "web" ] && [ "$base_name" != "*" ]; then
+                ln -sfn "$item" "$target_dir/$base_name"
+            fi
+        done
+        echo -e "    Linked: $target_dir -> $SOURCE_DIR (Live Sync, Web Excluded)"
     else
-        rm -rf "$target_dir"
         copy_skill_files "$target_dir"
-        echo -e "    Copied: $target_dir"
+        echo -e "    Copied: $target_dir (Web Excluded)"
     fi
 }
 
