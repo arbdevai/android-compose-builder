@@ -1,176 +1,196 @@
-# Android Compose Builder Skill
+<p align="center">
+  <img src="assets/banner.svg" alt="Android Compose Builder Banner" width="100%">
+</p>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Jetpack%20Compose-green.svg)](https://developer.android.com/jetpack/compose)
-[![AI Agents](https://img.shields.io/badge/AI%20Agents-Antigravity%20%7C%20Claude%20%7C%20Codex-purple.svg)](#multi-cli-compatibility)
-
-**Expert Android Developer Skill & Agent Standard** untuk membangun aplikasi Android modern berbasis Kotlin + Jetpack Compose Material3. Dirancang khusus untuk asisten AI coding (Antigravity CLI, Claude Code, OpenAI Codex CLI, Cursor, Copilot) agar dapat merancang, mengembangkan, dan memelihara aplikasi kelas produksi secara mandiri, tuntas, dan berstandar industri tinggi.
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT"></a>
+  <a href="https://developer.android.com/jetpack/compose"><img src="https://img.shields.io/badge/Platform-Android%20%7C%20Jetpack%20Compose-3DDC84.svg?style=flat-square&logo=android&logoColor=white" alt="Platform"></a>
+  <a href="https://kotlinlang.org/"><img src="https://img.shields.io/badge/Kotlin-2.0+-7F52FF.svg?style=flat-square&logo=kotlin&logoColor=white" alt="Kotlin"></a>
+  <a href="#multi-cli-compatibility"><img src="https://img.shields.io/badge/AI%20Agents-Antigravity%20%7C%20Claude%20%7C%20Codex-CCFF00.svg?style=flat-square&logo=google&logoColor=black" alt="AI Agents"></a>
+  <a href="https://github.com/arbdevai/android-compose-builder/actions"><img src="https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF.svg?style=flat-square&logo=githubactions&logoColor=white" alt="CI/CD"></a>
+</p>
 
 ---
 
-## ⚡ 1-Line Quick Install (Auto-Detect)
+## <img src="assets/icons/overview.svg" width="22" height="22" align="center" alt="Overview" /> Ikhtisar &amp; Standar Rekayasa
 
-Jika Anda ingin menginstal atau mengembalikan skill ini ke sistem lokal secara instan:
+**Android Compose Builder** adalah spesifikasi standar rekayasa agen (*Agent Engineering Standard*) resmi untuk merancang, membangun, dan memelihara aplikasi Android modern berbasis **Kotlin + Jetpack Compose Material 3**. 
+
+Dirancang dengan prinsip arsitektur tingkat industri Google Developer, skill ini memandu asisten coding AI (**Google Antigravity CLI**, **Claude Code**, **OpenAI Codex CLI**, **Cursor**, **Copilot**) agar menghasilkan kode yang andal, hemat memori, lolos verifikasi CI, dan siap pakai tanpa intervensi manual berulang.
+
+---
+
+## <img src="assets/icons/install.svg" width="22" height="22" align="center" alt="Install" /> Instalasi Cepat (1-Line Auto-Detect)
+
+Jalankan perintah berikut di terminal untuk memasang atau memperbarui skill ini secara otomatis:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/arbdevai/android-compose-builder/main/install.sh | bash
 ```
 
-> **Catatan:** Skrip installer otomatis mendeteksi CLI yang terpasang di sistem (`agy`, `claude`, `codex`, atau direktori konfigurasinya) dan langsung mengaktifkan skill untuk semua tool yang ditemukan.
+> **Mekanisme Otomatis:** Skrip installer secara cerdas memindai CLI yang terpasang di sistem (`agy`, `claude`, `codex`) dan mengaitkan symlink *live-sync* langsung ke direktori konfigurasi masing-masing agent.
 
 ---
 
-## 🌟 Fitur Utama & Standar Rekayasa
+## <img src="assets/icons/architecture.svg" width="22" height="22" align="center" alt="Architecture" /> Pilar Arsitektur &amp; Prinsip Rekayasa
 
-1. **Standar Skeleton Screen & Anti-Loading Spinner**:
-   - Dilarang menggunakan full-screen `CircularProgressIndicator` di layar kosong.
-   - Wajib menggunakan Skeleton Screen dengan animasi kilau halus (*shimmer effect*) berbasis murni Jetpack Compose (`rememberInfiniteTransition` + `Brush.linearGradient`) tanpa dependensi pihak ketiga berat.
-   - Komponen modular siap pakai: `SkeletonBox`, `SkeletonCard`, `SkeletonDashboard`, `SkeletonListItem`.
+Skill ini menetapkan 9 aturan ketat yang wajib dipatuhi oleh setiap AI agent:
 
-2. **Resiliensi Konkurensi & Mutex (Anti-Deadlock pada Hardware/Router)**:
-   - **Otentikasi Atomik**: Melindungi proses otentikasi/login perangkat keras atau router dengan `Mutex.withLock` untuk mencegah tabrakan sesi (*session thrashing*).
-   - **Larangan Re-entrancy Semaphore**: Melarang pemanggilan bersarang yang mengakuisisi permit `Semaphore` dari dalam blok permit yang sama demi mencegah kebuntuan total (*deadlock*).
-   - **Pre-Authentication**: Mewajibkan token aktif diselesaikan secara sekuensial sebelum memicu coroutine paralel (`async`).
+### 1. Skeleton Screen & Shimmer Native (Anti-Spinner Kosong)
+- **Larangan:** Dilarang menampilkan `CircularProgressIndicator` di tengah layar kosong saat transisi data.
+- **Standar:** Wajib menggunakan layout skeleton yang menyerupai bentuk konten asli dengan animasi kilau (*shimmer effect*) halus berbasis API Jetpack Compose murni (`rememberInfiniteTransition` + `Brush.linearGradient`) tanpa library pihak ketiga.
+- **Modul Tersedia:** `SkeletonBox`, `SkeletonCard`, `SkeletonDashboard`, `SkeletonListItem`.
 
-3. **Kebijakan Anti Data Dummy (Zero Dummy Data)**:
-   - Dilarang membiarkan data tiruan statis/palsu di layar produksi.
-   - Wajib menelusuri endpoint riil, mendekode skema otentikasi (enkripsi, token, cookie), dan memetakan model DTO yang toleran (`ignoreUnknownKeys = true`).
+### 2. Resiliensi Konkurensi & Mutex (Anti-Deadlock Perangkat Keras)
+- **Otentikasi Atomik:** Seluruh siklus login atau request token ke router/hardware dilindungi dengan `Mutex.withLock` guna mencegah *session thrashing*.
+- **Larangan Re-entrancy Semaphore:** Tidak boleh mengakuisisi permit `Semaphore` bersarang dari dalam blok permit yang sama demi mencegah *deadlock*.
+- **Sekuensial Pre-Auth:** Token atau sesi aktif wajib diselesaikan secara berurutan sebelum memicu coroutine paralel (`async`).
 
-4. **Standar Gaya Bahasa Profesional (Anti-Alay)**:
-   - Bebas dari bahasa berlebihan, mendramatisir, hiperbolis, atau template sok asik khas AI generik.
-   - Microcopy lugas, profesional, ringkas, dan to-the-point.
+### 3. Kebijakan Anti Data Dummy (Zero Dummy Data)
+- **Larangan:** Dilarang menyematkan data palsu statis (*mock data*) pada layar produksi.
+- **Standar:** Wajib menelusuri endpoint autentik, mendekode skema otentikasi (cookie, token, payload terenkripsi), serta memetakan model data yang toleran terhadap evolusi field (`ignoreUnknownKeys = true`).
 
-5. **Paten Bebas "AI Slop" pada Ikon & Grafis**:
-   - Dilarang menyematkan gambar render 3D hiperbolis yang tidak proporsional.
-   - Wajib Android Adaptive Vector Icons (XML SVG bersih pada canvas safe zone).
-   - Dilengkapi generator raster PNG otomatis (`mdpi` hingga `xxxhdpi`) berbasis pure Python zlib (tanpa Pillow / library eksternal).
+### 4. In-App Updater Standar Industri (Anti-APK Korup & Streaming Buffer)
+- **Larangan `DownloadManager`:** Dilarang mengandalkan `DownloadManager` sistem yang rentan hang saat sinyal lemot atau gagal menangani HTTP redirect GitHub/CDN.
+- **Direct OkHttp Streaming:** Wajib menggunakan streaming HTTP langsung dengan buffer 64 KB, timeout tangguh (30 detik koneksi, 60 detik baca/tulis), dan penghitungan persentase presisi.
+- **Isolasi File Sementara (`.part`):** Mengunduh ke file sementara `app-${version}-${flavor}.apk.part`. File hanya di-rename menjadi `.apk` setelah 100% byte terunduh dan lolos validasi. Jika terjadi gangguan jaringan, file `.part` langsung dihapus otomatis.
+- **Validasi Integritas 4 Lapis (`isApkValid`):**
+  1. Verifikasi ukuran fisik minimum (> 10 MB) dan exact match ukuran aset GitHub.
+  2. Deep archive & DEX parsing melalui `getPackageArchiveInfo(..., GET_SIGNING_CERTIFICATES or GET_ACTIVITIES)`.
+  3. Strict package name & flavor matching (`pkg.packageName == context.packageName`).
+  4. Monotonic version code progression (`pkg.longVersionCode > BuildConfig.VERSION_CODE`).
+- **Pembersihan Otomatis Storage:** Hapus seluruh file installer APK usang dari direktori unduhan sebelum mengunduh rilis baru atau setelah pembaruan sukses dipasang.
 
-6. **CI/CD GitHub Actions & Anti-Boncos API**:
-   - Dilarang menjalankan proses kompilasi gradle berat di mesin lokal.
-   - Pendelegasian penuh ke GitHub Actions CI untuk build signed APK.
-   - Pemantauan build wajib dengan interval minimal 60 detik (`gh run watch --interval 60`) untuk melindungi kuota GitHub API.
-   - Anti-halusinasi status CI: dilarang mengklaim rilis sukses tanpa bukti verifikasi resmi dari `gh run view` / `gh release view`.
+### 5. Formula Monotonik SemVer & Otomasi Rilis Bebas Emoji
+- **Formula Monotonik `versionCode`:**
+  $$\text{versionCode} = \text{MAJOR} \times 10000 + \text{MINOR} \times 100 + \text{PATCH}$$
+- **Zero-Emoji Policy:** Dilarang menyematkan emoji dekoratif pada catatan rilis, changelog, dan dialog update dalam aplikasi. Format rilis mengacu pada standar teknis resmi (AOSP / Linux Kernel style).
+- **Zero-Hardcoded Changelog:** Seluruh poin catatan rilis diekstrak secara dinamis 100% dari commit git riil melalui skrip `.github/scripts/generate_release_notes.py`.
+- **Rilis Satu Siklus:** Rilis dipicu otomatis via pesan commit `Release v...` tanpa manual tagging lokal.
 
-7. **In-App Updater & Storage Hygiene**:
-   - Pembersihan otomatis file installer APK lama di folder unduhan (`downloadDir`) sebelum mengunduh rilis baru atau setelah instalasi pembaruan berhasil.
-   - Proteksi anti double-download untuk menghemat kuota pengguna.
+### 6. Pre-Flight Linter & Deteksi Kebocoran Memori (Zero-CI-Failure)
+- Skrip mandiri `verify_kotlin_syntax.py` wajib dijalankan sebelum setiap git commit:
+  - Validasi keseimbangan tanda kurung dan blok kode dengan string parsing yang sadar escape literal.
+  - Deteksi pemanggilan fungsi `suspend` di dalam lambda Compose non-suspending.
+  - Validasi pembongkaran anggota `kotlin.Result<T>`.
+  - Pengecekan impor ekstensi modifier (`Modifier.border`, `Modifier.clip`, dsb.).
+  - Kewajiban blok `onDispose { ... }` pada seluruh `DisposableEffect`.
+  - Advisory peringatan memori non-blocking (`collectAsStateWithLifecycle`, leak `Context`, deteksi `GlobalScope`).
+  - Dukungan non-blind suppression (`// @validator-ignore`, `// @validator-ignore-file`, `@Suppress`).
 
-8. **Pre-Flight Linter & Memory-Safe Validator (Zero-CI-Failure & Anti-Leak)**:
-   - Skrip linter mandiri `verify_kotlin_syntax.py` untuk mendeteksi potensi error CI dan kebocoran memori sebelum commit:
-     - Keseimbangan tanda kurung kurawal/bracket dengan pemahaman literal string dan komentar.
-     - Deteksi panggilan suspend function ilegal pada non-suspending Compose lambdas.
-     - Validasi pembongkaran anggota `kotlin.Result<T>`.
-     - Validasi impor ekstensi Modifier Compose (`Modifier.border`, `Modifier.clip`, dsb.).
-     - Validasi `DisposableEffect` wajib memiliki `onDispose { ... }` (mencegah listener leak fatal).
-     - Advisory peringatan memori non-blocking (`collectAsStateWithLifecycle`, deteksi `GlobalScope`, context leak).
-     - **Sistem Pengecualian Anti-Membabi Buta**: Mendukung `// @validator-ignore`, `// @validator-ignore-file`, `@Suppress`, serta auto-ignore untuk folder `legacy/`, `vendor/`, `thirdparty/`, dan `generated/` agar tidak merusak kode yang kepemilikannya tidak jelas.
-     - Validasi resolusi referensi class internal antar-package.
+### 7. Otomasi Keystore & Signing CI (Anti-Muter-Muter)
+- Skrip `setup_release_keystore.py` mendeteksi dan menginstal `keytool` otomatis jika belum ada (`openjdk-17-jre-headless`).
+- Pembuatan release keystore non-interaktif, konversi Base64 instan, dan konfigurasi 4 secrets signing ke GitHub repository (`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`) dalam hitungan detik.
 
-9. **1-Click Starter Kit & Instant Keystore Setup**:
-   - Skrip otomasi `init_compose_project.py` untuk menginisiasi repositori baru lengkap dengan Material3, Navigation, ViewModel, Network Client, CI workflow, dan template Skeleton Screen.
-   - Skrip `setup_release_keystore.py` (anti-muter-muter): otomatis mendeteksi/menginstall `keytool` (`openjdk-17-jre-headless`), membuat release keystore non-interaktif, meng-encode Base64, dan mengunggah 4 rahasia signing ke GitHub Secrets dalam 3 detik.
+### 8. CI/CD GitHub Actions & Efisiensi Kuota API
+- Pendelegasian kompilasi build berat sepenuhnya ke GitHub Actions runners (tanpa kompilasi lokal).
+- Pemantauan build berkala dengan interval wajib 60 detik (`gh run watch --interval 60`) untuk melindungi kuota API GitHub.
+- Anti-halusinasi status rilis: wajib menyertakan verifikasi keluaran perintah terminal riil (`gh run view`, `gh release view`).
+
+### 9. Paten Bebas "AI Slop" pada Ikon & UI
+- Dilarang keras menggunakan gambar hasil generasi AI 3D hiperbolis yang pecah atau tidak simetris.
+- Wajib menggunakan Android Adaptive Vector Icons (XML SVG bersih pada canvas 108x108 dp dengan safe zone 66 dp).
+- Generator raster PNG terintegrasi (`mdpi` hingga `xxxhdpi`) berbasis Python zlib murni tanpa dependensi library eksternal.
 
 ---
 
-## 🤖 Multi-CLI Compatibility
+## <img src="assets/icons/compatibility.svg" width="22" height="22" align="center" alt="Compatibility" /> Kompatibilitas Multi-CLI
 
-Skill ini mengadopsi spesifikasi terbuka **Agent Skills Standard** dan kompatibel langsung dengan ekosistem agent:
+Skill ini mematuhi **Agent Skills Standard** dan kompatibel langsung di berbagai platform:
 
-| AI Agent / CLI | Status | Mekanisme Integrasi |
+| Agent / LLM CLI | Status | Lokasi Integrasi |
 | :--- | :---: | :--- |
-| **Antigravity CLI (`agy`)** | ✅ Native | `~/.gemini/config/skills/android-compose-builder/` atau `.agents/skills/` |
-| **Claude Code (`claude`)** | ✅ Native | `~/.claude/skills/android-compose-builder/` dan `CLAUDE.md` adapter |
-| **Codex CLI (`codex`)** | ✅ Native | `~/.codex/skills/android-compose-builder/` dan `CODEX.md` adapter |
-| **Cursor / Copilot / Windsurf** | ✅ Native | `AGENTS.md` & `GEMINI.md` universal prompt rules |
+| **Antigravity CLI (`agy`)** | Native | `~/.gemini/config/skills/android-compose-builder/` |
+| **Claude Code (`claude`)** | Native | `~/.claude/skills/android-compose-builder/` |
+| **OpenAI Codex CLI (`codex`)** | Native | `~/.codex/skills/android-compose-builder/` |
+| **Cursor / Copilot / Windsurf** | Native | Aturan universal via [AGENTS.md](AGENTS.md) & [GEMINI.md](GEMINI.md) |
 
 ---
 
-## 🛠️ Opsi Instalasi Manual
+## <img src="assets/icons/tools.svg" width="22" height="22" align="center" alt="Tools" /> Panduan Penggunaan &amp; Perintah Skrip
 
-Clone repositori ini:
+### 1. Inisiasi Proyek Compose Baru
+Untuk memulai aplikasi Jetpack Compose baru lengkap dengan Material 3, ViewModel, Coroutines, Navigation, Skeleton, dan CI workflow:
 
 ```bash
-git clone https://github.com/arbdevai/android-compose-builder.git
-cd android-compose-builder
+python3 scripts/init_compose_project.py /path/ke/proyek/baru com.example.myapp "My Application"
 ```
 
-### 1. Auto-Detect (Rekomendasi)
-Mendeteksi CLI yang aktif di mesin Anda dan memasang skill secara otomatis:
+### 2. Konfigurasi Release Keystore & GitHub Secrets Instan
+Mempersiapkan penandatanganan APK produksi di GitHub Actions tanpa konfigurasi manual:
+
 ```bash
-./install.sh
+python3 scripts/setup_release_keystore.py
 ```
 
-### 2. Pasang ke Semua CLI Sekaligus
+### 3. Pembuatan Ikon Adaptif Android (Vector & PNG Mipmap)
+Menghasilkan aset ikon vektor dan paket raster siap pakai dari warna tema:
+
 ```bash
-./install.sh --all
+python3 scripts/generate_launcher_icons.py --package com.example.myapp --color "#00E676"
 ```
 
-### 3. Pasang Khusus Per CLI
+### 4. Verifikasi Pre-Flight Linter
+Memeriksa seluruh file Kotlin dan XML sebelum melakukan commit atau push:
+
 ```bash
-./install.sh --antigravity   # Khusus Antigravity CLI (agy)
-./install.sh --claude        # Khusus Claude Code CLI
-./install.sh --codex         # Khusus OpenAI Codex CLI
+python3 scripts/verify_kotlin_syntax.py
 ```
 
-### 4. Pasang ke Workspace / Project Tertentu
-Jika ingin membatasi skill hanya pada direktori project aktif Anda:
+---
+
+## <img src="assets/icons/advanced.svg" width="22" height="22" align="center" alt="Advanced" /> Pilihan Instalasi Lanjutan
+
+### Instalasi Khusus Lingkungan
 ```bash
-cd /path/ke/proyek/android/anda
+./install.sh --antigravity       # Pasang khusus Antigravity CLI (agy)
+./install.sh --claude            # Pasang khusus Claude Code CLI
+./install.sh --codex             # Pasang khusus Codex CLI
+./install.sh --all               # Pasang ke semua CLI yang tersedia
+```
+
+### Pembatasan Per-Proyek (*Workspace Scope*)
+```bash
+cd /path/ke/proyek/android
 /path/ke/android-compose-builder/install.sh --workspace
 ```
 
-### 5. Cek Status & Deteksi
-```bash
-./install.sh --check
-```
+### Pembaruan Otomatis di Background
+Aktifkan sinkronisasi otomatis agar definisi skill selalu mutakhir setiap terminal dibuka:
 
-### 6. Auto-Update di Background (Mirip Skill Resmi)
-Aktifkan sinkronisasi otomatis agar skill selalu ter-update di background setiap terminal dibuka:
 ```bash
-./install.sh --auto-update       # Mengaktifkan background auto-update hook di shell profile
-./install.sh --disable-auto-update # Menonaktifkan auto-update hook
+./install.sh --auto-update       # Mengaktifkan background hook di profil shell
 ./install.sh --update            # Melakukan update instan ke commit GitHub terbaru
-```
-
-### 7. Uninstall
-```bash
-./install.sh --uninstall
-```
-
-### 8. Pengguna Windows / Tanpa Bash
-Gunakan installer Python mandiri:
-```bash
-python3 install.py
-python3 install.py --all
-python3 install.py --workspace
-python3 install.py --auto-update
-python3 install.py --update
+./install.sh --disable-auto-update
 ```
 
 ---
 
-## 📂 Struktur Repositori
+## <img src="assets/icons/structure.svg" width="22" height="22" align="center" alt="Structure" /> Struktur Repositori
 
 ```text
 android-compose-builder/
-├── SKILL.md                  # Spesifikasi inti skill (Agent Skills Standard)
-├── AGENTS.md                 # Aturan multi-agent universal
-├── GEMINI.md                 # Konfigurasi agen Google Antigravity / Gemini
-├── CLAUDE.md                 # Konfigurasi instruksi Claude Code / Claude CLI
-├── CODEX.md                  # Konfigurasi instruksi OpenAI Codex CLI
-├── install.sh                # Multi-CLI auto-detect installer (Bash)
-├── install.py                # Multi-CLI installer alternatif (Python)
-├── LICENSE                   # Lisensi MIT
-├── README.md                 # Dokumentasi panduan
-└── scripts/
-    ├── init_compose_project.py      # Starter kit inisiasi proyek Compose dari nol
-    ├── setup_release_keystore.py    # Auto-generator release keystore & GitHub secrets
-    ├── generate_launcher_icons.py   # Generator Adaptive Vector & PNG Mipmap
-    └── verify_kotlin_syntax.py      # Pre-flight linter sintaks Kotlin & XML
+├── assets/
+│   ├── banner.svg                   # Banner resmi bertema Google Developer (Lime Neon x Charcoal)
+│   └── icons/                       # Paket ikon visual SVG vektor mandiri (Bebas Emoji)
+├── scripts/
+│   ├── init_compose_project.py      # Generator proyek Jetpack Compose produksi dari nol
+│   ├── setup_release_keystore.py    # Otomasi keystore & upload GitHub secrets signing
+│   ├── generate_launcher_icons.py   # Generator Adaptive Vector XML & PNG Mipmap
+│   └── verify_kotlin_syntax.py      # Pre-flight linter sintaks & anti-memory-leak
+├── SKILL.md                         # Spesifikasi detail instruksi & implementasi skill
+├── AGENTS.md                        # Aturan standar universal AI coding agents
+├── GEMINI.md                        # Instruksi khusus Gemini & Google Antigravity
+├── CLAUDE.md                        # Instruksi konfigurasi Claude Code CLI
+├── CODEX.md                         # Instruksi konfigurasi OpenAI Codex CLI
+├── install.sh                       # Installer otomatis multi-CLI berbasis Bash
+├── install.py                       # Installer alternatif mandiri berbasis Python
+├── LICENSE                          # Lisensi resmi MIT
+└── README.md                        # Dokumentasi teknis proyek
 ```
 
 ---
 
-## 📜 Lisensi
+## <img src="assets/icons/license.svg" width="22" height="22" align="center" alt="License" /> Lisensi
 
-Didistribusikan di bawah lisensi [MIT](LICENSE). Bebas digunakan, dimodifikasi, dan didistribusikan kembali.
+Repositori ini dilisensikan di bawah lisensi terbuka [MIT](LICENSE). Bebas digunakan, diintegrasikan, dan disesuaikan untuk proyek komersial maupun open-source.

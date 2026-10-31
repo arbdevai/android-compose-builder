@@ -214,46 +214,95 @@ Untuk menjamin aplikasi tidak pernah force close / crash akibat perubahan di sis
 
 ---
 
-## 9. Logic In-App Updater yang Kebal Bug & Bersih Storage
+## 9. Logic In-App Updater Standar Industri (Anti-APK Korup, Streaming OkHttp & Deep Validation)
 
-- **Pembersihan Otomatis File APK Lama (Anti-Sampah & Anti-Penumpukan APK):**
-  - **JANGAN PERNAH** membiarkan file-file APK installer menumpuk di memori perangkat pengguna (`devbox-v1.0.9.apk`, `devbox-v1.0.10.apk`, dll.) setiap kali update dirilis. File APK yang menumpuk dapat menguras ratusan MB memori pengguna secara diam-diam.
-  - **Auto-Cleanup Saat Cek & Unduh:** Sebelum memulai pengunduhan versi baru, `UpdateManager` **WAJIB** memindai direktori unduhan (`downloadDir`) dan menghapus seluruh file APK usang dari versi sebelumnya.
-  - **Auto-Cleanup Pasca-Update Berhasil:** Saat aplikasi dibuka dan versi yang berjalan sudah sama dengan atau lebih baru dari file APK yang ada di storage (artinya instalasi pembaruan telah sukses), hapus installer APK tersebut secara otomatis.
-  - **Contoh Implementasi Standar:**
+- **LARANGAN KERAS MENGGUNAKAN ANDROID SYSTEM `DownloadManager`:**
+  - **DILARANG MENGGUNAKAN `DownloadManager` UNTUK IN-APP UPDATE:** `DownloadManager` berjalan di proses sistem luar (`com.android.providers.downloads`). Sangat rentan macet/terhenti ketika pengguna berada pada jaringan sinyal lemah/lemot, tidak stabil saat menangani rantai pengalihan URL (HTTP 302 Redirect GitHub Release ke CDN AWS S3 / Azure `objects.githubusercontent.com`), sering dibunuh oleh manajemen baterai OEM agresif (MIUI, ColorOS, OneUI), dan menulis langsung ke file target tanpa proteksi atomic temporary file.
+  - **STANDAR RESMI WAJIB: Direct OkHttp Streaming dengan Buffer & Generous Timeouts:**
+    - Gunakan `OkHttpClient` internal aplikasi dengan timeout tangguh:
+      ```kotlin
+      val httpClient = OkHttpClient.Builder()
+          .connectTimeout(30, TimeUnit.SECONDS)
+          .readTimeout(60, TimeUnit.SECONDS)
+          .writeTimeout(60, TimeUnit.SECONDS)
+          .followRedirects(true)
+          .followSslRedirects(true)
+          .build()
+      ```
+    - Streaming data secara langsung ke disk menggunakan buffer 64 KB (`ByteArray(64 * 1024)`).
+    - Hitung persentase progres unduhan secara presisi: `((downloadedBytes * 100L) / totalBytes).toInt().coerceIn(0, 99)`.
+
+- **ISOLASI FILE SEMENTARA (`.part` Temporary File) - ANTI FILE KORUP:**
+  - **DILARANG KERAS** menulis langsung ke file `.apk` saat proses pengunduhan berlangsung.
+  - Unduh selalu ke file sementara: `app-${version}-${flavor}.apk.part`.
+  - File `.part` **HANYA BOLEH DI-RENAME MENJADI `.apk`** setelah 100% byte berhasil terunduh dan lolos verifikasi integritas paket (`isApkValid`).
+  - Jika koneksi terputus (sinyal lemot / timeout / exception), file `.part` **WAJIB DIHAPUS OTOMATIS** seketika itu juga! Pengguna tidak akan pernah mendapatkan file separuh jalan yang rusak.
+
+- **DEEP APK INTEGRITY VERIFICATION (ANTI APK RUSAK / "THERE WAS A PROBLEM PARSING THE PACKAGE"):**
+  - **DILARANG KERAS** hanya mengecek ukuran file seadanya (`file.length() > 5MB`) atau parsing parsial dengan flag `0`. Flag `0` hanya membaca header manifest dan tetap meloloskan file yang DEX-nya terpotong atau corrupt!
+  - **Verifikasi Wajib 4 Lapis (`isApkValid`):**
+    1. **Cek Ukuran Fisik Minimum & Exact Match:** Ukuran minimal > 10 MB dan (jika ukuran aset GitHub diketahui dari field `size`) selisih ukuran tidak boleh melebihi 2 KB dari ukuran aset riil.
+    2. **Deep Archive & DEX Parsing:**
+       Panggil `packageManager.getPackageArchiveInfo(apkPath, PackageManager.GET_SIGNING_CERTIFICATES or PackageManager.GET_ACTIVITIES)` (atau `GET_SIGNATURES` untuk Android < 9). Ini memaksa Android membaca tabel komponen DEX dan sertifikat. Jika file korup/terpotong, fungsi ini mengembalikan `null`!
+    3. **Strict Flavor & Package Name Matching:**
+       Nama package APK harus cocok persis dengan `context.packageName` (`pkg.packageName == context.packageName`), **BUKAN** `startsWith(...)`. Ini mencegah flavor Root menimpa No-Root atau sebaliknya.
+    4. **Version Code Progression:**
+       Pastikan `pkg.longVersionCode > BuildConfig.VERSION_CODE`. Jangan pernah menganggap file lama yang tertinggal sebagai "Ready to Install" jika versinya sama atau lebih rendah.
     ```kotlin
-    fun cleanupOldApks(context: Context, keepVersion: String? = null) {
-        try {
-            val downloadDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
-                ?: context.cacheDir
-            val keepFileName = if (keepVersion != null) "app-$keepVersion.apk" else null
-
-            downloadDir.listFiles { file -> file.isFile && file.name.endsWith(".apk") }?.forEach { file ->
-                if (keepFileName == null || file.name != keepFileName) {
-                    val deleted = file.delete()
-                    Log.i("UpdateManager", "Membersihkan APK usang: ${file.name} (dihapus: $deleted)")
-                }
+    fun isApkValid(context: Context, apkFile: File, expectedBytes: Long = 0L): Boolean {
+        if (!apkFile.exists() || !apkFile.isFile || apkFile.length() < 10_000_000) return false
+        if (expectedBytes > 0L && Math.abs(apkFile.length() - expectedBytes) > 2048L) return false
+        return try {
+            val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                PackageManager.GET_SIGNING_CERTIFICATES or PackageManager.GET_ACTIVITIES
+            } else {
+                @Suppress("DEPRECATION")
+                PackageManager.GET_SIGNATURES or PackageManager.GET_ACTIVITIES
             }
-        } catch (e: Exception) {
-            Log.w("UpdateManager", "Gagal membersihkan APK lama: ${e.message}")
+            val pkg = context.packageManager.getPackageArchiveInfo(apkFile.absolutePath, flags) ?: return false
+            if (pkg.packageName != context.packageName) return false
+            val remoteVersionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pkg.longVersionCode else @Suppress("DEPRECATION") pkg.versionCode.toLong()
+            remoteVersionCode > BuildConfig.VERSION_CODE
+        } catch (_: Exception) {
+            false
         }
     }
     ```
-- **Cek File Sebelum Unduh (Anti Double-Download):**
-  - Sebelum memicu `DownloadManager`, periksa apakah file APK untuk versi target sudah pernah diunduh dan valid di penyimpanan lokal. Jika sudah ada, langsung arahkan ke instalasi tanpa mengunduh ulang.
-- **Pantau Status DownloadManager:**
-  - Pantau progres download secara reaktif (`DownloadManager.STATUS_RUNNING`, `STATUS_SUCCESSFUL`, `STATUS_FAILED`) agar pengguna mendapat indikator unduhan yang jelas.
-- **Pemasangan Mandiri via FileProvider:**
-  - Pemicu instalasi wajib menggunakan `FileProvider` dengan intent `ACTION_VIEW` dan tipe MIME `application/vnd.android.package-archive`:
+
+- **PENANGANAN IZIN INSTALASI SUMBER TIDAK DIKENAL (REQUEST_INSTALL_PACKAGES):**
+  - Pada Android 8.0+ (API 26+), periksa `canRequestPackageInstalls()` sebelum memicu intent instalasi. Jika izin belum diberikan, arahkan pengguna ke menu pengaturan sistem secara mulus:
     ```kotlin
-    val contentUri = FileProvider.getUriForFile(context, "${context.packageName}.provider", apkFile)
-    val installIntent = Intent(Intent.ACTION_VIEW).apply {
-        setDataAndType(contentUri, "application/vnd.android.package-archive")
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+    fun installApk(context: Context, apkFile: File) {
+        if (!apkFile.exists() || apkFile.length() < 10_000_000) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !context.packageManager.canRequestPackageInstalls()) {
+            val settingsIntent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+                data = Uri.parse("package:${context.packageName}")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            context.startActivity(settingsIntent)
+            return
+        }
+        val authority = "${context.packageName}.provider"
+        val contentUri = FileProvider.getUriForFile(context, authority, apkFile)
+        val installIntent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(contentUri, "application/vnd.android.package-archive")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+        }
+        context.startActivity(installIntent)
     }
-    context.startActivity(installIntent)
     ```
-  - **JANGAN** melempar pengguna ke browser eksternal untuk mengunduh APK manual jika sudah ada in-app update.
+
+- **Pembersihan Otomatis File APK Lama (Anti-Sampah & Anti-Penumpukan APK):**
+  - **Auto-Cleanup Saat Cek & Unduh:** Sebelum memulai pengunduhan versi baru, `UpdateManager` **WAJIB** memindai direktori unduhan (`downloadDir`) dan menghapus seluruh file `.apk` serta sisa file `.part` usang dari versi sebelumnya.
+  - **Pemberian Tag Flavor pada Nama File:**
+    Gunakan format terisolasi: `app-${version}-${flavor}.apk` agar file antar-flavor (Root vs No-Root) tidak saling bertumpukan atau saling timpa.
+
+- **Komparasi Versi SemVer Numerik (Anti-Lexicographical String Bug):**
+  - **DILARANG KERAS** membandingkan versi sebagai string biasa (karena `"1.10.0" < "1.9.0"` bernilai `true` pada string lexicographical per-karakter).
+  - Wajib memecah segmen SemVer berdasarkan tanda titik (`.`), mem-parsing ke integer numerik, dan membandingkan secara hierarkis (Major -> Minor -> Patch).
+
+- **Tata Letak UI Card Update:**
+  - Komponen card update wajib menggunakan `Modifier.fillMaxWidth()` dengan penataan `Arrangement.SpaceBetween` agar tombol aksi "Install Sekarang" atau "Perbarui" selalu berada rapi di pojok kanan kartu.
 
 ---
 
@@ -279,17 +328,62 @@ Untuk menjamin aplikasi tidak pernah force close / crash akibat perubahan di sis
 - **DILARANG MEMBERIKAN DATA BOHONGAN / STATUS HALUSINASI:**
   - AI **DILARANG KERAS** mengklaim, menebak, atau berasumsi bahwa build CI sudah berhasil / APK rilis sudah terbit tanpa bukti nyata dari output perintah resmi (`gh run view`, `gh release view`, atau API GitHub).
   - Jika perintah status gagal dieksekusi (misal kendala PTY atau jaringan), AI wajib menyatakan secara transparan dan jujur bahwa status belum bisa diverifikasi, **BUKAN** mengarang bahwa build sudah sukses.
-- **Pembaruan Versi (Auto-Bump):**
-  - Setiap rilis baru, wajib menaikkan `versionCode` dan `versionName` di `app/build.gradle.kts`.
+- **Standar Industri Penomoran Versi (SemVer 2.0.0 & Canonical VersionCode):**
+  - **Aturan `versionName` (Semantic Versioning `MAJOR.MINOR.PATCH`):**
+    - **MAJOR (X.0.0):** Dinaikkan saat terjadi perubahan arsitektur fundamental, perombakan framework besar (misal: migrasi runtime, perombakan navigasi total), atau rilis fitur besar yang mengubah paradigma aplikasi.
+    - **MINOR (1.X.0):** Dinaikkan saat ada penambahan fitur fungsional baru (seperti Kitty Graphics, multi-session tab, Web IDE, background daemon support, dsb.) yang tetap kompatibel ke belakang.
+    - **PATCH (1.0.X):** Dinaikkan saat perbaikan bug, hotfix layout, pembersihan memory leak, atau penyesuaian styling minor.
+    - **LARANGAN KERAS PATCH JUMBO:** Dilarang keras menaikkan angka patch hingga puluhan atau ratusan secara liar (misal `1.0.95`..`1.0.100`) jika fitur-fitur baru sudah banyak ditambahkan. Segera naikkan ke Minor Version berikutnya (`1.1.0`, `1.2.0`, dst.) agar siklus rilis terlihat profesional dan sesuai standar software engineering global.
+  - **Formula Canonical `versionCode` Standar Google Play & Enterprise:**
+    - `versionCode` adalah integer 32-bit yang wajib strictly monotonic increasing (selalu bertambah naik).
+    - Gunakan formula standar industri berbasis SemVer untuk menjamin `versionCode` selalu terprediksi dan sinkron matematis dengan `versionName`:
+      $$\text{versionCode} = \text{MAJOR} \times 10000 + \text{MINOR} \times 100 + \text{PATCH}$$
+      *(Atau skema 2-digit patch / 3-digit patch)*
+    - Contoh pemetaan terstruktur:
+      - `1.0.0` $\rightarrow$ `versionCode = 10000`
+      - `1.0.5` $\rightarrow$ `versionCode = 10005`
+      - `1.1.0` $\rightarrow$ `versionCode = 10100`
+      - `1.2.3` $\rightarrow$ `versionCode = 10203`
+      - `2.0.0` $\rightarrow$ `versionCode = 20000`
+    - Pada proyek yang sudah terlanjur menggunakan integer build linier (misal build 100), pastikan kenaikan berikutnya bertransisi secara mulus ke skema canonical atau tetap bertambah `+1` secara strictly increasing tanpa pernah turun.
 - **Git Push Aman Tanpa Password Prompt:**
   - Dorong perubahan menggunakan GitHub Token agar tidak tergantung pada prompt interaktif:
     ```bash
     git push "https://$(gh auth token)@github.com/<owner>/<repo>.git" main
     ```
-- **Rilis Otomatis (Tanpa Double Build):**
-  - **JANGAN PERNAH** menggunakan `git push origin main --tags` atau membuat tag git secara manual di lokal.
-  - Cukup buat commit di branch `main` dengan pesan yang diawali kata `"Release v..."` (contoh: `git commit -m "Release v1.0.3 - Penambahan fitur..."`), lalu push ke `main`.
-  - Workflow GitHub Actions akan mendeteksi pesan commit ini, membangun signed APK, dan otomatis membuat GitHub Release serta Git Tag dalam satu siklus build.
+- **Rilis Otomatis & Standar Industri Changelog (Zero-Emoji & Anti-Release Note Kosong):**
+  - **LARANGAN KERAS RELEASE NOTE HANYA BERISI LINK GITHUB:**
+    **JANGAN PERNAH** membiarkan rilis GitHub Actions dan dialog in-app update aplikasi hanya menampilkan string hampa seperti:
+    `Full Changelog: https://github.com/owner/repo/compare/...`
+    Hal ini sangat tidak profesional dan membuat pengguna kebingungan mengenai fitur baru atau perbaikan apa saja yang ada di versi tersebut.
+  - **KEBIJAKAN BEBAS EMOJI (Zero-Emoji Policy):**
+    **DILARANG MENGGUNAKAN EMOJI DEKORATIF** (seperti 🚀, ✨, 📦, 🛠️, 🎉) pada release note, changelog, dan dialog rilis aplikasi. Gunakan gaya dokumentasi teknis formal standar industri (seperti gaya rilis Linux Kernel, Android AOSP, atau Apache Foundation) yang bersih, rapi, dan berbasis tipografi Markdown murni.
+  - **DILARANG KERAS MENG-HARDCODE TEKS PADA CHANGELOG (Zero-Hardcoded Changelog Policy):**
+    **JANGAN PERNAH** mengisi changelog dengan teks hardcode statis (seperti *"Performance improvements, bug fixes, and system stabilization"*). Seluruh poin changelog wajib **100% diekstrak secara dinamis** dari pesan commit rilis aktual dan riwayat git log riil sejak tag rilis sebelumnya.
+  - **Ekstraksi Changelog Dinamis di Workflow CI (`body_path` + `generate_release_notes`):**
+    Di dalam workflow GitHub Actions (`.github/workflows/build-apk.yml`), gunakan `actions/checkout@v4` dengan `fetch-depth: 0` agar seluruh riwayat git tersedia, dan panggil skrip modular `.github/scripts/generate_release_notes.py` (hindari inline script panjang di YAML yang rentan shell escaping):
+    ```yaml
+      - name: Generate Release Notes
+        if: steps.check_release.outputs.is_release == 'true'
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          REPO_NAME: ${{ github.repository }}
+          TAG_NAME: ${{ steps.check_release.outputs.tag }}
+        run: python3 .github/scripts/generate_release_notes.py
+
+      - name: Publish tagged release
+        if: steps.check_release.outputs.is_release == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.check_release.outputs.tag }}
+          name: DevBox ${{ steps.check_release.outputs.tag }}
+          body_path: release_notes.md
+          generate_release_notes: true
+          files: app/build/outputs/apk/release/*.apk
+    ```
+  - **Sinergi dengan In-App Updater:**
+    Karena `UpdateManager` di Android membaca field `body` dari GitHub Release API (`https://api.github.com/repos/.../releases/latest`), penyediaan `body_path` terstruktur di atas secara otomatis membuat dialog pembaruan in-app di HP pengguna menampilkan ringkasan changelog yang rapi, profesional, dan informatif.
+  - **JANGAN PERNAH** menggunakan `git push origin main --tags` atau membuat tag git manual di lokal; biarkan workflow CI yang membuat tag dan release otomatis dari pesan commit.
 - **Pemantauan Proaktif CI dengan Interval Mutlak 1 Menit (Anti-Boncos API):**
   - **ATURAN WAJIB KUOTA:** Pantau workflow build GitHub Actions dengan **interval tepat 60 detik (1 menit)** agar tidak menguras kuota GitHub API:
     ```bash
