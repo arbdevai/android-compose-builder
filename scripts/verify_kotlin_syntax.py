@@ -405,9 +405,10 @@ def check_kotlin_file(filepath):
     # =========================================================================
 
     # A. collectAsState() tanpa lifecycle
+    is_service_file = bool(re.search(r':\s*(?:InputMethodService|LifecycleService|Service|AccessibilityService)\b', content))
     for line_idx, line in enumerate(lines, 1):
         if re.search(r'\bcollectAsState\s*\(', line) and 'collectAsStateWithLifecycle' not in line:
-            if not is_line_suppressed(lines, line_idx, "lifecycle-flow"):
+            if not is_service_file and not is_line_suppressed(lines, line_idx, "lifecycle-flow"):
                 warnings.append(
                     f"{filepath}:{line_idx}: [Advisory] Penggunaan 'collectAsState()' terdeteksi. Disarankan beralih ke 'collectAsStateWithLifecycle()' agar Flow berhenti mengonsumsi RAM/CPU saat layar di background. (Gunakan '// @validator-ignore: lifecycle-flow' jika disengaja)."
                 )
@@ -490,7 +491,10 @@ def main():
                     pkg = m_pkg.group(1) if m_pkg else ""
                     for m in class_decl_re.finditer(txt):
                         cname = m.group(1)
-                        class_map[cname] = pkg
+                        if cname not in class_map:
+                            class_map[cname] = set()
+                        if pkg:
+                            class_map[cname].add(pkg)
                 except Exception:
                     pass
             elif f.endswith(".xml") and ("res/" in path or "AndroidManifest.xml" in path):
@@ -500,22 +504,49 @@ def main():
                     errors.append(err)
 
     # 8. Deteksi referensi class internal proyek tanpa import yang valid (Cross-Reference Resolution) (HARD ERROR)
+    local_decl_re = re.compile(r'^\s*(?:@\w+\s+)*(?:data\s+class|class|object|interface|enum\s+class|fun(?:\s+<[^>]+>)?)\s+([a-zA-Z0-9_]+)', re.MULTILINE)
     for path in kt_files:
         try:
             with open(path, "r", encoding="utf-8") as fp:
                 txt = fp.read()
             m_pkg = pkg_re.search(txt)
             cur_pkg = m_pkg.group(1) if m_pkg else ""
-            for cname, cpkg in class_map.items():
-                if not cpkg or cur_pkg == cpkg:
+
+            # Kumpulkan nama yang dideklarasikan secara lokal di file ini
+            local_names = set(m.group(1) for m in local_decl_re.finditer(txt))
+
+            for cname, pkgs in class_map.items():
+                if not pkgs:
+                    continue
+                # Jika nama ini dideklarasikan di file ini sendiri, tidak butuh import
+                if cname in local_names:
+                    continue
+                # Jika package file ini sama dengan salah satu package pemilik class, tidak butuh import
+                if cur_pkg in pkgs:
                     continue
                 if re.search(r'\b' + re.escape(cname) + r'\b', txt):
-                    direct_import = f"import {cpkg}.{cname}"
-                    wildcard_import = f"import {cpkg}.*"
-                    fqcn = f"{cpkg}.{cname}"
-                    if direct_import not in txt and wildcard_import not in txt and fqcn not in txt:
+                    # Cek apakah ada import yang valid
+                    has_valid_import = False
+                    for cpkg in pkgs:
+                        direct_import = f"import {cpkg}.{cname}"
+                        wildcard_import = f"import {cpkg}.*"
+                        fqcn = f"{cpkg}.{cname}"
+                        if direct_import in txt or wildcard_import in txt or fqcn in txt:
+                            has_valid_import = True
+                            break
+                    # Cek jika ada import eksplisit untuk class/fun bernama sama dari package lain
+                    if not has_valid_import:
+                        if re.search(r'^\s*import\s+[a-zA-Z0-9_.]+\.' + re.escape(cname) + r'\b', txt, re.MULTILINE):
+                            has_valid_import = True
+                    # Cek apakah disupresi via komentar validator-ignore
+                    if not has_valid_import:
+                        if "@validator-ignore: import" in txt or "@validator-ignore: imports" in txt:
+                            has_valid_import = True
+
+                    if not has_valid_import:
+                        pkg_list = " / ".join(sorted(pkgs))
                         errors.append(
-                            f"{path}: Memanggil class/object '{cname}' dari package '{cpkg}', tetapi tidak menemukan import '{direct_import}' atau '{wildcard_import}'."
+                            f"{path}: Memanggil class/object '{cname}' dari package '{pkg_list}', tetapi tidak menemukan import 'import {pkg_list}.{cname}' atau 'import {pkg_list}.*'."
                         )
         except Exception:
             pass

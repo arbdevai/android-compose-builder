@@ -524,7 +524,7 @@ local.properties
     script_dir = os.path.dirname(os.path.abspath(__file__))
     icon_script = os.path.join(script_dir, "generate_launcher_icons.py")
     if os.path.exists(icon_script):
-        subprocess.run([sys.executable, icon_script, res_dir], check=False)
+        subprocess.run([sys.executable, icon_script, res_dir, "--app-name", app_name], check=False)
 
     print(f"\nSelesai! Struktur proyek '{app_name}' berhasil dibuat.")
     print("Petunjuk Signing Release Keystore (Anti-Muter-Muter):")
