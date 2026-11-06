@@ -259,6 +259,10 @@ copy_skill_files() {
     cp "$SOURCE_DIR/SKILL.md" "$target_dir/SKILL.md"
     cp "$SOURCE_DIR"/scripts/*.py "$target_dir/scripts/"
     chmod +x "$target_dir"/scripts/*.py
+    if [ -d "$SOURCE_DIR/references" ]; then
+        mkdir -p "$target_dir/references"
+        cp -r "$SOURCE_DIR/references"/* "$target_dir/references/"
+    fi
 }
 
 deploy_skill() {

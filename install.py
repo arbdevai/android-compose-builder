@@ -47,6 +47,13 @@ def copy_skill(source_dir: Path, target_dir: Path):
         except Exception:
             pass
 
+    ref_source = source_dir / "references"
+    if ref_source.exists():
+        ref_target = target_dir / "references"
+        ref_target.mkdir(parents=True, exist_ok=True)
+        for ref_file in ref_source.glob("*.md"):
+            shutil.copy2(ref_file, ref_target / ref_file.name)
+
 def deploy_skill(source_dir: Path, target_dir: Path, use_symlink: bool = True):
     target_dir.parent.mkdir(parents=True, exist_ok=True)
     if target_dir.is_symlink():

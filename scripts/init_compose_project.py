@@ -520,7 +520,61 @@ local.properties
 *.iml
 """)
 
-    # 9. Panggil generate_launcher_icons.py
+    # 9. docs/PRD.md dan docs/STATE.md (Persistent Memory System)
+    docs_dir = os.path.join(target_dir, "docs")
+    os.makedirs(docs_dir, exist_ok=True)
+    prd_path = os.path.join(docs_dir, "PRD.md")
+    if not os.path.exists(prd_path):
+        with open(prd_path, "w") as fp:
+            fp.write(f"""# Product Requirement Document (PRD)
+
+## 1. Identitas Aplikasi
+- **Nama Aplikasi:** {app_name}
+- **Package Name:** {package_name}
+- **Min SDK / Target SDK:** 26 / 35 (Android 15 Ready)
+- **Arsitektur:** Single-Activity, Clean Architecture (Data -> Domain -> UI), Jetpack Compose Material3.
+
+## 2. Kebutuhan Teknis & Native
+- **Native Engine:** None
+- **Storage:** Room Database / DataStore
+- **Network / Hardware:** OkHttp / Retrofit
+
+## 3. Daftar Fitur Utama (Vertical Slices)
+- [ ] Fitur 1: Inisiasi UI Dashboard dan State Management
+- [ ] Fitur 2: Integrasi In-App Updater dengan streaming .part
+
+## 4. Batasan & Desain Sistem
+- Bebas AI slop (Nol pulsing green dot, nol marquee, nol glow).
+- Nol emoji di seluruh UI, microcopy, dan log.
+- Gunakan Vector Icons resmi Material3.
+- Shimmer skeleton loading untuk semua status tunggu.
+""")
+
+    state_path = os.path.join(docs_dir, "STATE.md")
+    if not os.path.exists(state_path):
+        with open(state_path, "w") as fp:
+            fp.write(f"""# Project State & Session Memory
+
+## Status Saat Ini
+- **Fase Aktif:** Fase 1 - Fondasi Proyek
+- **Versi Terakhir:** v1.0.0 (versionCode: 10000)
+- **Status CI Terakhir:** Ready for initial commit
+
+## Fitur yang Selesai Tuntas (Vertical Slices)
+- [x] Inisiasi struktur proyek Compose {app_name} ({package_name})
+- [x] Template CI/CD GitHub Actions dan Proguard rules
+- [x] Setup file persistent state dan PRD
+
+## Catatan Bug Terselesaikan & Workaround (Anti-Mengulang Masalah)
+- Belum ada catatan bug.
+
+## Tugas Aktif Selanjutnya (Next Actions)
+1. Tentukan kebutuhan spesifik fitur di `docs/PRD.md`.
+2. Implementasikan data layer dan ViewModel tuntas hingga Compose Screen.
+3. Jalankan `python3 scripts/verify_kotlin_syntax.py .` sebelum push.
+""")
+
+    # 10. Panggil generate_launcher_icons.py
     script_dir = os.path.dirname(os.path.abspath(__file__))
     icon_script = os.path.join(script_dir, "generate_launcher_icons.py")
     if os.path.exists(icon_script):

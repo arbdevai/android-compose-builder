@@ -1,1408 +1,567 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark scroll-smooth">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Android Compose Builder — Zero Local Build APK Engineering Standard</title>
   <meta name="description" content="Standar Rekayasa AI Agent untuk bikin aplikasi Android Kotlin + Jetpack Compose tanpa build lokal. 100% kompilasi cloud via GitHub Actions.">
-  <link rel="icon" type="image/svg+xml" href="../assets/icons/install.svg">
+  <link rel="icon" type="image/svg+xml" href="assets/icons/install.svg">
   
+  <!-- Google Fonts: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <style>
-    :root {
-      --bg-dark: #090C0F;
-      --bg-card: #101519;
-      --bg-card-hover: #151C22;
-      --border-subtle: #1C252F;
-      --border-bright: #2A3847;
-      --lime-neon: #CCFF00;
-      --lime-glow: rgba(204, 255, 0, 0.18);
-      --mint: #3DDC84;
-      --mint-glow: rgba(61, 220, 132, 0.15);
-      --text-main: #F8FAFC;
-      --text-muted: #94A3B8;
-      --text-dim: #64748B;
-      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
-      --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
-      --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      font-family: var(--font-sans);
-      overflow-x: hidden;
-      max-width: 100vw;
-    }
-
-    body {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      background-color: var(--bg-dark);
-      overflow-x: hidden;
-      max-width: 100vw;
-    }
-
-    /* Ambient Canvas */
-    #bg-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.65;
-    }
-
-    /* Content Wrapper */
-    .content-wrapper {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      width: 100%;
-      max-width: 100vw;
-      overflow-x: hidden;
-      min-width: 0;
-    }
-
-    .content-wrapper > * {
-      width: 100%;
-      max-width: 100%;
-      min-width: 0;
-      box-sizing: border-box;
-    }
-
-    section {
-      width: 100%;
-      max-width: 100%;
-      min-width: 0;
-      box-sizing: border-box;
-    }
-
-    /* Top Navigation Bar */
-    header.site-header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      background: rgba(9, 12, 15, 0.85);
-      border-bottom: 1px solid var(--border-subtle);
-      transition: border-color 0.3s ease;
-    }
-
-    .nav-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0.85rem 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .brand-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      text-decoration: none;
-      color: var(--text-main);
-      font-weight: 700;
-      font-size: 1.05rem;
-      letter-spacing: -0.3px;
-    }
-
-    .brand-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.25rem 0.6rem;
-      background: #141D16;
-      border: 1px solid var(--lime-neon);
-      border-radius: 6px;
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--lime-neon);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      box-shadow: 0 0 12px var(--lime-glow);
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 1.75rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      text-decoration: none;
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      font-weight: 500;
-      transition: color 0.25s ease, transform 0.2s var(--ease-spring);
-      position: relative;
-    }
-
-    .nav-links a:hover {
-      color: var(--text-main);
-      transform: translateY(-1px);
-    }
-
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: -4px;
-      left: 0;
-      width: 0%;
-      height: 2px;
-      background: var(--lime-neon);
-      transition: width 0.3s var(--ease-spring);
-      border-radius: 2px;
-    }
-
-    .nav-links a:hover::after {
-      width: 100%;
-    }
-
-    .nav-cta-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: #12181F;
-      border: 1px solid var(--border-bright);
-      border-radius: 8px;
-      color: var(--lime-neon);
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.3s var(--ease-spring);
-    }
-
-    .nav-cta-btn:hover {
-      background: var(--lime-neon);
-      color: #0A0D10;
-      border-color: var(--lime-neon);
-      box-shadow: 0 0 20px var(--lime-glow);
-      transform: translateY(-2px);
-    }
-
-    .mobile-menu-toggle {
-      display: none;
-      background: none;
-      border: none;
-      color: var(--text-main);
-      cursor: pointer;
-      padding: 0.5rem;
-    }
-
-    /* Hero Section */
-    section.hero-section {
-      width: 100%;
-      max-width: 1200px;
-      min-width: 0;
-      padding: 5rem 1.5rem 3.5rem;
-      margin: 0 auto;
-      text-align: center;
-      position: relative;
-      box-sizing: border-box;
-    }
-
-    .hero-badge-wrap {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: rgba(20, 27, 33, 0.9);
-      border: 1px solid var(--border-bright);
-      padding: 0.4rem 0.9rem;
-      border-radius: 999px;
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      margin-bottom: 1.75rem;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-      animation: floatBadge 4s ease-in-out infinite;
-    }
-
-    @keyframes floatBadge {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-4px); }
-    }
-
-    .hero-badge-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--lime-neon);
-      box-shadow: 0 0 8px var(--lime-neon);
-      animation: pulseDot 2s infinite;
-    }
-
-    @keyframes pulseDot {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.85); }
-    }
-
-    .hero-title {
-      font-size: clamp(2.2rem, 5.5vw, 4.2rem);
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -1.5px;
-      margin-bottom: 1.5rem;
-      color: #FFFFFF;
-    }
-
-    .hero-title span.lime-highlight {
-      color: var(--lime-neon);
-      position: relative;
-      display: inline-block;
-    }
-
-    .hero-subtitle {
-      font-size: clamp(1.05rem, 2.2vw, 1.35rem);
-      font-weight: 400;
-      line-height: 1.6;
-      color: var(--text-muted);
-      max-width: 760px;
-      margin: 0 auto 2.5rem;
-    }
-
-    /* Terminal Copy Bar */
-    .terminal-install-box {
-      width: 100%;
-      max-width: 680px;
-      margin: 0 auto 3rem;
-      background: #0E1317;
-      border: 1px solid var(--border-bright);
-      border-radius: 12px;
-      padding: 0.6rem 0.75rem 0.6rem 1.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 24px rgba(204, 255, 0, 0.05);
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-      box-sizing: border-box;
-    }
-
-    .terminal-install-box:hover {
-      border-color: var(--lime-neon);
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 32px var(--lime-glow);
-    }
-
-    .terminal-cmd {
-      font-family: var(--font-mono);
-      font-size: clamp(0.78rem, 1.8vw, 0.92rem);
-      color: #E2E8F0;
-      white-space: nowrap;
-      overflow-x: auto;
-      scrollbar-width: none;
-      min-width: 0;
-      max-width: 100%;
-    }
-
-    .terminal-cmd::-webkit-scrollbar {
-      display: none;
-    }
-
-    .terminal-cmd span.prompt {
-      color: var(--lime-neon);
-      font-weight: 700;
-      margin-right: 0.5rem;
-    }
-
-    .copy-button {
-      background: #18222A;
-      color: var(--lime-neon);
-      border: 1px solid rgba(204, 255, 0, 0.3);
-      padding: 0.6rem 1.1rem;
-      border-radius: 8px;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      transition: all 0.25s var(--ease-spring);
-      flex-shrink: 0;
-    }
-
-    .copy-button:hover {
-      background: var(--lime-neon);
-      color: #0A0D10;
-      border-color: var(--lime-neon);
-      transform: scale(1.03);
-      box-shadow: 0 0 16px var(--lime-glow);
-    }
-
-    .copy-button:active {
-      transform: scale(0.97);
-    }
-
-    /* Comparison Section: Local vs Cloud */
-    section.comparison-section {
-      max-width: 1100px;
-      margin: 0 auto 5rem;
-      padding: 0 1.5rem;
-    }
-
-    .section-header {
-      text-align: center;
-      margin-bottom: 3rem;
-    }
-
-    .section-tag {
-      display: inline-block;
-      font-family: var(--font-mono);
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--lime-neon);
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
-      margin-bottom: 0.5rem;
-    }
-
-    .section-title {
-      font-size: clamp(1.75rem, 3.5vw, 2.5rem);
-      font-weight: 800;
-      letter-spacing: -0.8px;
-      margin-bottom: 0.75rem;
-    }
-
-    .section-desc {
-      color: var(--text-muted);
-      font-size: 1.05rem;
-      max-width: 650px;
-      margin: 0 auto;
-    }
-
-    .comparison-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-    }
-
-    @media (max-width: 768px) {
-      .comparison-grid {
-        grid-template-columns: 1fr;
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            charcoal: {
+              950: '#07090C',
+              900: '#0B0E12',
+              850: '#101419',
+              800: '#151B22',
+              700: '#1E2631',
+              600: '#2A3644',
+            },
+            lime: {
+              neon: '#CCFF00',
+              glow: 'rgba(204, 255, 0, 0.2)',
+              mint: '#3DDC84',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          animation: {
+            'shimmer': 'shimmer 2s infinite linear',
+            'float': 'float 4s ease-in-out infinite',
+            'pulse-glow': 'pulseGlow 2.5s ease-in-out infinite',
+          },
+          keyframes: {
+            shimmer: {
+              '0%': { transform: 'translateX(-100%)' },
+              '100%': { transform: 'translateX(100%)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' },
+            },
+            pulseGlow: {
+              '0%, 100%': { opacity: '0.4' },
+              '50%': { opacity: '0.85' },
+            }
+          }
+        }
       }
     }
+  </script>
 
-    .comparison-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      padding: 2rem;
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B0E12;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1E2631;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #CCFF00;
+    }
+
+    /* Bento Spotlight Hover Card Effect */
+    .bento-card {
+      position: relative;
+      background: #101419;
+      border: 1px solid #1E2631;
+      border-radius: 1rem;
+      overflow: hidden;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .bento-card:hover {
+      border-color: rgba(204, 255, 0, 0.45);
+      transform: translateY(-3px);
+      box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.7), 0 0 24px rgba(204, 255, 0, 0.08);
+    }
+
+    /* Skeleton Animation */
+    .skeleton-box {
       position: relative;
       overflow: hidden;
-      transition: all 0.4s var(--ease-spring);
+      background: #18202A;
     }
-
-    .comparison-card.bad {
-      border-color: #2D1A1E;
-      background: #110D0F;
-    }
-
-    .comparison-card.good {
-      border-color: rgba(204, 255, 0, 0.4);
-      background: #0E1511;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 30px rgba(204, 255, 0, 0.04);
-    }
-
-    .comparison-card.good:hover {
-      transform: translateY(-4px);
-      border-color: var(--lime-neon);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 40px var(--lime-glow);
-    }
-
-    .comparison-badge {
-      display: inline-block;
-      padding: 0.35rem 0.8rem;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-family: var(--font-mono);
-      font-weight: 700;
-      margin-bottom: 1.25rem;
-    }
-
-    .bad .comparison-badge {
-      background: #3B1219;
-      color: #F87171;
-    }
-
-    .good .comparison-badge {
-      background: #182B14;
-      color: var(--lime-neon);
-    }
-
-    .comparison-card h3 {
-      font-size: 1.35rem;
-      margin-bottom: 1rem;
-      font-weight: 700;
-    }
-
-    .comparison-card ul {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.85rem;
-    }
-
-    .comparison-card li {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.65rem;
-      font-size: 0.92rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-
-    .comparison-card li svg {
-      flex-shrink: 0;
-      margin-top: 3px;
-    }
-
-    /* Visual Architecture Pipeline */
-    section.pipeline-section {
-      max-width: 1200px;
-      margin: 0 auto 5rem;
-      padding: 0 1.5rem;
-    }
-
-    .pipeline-wrapper {
-      background: var(--bg-card);
-      border: 1px solid var(--border-bright);
-      border-radius: 16px;
-      padding: 2.5rem 2rem;
-      position: relative;
-    }
-
-    .pipeline-steps {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr auto 1fr;
-      align-items: center;
-      gap: 1rem;
-      margin-top: 2rem;
-    }
-
-    @media (max-width: 900px) {
-      .pipeline-steps {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-      }
-      .pipeline-arrow {
-        transform: rotate(90deg);
-        margin: 0 auto;
-      }
-    }
-
-    .pipeline-node {
-      background: #0B0E12;
-      border: 1px solid var(--border-bright);
-      border-radius: 12px;
-      padding: 1.5rem;
-      position: relative;
-      transition: all 0.35s var(--ease-spring);
-    }
-
-    .pipeline-node:hover {
-      border-color: var(--lime-neon);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px var(--lime-glow);
-    }
-
-    .pipeline-node .node-step {
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--lime-neon);
-      margin-bottom: 0.5rem;
-      letter-spacing: 0.5px;
-    }
-
-    .pipeline-node h4 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      color: #FFFFFF;
-    }
-
-    .pipeline-node p {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-
-    .pipeline-arrow {
-      color: var(--lime-neon);
-      display: flex;
-      justify-content: center;
-      opacity: 0.7;
-    }
-
-    /* 9 Engineering Pillars Grid */
-    section.pillars-section {
-      max-width: 1200px;
-      margin: 0 auto 5rem;
-      padding: 0 1.5rem;
-    }
-
-    .pillars-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 1.25rem;
-    }
-
-    .pillar-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 14px;
-      padding: 1.75rem;
-      transition: all 0.35s var(--ease-spring);
-      position: relative;
-    }
-
-    .pillar-card:hover {
-      background: var(--bg-card-hover);
-      border-color: rgba(204, 255, 0, 0.4);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4), 0 0 20px var(--lime-glow);
-    }
-
-    .pillar-header {
-      display: flex;
-      align-items: center;
-      gap: 0.85rem;
-      margin-bottom: 1rem;
-    }
-
-    .pillar-icon-box {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
-      background: #151D24;
-      border: 1px solid var(--border-bright);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: all 0.3s ease;
-    }
-
-    .pillar-card:hover .pillar-icon-box {
-      border-color: var(--lime-neon);
-      background: #1C261B;
-    }
-
-    .pillar-card h4 {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #FFFFFF;
-      letter-spacing: -0.3px;
-    }
-
-    .pillar-card p {
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
-
-    /* Interactive CLI Switcher */
-    section.cli-section {
-      max-width: 900px;
-      margin: 0 auto 5rem;
-      padding: 0 1.5rem;
-    }
-
-    .cli-tabs {
-      display: flex;
-      gap: 0.5rem;
-      background: #0E1317;
-      border: 1px solid var(--border-bright);
-      padding: 0.35rem;
-      border-radius: 10px;
-      margin-bottom: 1.5rem;
-      overflow-x: auto;
-    }
-
-    .cli-tab-btn {
-      flex: 1;
-      min-width: 140px;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-family: var(--font-mono);
-      font-size: 0.82rem;
-      font-weight: 600;
-      padding: 0.65rem 1rem;
-      border-radius: 7px;
-      cursor: pointer;
-      transition: all 0.25s var(--ease-spring);
-      text-align: center;
-    }
-
-    .cli-tab-btn.active {
-      background: var(--lime-neon);
-      color: #0A0D10;
-      box-shadow: 0 2px 10px var(--lime-glow);
-    }
-
-    .cli-panel {
-      display: none;
-      background: #0B0E12;
-      border: 1px solid var(--border-bright);
-      border-radius: 12px;
-      padding: 1.5rem;
-      font-family: var(--font-mono);
-      font-size: 0.88rem;
-      position: relative;
-    }
-
-    .cli-panel.active {
-      display: block;
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .cli-code-block {
-      color: #CBD5E1;
-      line-height: 1.7;
-      white-space: pre-wrap;
-    }
-
-    .cli-code-block span.comment {
-      color: var(--text-dim);
-    }
-
-    .cli-code-block span.kw {
-      color: var(--lime-neon);
-      font-weight: 600;
-    }
-
-    /* Footer */
-    footer.site-footer {
-      border-top: 1px solid var(--border-subtle);
-      background: #080A0D;
-      padding: 3.5rem 1.5rem 2.5rem;
-      margin-top: auto;
-    }
-
-    .footer-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-    }
-
-    .footer-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-    }
-
-    .footer-copy {
-      font-size: 0.85rem;
-      color: var(--text-dim);
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 1.5rem;
-      list-style: none;
-    }
-
-    .footer-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 0.85rem;
-      transition: color 0.2s ease;
-    }
-
-    .footer-links a:hover {
-      color: var(--lime-neon);
-    }
-
-    /* Mobile Nav Drawer */
-    .mobile-nav-drawer {
-      display: none;
-      background: #0D1216;
-      border-bottom: 1px solid var(--border-bright);
-      padding: 1rem 1.5rem;
-    }
-
-    .mobile-nav-drawer.open {
-      display: block;
-      animation: slideDown 0.3s var(--ease-spring);
-    }
-
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .mobile-nav-drawer ul {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.85rem;
-    }
-
-    .mobile-nav-drawer a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 0.95rem;
-      display: block;
-      padding: 0.4rem 0;
-    }
-
-    /* =========================================================================
-       Mobile Responsive Refinements (Pixel-Perfect Layout on Screens < 768px)
-       ========================================================================= */
-    @media (max-width: 768px) {
-      .nav-links, .nav-cta-btn {
-        display: none;
-      }
-
-      .mobile-menu-toggle {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 38px;
-        height: 38px;
-        border-radius: 8px;
-        background: #12181F;
-        border: 1px solid var(--border-bright);
-        color: var(--text-main);
-        cursor: pointer;
-        transition: all 0.2s var(--ease-spring);
-      }
-
-      .mobile-menu-toggle:active {
-        transform: scale(0.92);
-        background: #18222B;
-      }
-
-      .nav-container {
-        padding: 0.75rem 1rem;
-      }
-
-      .brand-logo {
-        font-size: 0.94rem;
-        gap: 0.5rem;
-      }
-
-      .brand-badge {
-        font-size: 0.65rem;
-        padding: 0.15rem 0.45rem;
-      }
-
-      section.hero-section {
-        padding: 3rem 1.15rem 2.25rem;
-      }
-
-      .hero-badge-wrap {
-        font-size: 0.74rem;
-        padding: 0.35rem 0.75rem;
-        max-width: 100%;
-        line-height: 1.35;
-        margin-bottom: 1.35rem;
-      }
-
-      .hero-title {
-        font-size: clamp(1.95rem, 7.5vw, 2.75rem);
-        letter-spacing: -0.8px;
-        margin-bottom: 1rem;
-      }
-
-      .hero-subtitle {
-        font-size: 0.95rem;
-        line-height: 1.55;
-        margin-bottom: 2rem;
-      }
-
-      .terminal-install-box {
-        width: 100%;
-        max-width: 100%;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.85rem;
-        padding: 0.9rem 1rem;
-        margin-bottom: 2rem;
-        box-sizing: border-box;
-      }
-
-      .terminal-cmd {
-        min-width: 0;
-        max-width: 100%;
-        width: 100%;
-        font-size: 0.82rem;
-        overflow-x: auto;
-        white-space: nowrap;
-        padding-bottom: 0.25rem;
-        box-sizing: border-box;
-      }
-
-      .copy-button {
-        width: 100%;
-        justify-content: center;
-        padding: 0.65rem 1rem;
-        font-size: 0.84rem;
-      }
-
-      section.comparison-section,
-      section.pipeline-section,
-      section.pillars-section,
-      section.cli-section {
-        margin-bottom: 3.5rem;
-        padding: 0 1.15rem;
-      }
-
-      .section-header {
-        margin-bottom: 2rem;
-      }
-
-      .section-title {
-        font-size: 1.65rem;
-        letter-spacing: -0.5px;
-      }
-
-      .section-desc {
-        font-size: 0.92rem;
-      }
-
-      .comparison-grid {
-        grid-template-columns: 1fr;
-        gap: 1.15rem;
-      }
-
-      .comparison-card {
-        padding: 1.4rem 1.15rem;
-        border-radius: 14px;
-      }
-
-      .comparison-card h3 {
-        font-size: 1.18rem;
-      }
-
-      .comparison-card li {
-        font-size: 0.88rem;
-        gap: 0.55rem;
-      }
-
-      .pipeline-wrapper {
-        padding: 1.6rem 1.15rem;
-        border-radius: 14px;
-      }
-
-      .pipeline-steps {
-        grid-template-columns: 1fr;
-        gap: 0.75rem;
-        margin-top: 1.25rem;
-      }
-
-      .pipeline-node {
-        padding: 1.15rem 1rem;
-        border-radius: 10px;
-      }
-
-      .pipeline-arrow {
-        transform: rotate(90deg);
-        margin: 0.2rem auto;
-      }
-
-      .pillars-grid {
-        grid-template-columns: 1fr;
-        gap: 0.85rem;
-      }
-
-      .pillar-card {
-        padding: 1.25rem 1.1rem;
-        border-radius: 12px;
-      }
-
-      .pillar-header {
-        gap: 0.75rem;
-        margin-bottom: 0.65rem;
-      }
-
-      .pillar-icon-box {
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
-      }
-
-      .pillar-card h4 {
-        font-size: 0.98rem;
-      }
-
-      .pillar-card p {
-        font-size: 0.85rem;
-        line-height: 1.55;
-      }
-
-      .cli-tabs {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.4rem;
-        padding: 0.3rem;
-      }
-
-      .cli-tab-btn {
-        min-width: 0;
-        padding: 0.6rem 0.4rem;
-        font-size: 0.76rem;
-        text-align: center;
-      }
-
-      .cli-panel {
-        padding: 1.15rem 1rem;
-        border-radius: 10px;
-      }
-
-      .cli-code-block {
-        font-size: 0.78rem;
-        line-height: 1.6;
-        word-break: break-word;
-      }
-
-      footer.site-footer {
-        padding: 2.5rem 1.15rem 2rem;
-      }
-
-      .footer-top {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1.25rem;
-      }
-
-      .footer-links {
-        flex-wrap: wrap;
-        gap: 0.75rem 1.25rem;
-      }
-
-      .footer-copy {
-        font-size: 0.8rem;
-        line-height: 1.5;
-      }
-    }
-
-    @media (max-width: 420px) {
-      .brand-logo {
-        font-size: 0.88rem;
-      }
-
-      .brand-badge {
-        display: none;
-      }
-
-      .hero-title {
-        font-size: 1.85rem;
-      }
-
-      .cli-tab-btn {
-        font-size: 0.72rem;
-        padding: 0.55rem 0.25rem;
-      }
+    .skeleton-box::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(90deg, transparent, rgba(204, 255, 0, 0.12), transparent);
+      animation: shimmer 1.8s infinite;
     }
   </style>
 </head>
-<body>
+<body class="bg-charcoal-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-lime-neon selection:text-charcoal-950 overflow-x-hidden w-full max-w-full">
 
-  <!-- Ambient Physics Canvas Background -->
-  <canvas id="bg-canvas"></canvas>
+  <!-- Ambient Interactive Canvas Background -->
+  <canvas id="bg-canvas" class="fixed inset-0 pointer-events-none z-0 opacity-50"></canvas>
 
-  <div class="content-wrapper">
-    <!-- Header Navigation -->
-    <header class="site-header">
-      <div class="nav-container">
-        <a href="#" class="brand-logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <polygon points="13 2 4 14 11 14 10 22 20 10 13 10 13 2" fill="#CCFF00" stroke="#CCFF00" stroke-width="1.5" stroke-linejoin="round"/>
-          </svg>
-          Android Compose Builder
-          <span class="brand-badge">Cloud CI</span>
+  <div class="relative z-10 flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
+    
+    <!-- Top Sticky Navigation -->
+    <header class="sticky top-0 z-50 backdrop-blur-xl bg-charcoal-950/85 border-b border-charcoal-700/80 transition-colors">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        
+        <!-- Brand Logo -->
+        <a href="#" class="flex items-center gap-2.5 min-w-0 group">
+          <div class="w-8 h-8 rounded-lg bg-charcoal-850 border border-charcoal-700 flex items-center justify-center flex-shrink-0 group-hover:border-lime-neon transition-colors shadow-sm">
+            <svg class="w-4 h-4 text-lime-neon" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="13 2 4 14 11 14 10 22 20 10 13 10 13 2" />
+            </svg>
+          </div>
+          <span class="font-bold text-sm sm:text-base tracking-tight truncate text-slate-100 group-hover:text-white transition-colors">
+            Android Compose <span class="text-lime-neon font-black">Builder</span>
+          </span>
+          <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-lime-neon/10 text-lime-neon border border-lime-neon/30 uppercase tracking-wider">
+            Cloud CI
+          </span>
         </a>
 
-        <ul class="nav-links">
-          <li><a href="#overview">Konsep Inti</a></li>
-          <li><a href="#pipeline">Alur Produksi</a></li>
-          <li><a href="#pillars">9 Standar</a></li>
-          <li><a href="#compatibility">Multi-CLI</a></li>
-        </ul>
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden md:flex items-center gap-6">
+          <a href="#bento" class="text-xs lg:text-sm font-medium text-slate-400 hover:text-lime-neon transition-colors">Bento Features</a>
+          <a href="#pipeline" class="text-xs lg:text-sm font-medium text-slate-400 hover:text-lime-neon transition-colors">Alur Cloud CI</a>
+          <a href="#cli" class="text-xs lg:text-sm font-medium text-slate-400 hover:text-lime-neon transition-colors">Multi-CLI</a>
+          <a href="https://github.com/arbdevai/android-compose-builder" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs lg:text-sm font-mono font-semibold bg-charcoal-850 hover:bg-lime-neon text-lime-neon hover:text-charcoal-950 border border-charcoal-600 hover:border-lime-neon transition-all duration-200 hover:scale-105 shadow-sm">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+            GitHub
+          </a>
+        </nav>
 
-        <a href="https://github.com/arbdevai/android-compose-builder" target="_blank" class="nav-cta-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-          </svg>
-          GitHub Repo
-        </a>
-
-        <button class="mobile-menu-toggle" id="menuToggle" aria-label="Toggle menu">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
+        <!-- Mobile Menu Hamburger Button -->
+        <button id="mobileMenuBtn" aria-label="Toggle Navigation" class="md:hidden p-2 rounded-lg bg-charcoal-850 border border-charcoal-700 text-slate-200 hover:text-lime-neon hover:border-lime-neon transition-colors focus:outline-none">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
           </svg>
         </button>
       </div>
 
       <!-- Mobile Navigation Drawer -->
-      <div class="mobile-nav-drawer" id="mobileDrawer">
-        <ul>
-          <li><a href="#overview" class="mobile-nav-link">Konsep Inti</a></li>
-          <li><a href="#pipeline" class="mobile-nav-link">Alur Produksi</a></li>
-          <li><a href="#pillars" class="mobile-nav-link">9 Standar</a></li>
-          <li><a href="#compatibility" class="mobile-nav-link">Multi-CLI</a></li>
-          <li><a href="https://github.com/arbdevai/android-compose-builder" target="_blank" style="color: var(--lime-neon);">Lihat di GitHub →</a></li>
-        </ul>
+      <div id="mobileDrawer" class="hidden md:hidden bg-charcoal-900 border-b border-charcoal-700 px-4 py-3 space-y-2.5 transition-all">
+        <a href="#bento" class="block py-2 text-sm font-medium text-slate-300 hover:text-lime-neon">Bento Features</a>
+        <a href="#pipeline" class="block py-2 text-sm font-medium text-slate-300 hover:text-lime-neon">Alur Cloud CI</a>
+        <a href="#cli" class="block py-2 text-sm font-medium text-slate-300 hover:text-lime-neon">Multi-CLI</a>
+        <a href="https://github.com/arbdevai/android-compose-builder" target="_blank" class="block py-2 text-sm font-semibold text-lime-neon">Lihat di GitHub →</a>
       </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero-section">
-      <div class="hero-badge-wrap">
-        <span class="hero-badge-dot"></span>
-        <span>Google Dev Agent Engineering Standard • Kotlin 2.0+</span>
-      </div>
+    <!-- Main Content Container -->
+    <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 space-y-16 sm:space-y-24">
 
-      <h1 class="hero-title">
-        Bikin APK Android Modern<br>
-        <span class="lime-highlight">Tanpa Build Lokal</span>
-      </h1>
-
-      <p class="hero-subtitle">
-        Tulis kode Jetpack Compose &amp; verifikasi sintaks di devbox ringan Anda. Seluruh proses berat kompilasi Gradle, signing APK, dan rilis didelegasikan 100% ke GitHub Actions runner cloud.
-      </p>
-
-      <!-- 1-Line Command Box -->
-      <div class="terminal-install-box">
-        <div class="terminal-cmd">
-          <span class="prompt">$</span>curl -fsSL https://raw.githubusercontent.com/arbdevai/android-compose-builder/main/install.sh | bash
-        </div>
-        <button class="copy-button" id="copyBtn" aria-label="Salin perintah instalasi">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-          </svg>
-          <span id="copyText">Salin</span>
-        </button>
-      </div>
-    </section>
-
-    <!-- Comparison Section: Local vs Cloud CI -->
-    <section class="comparison-section" id="overview">
-      <div class="section-header">
-        <span class="section-tag">Paradigma Rekayasa</span>
-        <h2 class="section-title">Mengapa Nol Kompilasi Lokal?</h2>
-        <p class="section-desc">Bandingkan beban lingkungan kerja konvensional dengan arsitektur cloud headless yang diadopsi skill ini.</p>
-      </div>
-
-      <div class="comparison-grid">
-        <!-- Conventional Card -->
-        <div class="comparison-card bad">
-          <span class="comparison-badge">Konvensional (Lokal Berat)</span>
-          <h3>Kompilasi Gradle Lokal</h3>
-          <ul>
-            <li>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-              <span>Wajib pasang Android Studio &amp; Android SDK (~15 - 30 GB storage).</span>
-            </li>
-            <li>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-              <span>Gradle daemon menyedot 8 - 16 GB RAM hingga container macet / OOM crash.</span>
-            </li>
-            <li>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-              <span>Tidak fleksibel di container ringan, devbox remote, atau laptop berspesifikasi standar.</span>
-            </li>
-            <li>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-              <span>Konfigurasi manual keystore lokal yang rentan bocor dan sulit disinkronkan.</span>
-            </li>
-          </ul>
+      <!-- Hero Section -->
+      <section class="text-center space-y-6 max-w-4xl mx-auto pt-4">
+        
+        <!-- Status Pill -->
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-charcoal-850 border border-charcoal-700 text-xs sm:text-sm text-slate-300 shadow-sm animate-float">
+          <span class="w-2 h-2 rounded-full bg-lime-neon animate-ping"></span>
+          <span class="font-mono text-lime-neon font-semibold">ZERO LOCAL BUILD</span>
+          <span class="text-slate-500">•</span>
+          <span>Google Dev Agent Engineering Standard</span>
         </div>
 
-        <!-- Android Compose Builder Card -->
-        <div class="comparison-card good">
-          <span class="comparison-badge">Android Compose Builder</span>
-          <h3>100% Cloud CI Delegation</h3>
-          <ul>
-            <li>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CCFF00" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-              <span><strong>0 MB SDK Lokal:</strong> Devbox Anda tetap bersih, ringan, dan responsif.</span>
-            </li>
-            <li>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CCFF00" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-              <span><strong>Pre-Flight Linter Kilat:</strong> Cek tanda kurung, coroutine suspend, dan leak dalam 20 milidetik.</span>
-            </li>
-            <li>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CCFF00" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-              <span><strong>GitHub Actions Runners:</strong> Headless JDK, cache dependensi berkecepatan tinggi, dan rilis otomatis.</span>
-            </li>
-            <li>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CCFF00" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-              <span><strong>Auto-Signed Keystore:</strong> 1-click upload 4 signing secret ke GitHub Secrets via CLI.</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </section>
+        <!-- Headline -->
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
+          Bikin APK Android Modern<br class="hidden sm:inline">
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-lime-neon via-lime-mint to-emerald-400">
+            Tanpa Kompilasi Lokal
+          </span>
+        </h1>
 
-    <!-- Pipeline Section -->
-    <section class="pipeline-section" id="pipeline">
-      <div class="pipeline-wrapper">
-        <div class="section-header" style="margin-bottom: 1.5rem;">
-          <span class="section-tag">Arsitektur Alur Produksi</span>
-          <h2 class="section-title">Dari Baris Kode ke APK Siap Pakai</h2>
-          <p class="section-desc">Pemisahan tegas antara ranah rekayasa kode lokal dan kompilasi cloud.</p>
-        </div>
+        <!-- Subheading -->
+        <p class="text-base sm:text-lg lg:text-xl text-slate-400 font-normal max-w-2xl mx-auto leading-relaxed">
+          Tulis kode Kotlin &amp; Jetpack Compose di devbox ringan Anda. Biarkan runner cloud GitHub Actions yang melakukan kompilasi headless Gradle, auto-signing, dan merilis signed APK produksi.
+        </p>
 
-        <div class="pipeline-steps">
-          <!-- Step 1 -->
-          <div class="pipeline-node">
-            <div class="node-step">01 // LOCAL WORKSPACE</div>
-            <h4>Tulis &amp; Linter</h4>
-            <p>Rancang UI Jetpack Compose &amp; ViewModel. Jalankan <code>verify_kotlin_syntax.py</code> untuk memastikan kode 100% bebas error CI.</p>
-          </div>
-
-          <!-- Arrow 1 -->
-          <div class="pipeline-arrow">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-          </div>
-
-          <!-- Step 2 -->
-          <div class="pipeline-node">
-            <div class="node-step">02 // GIT DELEGATION</div>
-            <h4>Commit &amp; Push</h4>
-            <p>Commit dengan format <code>Release v1.0.0</code> lalu push ke branch <code>main</code>. Workflow mendeteksi dan memicu runner cloud.</p>
-          </div>
-
-          <!-- Arrow 2 -->
-          <div class="pipeline-arrow">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-          </div>
-
-          <!-- Step 3 -->
-          <div class="pipeline-node">
-            <div class="node-step">03 // GITHUB ACTIONS RUNNER</div>
-            <h4>Cloud Build &amp; Release</h4>
-            <p>Kompilasi headless, signing APK dengan release keystore rahasia, ekstraksi changelog dinamis, dan terbit di GitHub Release.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 9 Engineering Pillars -->
-    <section class="pillars-section" id="pillars">
-      <div class="section-header">
-        <span class="section-tag">Standar Rekayasa</span>
-        <h2 class="section-title">9 Pilar Kualitas Tingkat Industri</h2>
-        <p class="section-desc">Aturan wajib yang diinstruksikan kepada AI agent untuk mencegah cacat kode di lingkungan produksi.</p>
-      </div>
-
-      <div class="pillars-grid">
-        <!-- Pillar 1 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CCFF00" stroke-width="1.8"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+        <!-- Interactive 1-Line Terminal Install Box -->
+        <div class="w-full max-w-2xl mx-auto pt-2">
+          <div class="bg-charcoal-900 border border-charcoal-700 hover:border-lime-neon rounded-xl p-3 sm:p-2.5 sm:pl-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xl transition-all group">
+            <div class="flex items-center gap-2 min-w-0 overflow-x-auto py-1 scrollbar-none">
+              <span class="font-mono text-lime-neon font-bold text-sm">$</span>
+              <code id="cmdText" class="font-mono text-xs sm:text-sm text-slate-200 whitespace-nowrap select-all">
+                curl -fsSL https://raw.githubusercontent.com/arbdevai/android-compose-builder/main/install.sh | bash
+              </code>
             </div>
-            <h4>Zero Local Build</h4>
+            <button id="copyBtn" class="flex-shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 rounded-lg bg-charcoal-800 hover:bg-lime-neon text-lime-neon hover:text-charcoal-950 font-mono text-xs font-bold border border-charcoal-600 hover:border-lime-neon transition-all duration-200 active:scale-95 shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke-width="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke-width="2"/>
+              </svg>
+              <span id="copyLabel">Salin Perintah</span>
+            </button>
           </div>
-          <p>Dilarang memicu Gradle lokal. Kompilasi build didelegasikan penuh ke GitHub Actions CI runner untuk menghemat daya dan RAM.</p>
         </div>
 
-        <!-- Pillar 2 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CCFF00" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="4"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="14" y2="12"/></svg>
+        <!-- Metric Badges -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto pt-4 text-left">
+          <div class="p-3.5 rounded-xl bg-charcoal-900/90 border border-charcoal-700/80">
+            <div class="text-xl sm:text-2xl font-bold font-mono text-lime-neon">0 MB</div>
+            <div class="text-xs text-slate-400 font-medium mt-0.5">Local SDK Required</div>
+          </div>
+          <div class="p-3.5 rounded-xl bg-charcoal-900/90 border border-charcoal-700/80">
+            <div class="text-xl sm:text-2xl font-bold font-mono text-white">100%</div>
+            <div class="text-xs text-slate-400 font-medium mt-0.5">GitHub Actions CI</div>
+          </div>
+          <div class="p-3.5 rounded-xl bg-charcoal-900/90 border border-charcoal-700/80">
+            <div class="text-xl sm:text-2xl font-bold font-mono text-lime-neon">20 ms</div>
+            <div class="text-xs text-slate-400 font-medium mt-0.5">Pre-Flight Linter</div>
+          </div>
+          <div class="p-3.5 rounded-xl bg-charcoal-900/90 border border-charcoal-700/80">
+            <div class="text-xl sm:text-2xl font-bold font-mono text-white">4-Tier</div>
+            <div class="text-xs text-slate-400 font-medium mt-0.5">APK Deep Validation</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           BENTO GRID ARCHITECTURE SHOWCASE
+           =================================================================== -->
+      <section id="bento" class="space-y-6">
+        <div class="text-center max-w-2xl mx-auto space-y-2">
+          <span class="font-mono text-xs font-bold text-lime-neon uppercase tracking-wider">BENTO ARCHITECTURE</span>
+          <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Pilar Rekayasa Standar Industri
+          </h2>
+          <p class="text-sm sm:text-base text-slate-400">
+            Arsitektur modular yang dirancang untuk mencegah OOM, deadlock hardware, APK corrupt, dan kegagalan CI.
+          </p>
+        </div>
+
+        <!-- The Responsive Bento Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 w-full">
+          
+          <!-- Bento 1: Cloud CI Engine (Spans 2 columns, 2 rows on large) -->
+          <div class="bento-card md:col-span-2 lg:col-span-2 lg:row-span-2 p-5 sm:p-7 flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-lime-neon/10 text-lime-neon border border-lime-neon/20">
+                  CORE PARADIGM
+                </span>
+                <span class="text-xs font-mono text-slate-500">PILAR 01</span>
+              </div>
+              <h3 class="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                Zero Local Build Engine
+              </h3>
+              <p class="text-sm text-slate-400 leading-relaxed">
+                Menghapus kewajiban instalasi Android Studio dan Gradle lokal (~20 GB). AI coding agent Anda bekerja di container ringan tanpa risiko kehabisan memori atau CPU throttling.
+              </p>
+
+              <!-- Interactive Pipeline Mockup inside Card -->
+              <div class="space-y-2.5 pt-2 font-mono text-xs">
+                <div class="p-3 rounded-lg bg-charcoal-900 border border-charcoal-700 flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-lime-neon"></span>
+                    <span class="text-slate-300">Local Devbox (Compose Code)</span>
+                  </div>
+                  <span class="text-lime-neon font-semibold text-[11px]">0 MB SDK</span>
+                </div>
+                <div class="flex justify-center text-slate-600">↓ commit: Release v1.0.0</div>
+                <div class="p-3 rounded-lg bg-charcoal-900 border border-charcoal-700 flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+                    <span class="text-slate-300">GitHub Actions (Ubuntu Cloud)</span>
+                  </div>
+                  <span class="text-blue-400 font-semibold text-[11px]">Headless Runner</span>
+                </div>
+                <div class="flex justify-center text-slate-600">↓ build signed APK</div>
+                <div class="p-3 rounded-lg bg-charcoal-900 border border-lime-neon/40 flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-lime-mint"></span>
+                    <span class="text-slate-300">GitHub Release Artifact</span>
+                  </div>
+                  <span class="text-lime-mint font-semibold text-[11px]">Ready APK</span>
+                </div>
+              </div>
             </div>
-            <h4>Skeleton &amp; Shimmer</h4>
-          </div>
-          <p>Anti-spinner kosong. Wajib menggunakan skeleton shimmer native berbasis Jetpack Compose murni tanpa library berat.</p>
-        </div>
 
-        <!-- Pillar 3 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CCFF00" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <div class="pt-4 border-t border-charcoal-800 text-xs text-slate-400 flex items-center justify-between">
+              <span>Keberhasilan dipantau via CLI</span>
+              <code class="text-lime-neon font-mono">gh run watch --interval 60</code>
             </div>
-            <h4>Mutex &amp; Anti-Deadlock</h4>
           </div>
-          <p>Otentikasi perangkat keras atomik dengan <code>Mutex.withLock</code> dan proteksi larangan re-entrant Semaphore bersarang.</p>
-        </div>
 
-        <!-- Pillar 4 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CCFF00" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
+          <!-- Bento 2: Streaming In-App Updater (Spans 2 columns) -->
+          <div class="bento-card md:col-span-1 lg:col-span-2 p-5 sm:p-6 flex flex-col justify-between space-y-4">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-charcoal-800 text-lime-neon border border-charcoal-700">
+                  ANTI-APK CORRUPT
+                </span>
+                <span class="text-xs font-mono text-slate-500">PILAR 05</span>
+              </div>
+              <h3 class="text-lg sm:text-xl font-bold text-white">Streaming OkHttp &amp; .part Isolation</h3>
+              <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                Dilarang menggunakan Android DownloadManager. Unduh langsung dengan buffer 64 KB ke file sementara <code class="text-lime-neon font-mono">.part</code>. Rename atomik hanya setelah lolos verifikasi integritas 4 lapis (GET_SIGNING_CERTIFICATES &amp; DEX components check).
+              </p>
             </div>
-            <h4>Zero Dummy Data</h4>
-          </div>
-          <p>Wajib menembak endpoint riil, mendekode cookie/token asli, dan memetakan DTO yang toleran terhadap evolusi data.</p>
-        </div>
 
-        <!-- Pillar 5 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CCFF00" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <!-- Simulated Download Progress Bar -->
+            <div class="p-3 rounded-lg bg-charcoal-900 border border-charcoal-700 space-y-1.5 font-mono text-xs">
+              <div class="flex justify-between text-slate-300 text-[11px]">
+                <span>app-v1.0.4-release.apk.part</span>
+                <span class="text-lime-neon font-bold">100% Validated</span>
+              </div>
+              <div class="w-full bg-charcoal-800 h-2 rounded-full overflow-hidden">
+                <div class="bg-gradient-to-r from-lime-mint to-lime-neon h-full w-full rounded-full"></div>
+              </div>
             </div>
-            <h4>Streaming In-App Updater</h4>
           </div>
-          <p>Unduh via OkHttp streaming buffer 64 KB ke file <code>.part</code> dengan validasi integritas 4 lapis (anti APK corrupt).</p>
-        </div>
 
-        <!-- Pillar 6 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CCFF00" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <!-- Bento 3: Native Skeleton Shimmer (1 column) -->
+          <div class="bento-card p-5 sm:p-6 flex flex-col justify-between space-y-3">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-mono font-bold text-lime-neon">UX STANDARD</span>
+                <span class="text-xs font-mono text-slate-500">PILAR 02</span>
+              </div>
+              <h3 class="text-base sm:text-lg font-bold text-white">Native Skeleton Shimmer</h3>
+              <p class="text-xs text-slate-400">
+                Reject loading spinner di layar kosong. Menggunakan kilau animasi Compose murni tanpa library pihak ketiga.
+              </p>
             </div>
-            <h4>Monotonic SemVer &amp; Zero-Emoji</h4>
-          </div>
-          <p>Formula strictly monotonic: <code>MAJOR*10000 + MINOR*100 + PATCH</code>, serta catatan rilis dinamis 100% bebas emoji dekoratif.</p>
-        </div>
 
-        <!-- Pillar 7 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CCFF00" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+            <!-- Live Skeleton Shimmer Mockup Component -->
+            <div class="p-3 rounded-lg bg-charcoal-900 border border-charcoal-700 space-y-2">
+              <div class="skeleton-box h-3 w-3/4 rounded"></div>
+              <div class="skeleton-box h-2.5 w-full rounded"></div>
+              <div class="skeleton-box h-2.5 w-1/2 rounded"></div>
             </div>
-            <h4>Zero-CI Pre-Flight Linter</h4>
           </div>
-          <p>Deteksi coroutine suspend boundary, Result unwrap, dan leak <code>DisposableEffect</code> di lokal sebelum commit.</p>
-        </div>
 
-        <!-- Pillar 8 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CCFF00" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <!-- Bento 4: Resilient Mutex & Anti-Deadlock (1 column) -->
+          <div class="bento-card p-5 sm:p-6 flex flex-col justify-between space-y-3">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-mono font-bold text-lime-neon">CONCURRENCY</span>
+                <span class="text-xs font-mono text-slate-500">PILAR 03</span>
+              </div>
+              <h3 class="text-base sm:text-lg font-bold text-white">Mutex &amp; Anti-Deadlock</h3>
+              <p class="text-xs text-slate-400">
+                Otentikasi atomik dengan <code class="text-lime-neon font-mono text-[11px]">Mutex.withLock</code> dan larangan re-entrancy Semaphore saat berkomunikasi dengan hardware/router.
+              </p>
             </div>
-            <h4>Auto Release Keystore</h4>
-          </div>
-          <p>Skrip non-interaktif pembuatan release keystore dan upload 4 GitHub secrets signing secara otomatis dalam 3 detik.</p>
-        </div>
 
-        <!-- Pillar 9 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CCFF00" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <div class="p-2.5 rounded-lg bg-charcoal-900 border border-charcoal-700 font-mono text-[11px] text-slate-400">
+              <span class="text-blue-400">authMutex</span>.<span class="text-lime-neon">withLock</span> {<br>
+              &nbsp;&nbsp;ensureValidSession()<br>
+              }
             </div>
-            <h4>Anti-AI Slop Graphic</h4>
           </div>
-          <p>Wajib Adaptive Vector Icons XML (canvas 108dp safezone 66dp) dan generator raster PNG mandiri berbasis Python zlib.</p>
+
+          <!-- Bento 5: Pre-Flight Linter (2 columns on large) -->
+          <div class="bento-card md:col-span-2 lg:col-span-2 p-5 sm:p-6 flex flex-col justify-between space-y-4">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-charcoal-800 text-lime-neon border border-charcoal-700">
+                  ZERO-CI-FAILURE
+                </span>
+                <span class="text-xs font-mono text-slate-500">PILAR 07</span>
+              </div>
+              <h3 class="text-lg sm:text-xl font-bold text-white">Pre-Flight Memory-Safe Linter</h3>
+              <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                Skrip mandiri <code class="text-lime-neon font-mono text-xs">verify_kotlin_syntax.py</code> memverifikasi coroutine boundaries,Result unwrap, bracket balance, DisposableEffect leak, dan advisory non-blocking dalam hitungan milidetik sebelum git push.
+              </p>
+            </div>
+
+            <div class="p-3 rounded-lg bg-charcoal-900 border border-charcoal-700 font-mono text-xs text-slate-300 flex items-center justify-between">
+              <span class="text-slate-400">$ python3 scripts/verify_kotlin_syntax.py</span>
+              <span class="text-lime-neon font-bold">✓ PASSED</span>
+            </div>
+          </div>
+
+          <!-- Bento 6: Auto Release Keystore (1 column) -->
+          <div class="bento-card p-5 sm:p-6 flex flex-col justify-between space-y-3">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-mono font-bold text-lime-neon">AUTOMATION</span>
+                <span class="text-xs font-mono text-slate-500">PILAR 08</span>
+              </div>
+              <h3 class="text-base sm:text-lg font-bold text-white">1-Click Keystore Setup</h3>
+              <p class="text-xs text-slate-400">
+                Deteksi otomatis `keytool`, pembuatan keystore rilis non-interaktif, dan upload 4 GitHub Secrets otomatis dalam 3 detik.
+              </p>
+            </div>
+            <div class="text-[11px] font-mono text-slate-400 bg-charcoal-900 p-2 rounded border border-charcoal-700 truncate">
+              KEYSTORE_BASE64 • KEY_ALIAS
+            </div>
+          </div>
+
+          <!-- Bento 7: SemVer & Dynamic Changelog (1 column) -->
+          <div class="bento-card p-5 sm:p-6 flex flex-col justify-between space-y-3">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-mono font-bold text-lime-neon">RELEASE STD</span>
+                <span class="text-xs font-mono text-slate-500">PILAR 06</span>
+              </div>
+              <h3 class="text-base sm:text-lg font-bold text-white">SemVer &amp; Zero-Emoji</h3>
+              <p class="text-xs text-slate-400">
+                Formula strictly monotonic: <code class="text-lime-neon font-mono text-[10px]">MAJOR*10000 + MINOR*100 + PATCH</code>, dan ekstraksi catatan rilis 100% dinamis dari git commit.
+              </p>
+            </div>
+            <div class="text-[11px] font-mono text-lime-mint bg-charcoal-900 p-2 rounded border border-charcoal-700">
+              1.0.5 → versionCode 10005
+            </div>
+          </div>
+
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Multi-CLI Integration Section -->
-    <section class="cli-section" id="compatibility">
-      <div class="section-header">
-        <span class="section-tag">Kompatibilitas Lintas Agen</span>
-        <h2 class="section-title">Pasang Instan di CLI Favorit Anda</h2>
-        <p class="section-desc">Mendukung spesifikasi terbuka Agent Skills Standard secara native.</p>
-      </div>
+      <!-- ===================================================================
+           PIPELINE SECTION (Visual Timeline)
+           =================================================================== -->
+      <section id="pipeline" class="space-y-6">
+        <div class="text-center max-w-2xl mx-auto space-y-2">
+          <span class="font-mono text-xs font-bold text-lime-neon uppercase tracking-wider">WORKFLOW TIMELINE</span>
+          <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Dari Baris Kode ke APK Siap Pasang
+          </h2>
+        </div>
 
-      <div class="cli-tabs">
-        <button class="cli-tab-btn active" data-tab="agy">Antigravity CLI (agy)</button>
-        <button class="cli-tab-btn" data-tab="claude">Claude Code (claude)</button>
-        <button class="cli-tab-btn" data-tab="codex">OpenAI Codex (codex)</button>
-        <button class="cli-tab-btn" data-tab="cursor">Cursor / Copilot</button>
-      </div>
+        <div class="p-6 sm:p-8 rounded-2xl bg-charcoal-900 border border-charcoal-700">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+            
+            <!-- Step 1 -->
+            <div class="space-y-3 p-5 rounded-xl bg-charcoal-850 border border-charcoal-700">
+              <div class="flex items-center justify-between">
+                <span class="w-7 h-7 rounded-lg bg-lime-neon text-charcoal-950 font-bold font-mono text-xs flex items-center justify-center">01</span>
+                <span class="font-mono text-xs text-lime-neon">LOKAL RINGAN</span>
+              </div>
+              <h4 class="text-base font-bold text-white">Tulis UI &amp; Linter</h4>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Rancang komponen Jetpack Compose Material 3 &amp; ViewModel. Jalankan <code class="text-lime-neon font-mono">verify_kotlin_syntax.py</code> untuk validasi sintaks &amp; leak.
+              </p>
+            </div>
 
-      <div class="cli-panel active" id="panel-agy">
-        <div class="cli-code-block"><span class="comment"># Pasang khusus Antigravity CLI dengan live-sync symlink</span>
-<span class="kw">./install.sh</span> --antigravity
+            <!-- Step 2 -->
+            <div class="space-y-3 p-5 rounded-xl bg-charcoal-850 border border-charcoal-700">
+              <div class="flex items-center justify-between">
+                <span class="w-7 h-7 rounded-lg bg-blue-400 text-charcoal-950 font-bold font-mono text-xs flex items-center justify-center">02</span>
+                <span class="font-mono text-xs text-blue-400">DELEGASI CLOUD</span>
+              </div>
+              <h4 class="text-base font-bold text-white">Commit &amp; Push</h4>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Buat commit dengan pesan berawalan <code class="text-white font-mono">"Release v1.0.0"</code> dan push ke GitHub. Workflow CI otomatis mendeteksi pemicu rilis.
+              </p>
+            </div>
 
-<span class="comment"># Atau aktifkan background auto-update profil shell</span>
-<span class="kw">./install.sh</span> --auto-update</div>
-      </div>
+            <!-- Step 3 -->
+            <div class="space-y-3 p-5 rounded-xl bg-charcoal-850 border border-charcoal-700">
+              <div class="flex items-center justify-between">
+                <span class="w-7 h-7 rounded-lg bg-lime-mint text-charcoal-950 font-bold font-mono text-xs flex items-center justify-center">03</span>
+                <span class="font-mono text-xs text-lime-mint">PRODUKSI SELESAI</span>
+              </div>
+              <h4 class="text-base font-bold text-white">Cloud Build &amp; Release</h4>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                GitHub Actions runner mengeksekusi kompilasi headless, menandatangani APK dengan release keystore, dan mengunggah APK ke GitHub Release.
+              </p>
+            </div>
 
-      <div class="cli-panel" id="panel-claude">
-        <div class="cli-code-block"><span class="comment"># Pasang untuk Claude Code CLI</span>
-<span class="kw">./install.sh</span> --claude
+          </div>
+        </div>
+      </section>
 
-<span class="comment"># Otomatis mengaitkan adapter instruksi CLAUDE.md di ~/.claude/</span></div>
-      </div>
+      <!-- ===================================================================
+           MULTI-CLI COMPATIBILITY SWITCHER
+           =================================================================== -->
+      <section id="cli" class="space-y-6 max-w-4xl mx-auto">
+        <div class="text-center space-y-2">
+          <span class="font-mono text-xs font-bold text-lime-neon uppercase tracking-wider">INTEGRATION</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            Kompatibilitas Lintas AI Agent CLI
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-400">
+            Mengadopsi spesifikasi terbuka Agent Skills Standard secara native.
+          </p>
+        </div>
 
-      <div class="cli-panel" id="panel-codex">
-        <div class="cli-code-block"><span class="comment"># Pasang untuk OpenAI Codex CLI</span>
-<span class="kw">./install.sh</span> --codex
+        <div class="bg-charcoal-900 border border-charcoal-700 rounded-2xl p-4 sm:p-6 space-y-4">
+          <!-- CLI Tabs (2x2 on mobile, 4-inline on desktop) -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 p-1.5 rounded-xl bg-charcoal-950 border border-charcoal-800">
+            <button class="cli-tab py-2 px-3 rounded-lg text-xs font-mono font-bold transition-all text-charcoal-950 bg-lime-neon shadow-sm" data-target="agy">
+              Antigravity (agy)
+            </button>
+            <button class="cli-tab py-2 px-3 rounded-lg text-xs font-mono font-bold transition-all text-slate-400 hover:text-white" data-target="claude">
+              Claude Code
+            </button>
+            <button class="cli-tab py-2 px-3 rounded-lg text-xs font-mono font-bold transition-all text-slate-400 hover:text-white" data-target="codex">
+              OpenAI Codex
+            </button>
+            <button class="cli-tab py-2 px-3 rounded-lg text-xs font-mono font-bold transition-all text-slate-400 hover:text-white" data-target="cursor">
+              Cursor / Copilot
+            </button>
+          </div>
 
-<span class="comment"># Otomatis mengaitkan konfigurasi di ~/.codex/instructions.md</span></div>
-      </div>
+          <!-- CLI Code Displays -->
+          <div id="cli-agy" class="cli-content font-mono text-xs text-slate-300 p-4 rounded-xl bg-charcoal-950 border border-charcoal-800 space-y-2">
+            <div class="text-slate-500"># Pasang ke Antigravity CLI dengan live-sync symlink</div>
+            <div class="text-lime-neon">./install.sh --antigravity</div>
+            <div class="text-slate-500 pt-2"># Atau aktifkan background auto-update hook di profil shell</div>
+            <div class="text-slate-200">./install.sh --auto-update</div>
+          </div>
 
-      <div class="cli-panel" id="panel-cursor">
-        <div class="cli-code-block"><span class="comment"># Kompatibel langsung via aturan universal</span>
-<span class="kw">cp</span> AGENTS.md .cursorrules
-<span class="comment"># Atau sertakan AGENTS.md di root workspace proyek Anda</span></div>
-      </div>
-    </section>
+          <div id="cli-claude" class="cli-content hidden font-mono text-xs text-slate-300 p-4 rounded-xl bg-charcoal-950 border border-charcoal-800 space-y-2">
+            <div class="text-slate-500"># Pasang untuk Claude Code CLI</div>
+            <div class="text-lime-neon">./install.sh --claude</div>
+            <div class="text-slate-500 pt-2"># Otomatis mengaitkan adapter instruksi CLAUDE.md di ~/.claude/</div>
+          </div>
+
+          <div id="cli-codex" class="cli-content hidden font-mono text-xs text-slate-300 p-4 rounded-xl bg-charcoal-950 border border-charcoal-800 space-y-2">
+            <div class="text-slate-500"># Pasang untuk OpenAI Codex CLI</div>
+            <div class="text-lime-neon">./install.sh --codex</div>
+            <div class="text-slate-500 pt-2"># Mengaitkan konfigurasi di ~/.codex/instructions.md</div>
+          </div>
+
+          <div id="cli-cursor" class="cli-content hidden font-mono text-xs text-slate-300 p-4 rounded-xl bg-charcoal-950 border border-charcoal-800 space-y-2">
+            <div class="text-slate-500"># Kompatibel langsung via aturan universal</div>
+            <div class="text-lime-neon">cp AGENTS.md .cursorrules</div>
+            <div class="text-slate-500 pt-2"># Atau sertakan AGENTS.md di root workspace proyek Anda</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
 
     <!-- Footer -->
-    <footer class="site-footer">
-      <div class="footer-container">
-        <div class="footer-top">
-          <div class="brand-logo" style="font-size: 0.95rem;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <polygon points="13 2 4 14 11 14 10 22 20 10 13 10 13 2" fill="#CCFF00" stroke="#CCFF00" stroke-width="1.5"/>
-            </svg>
-            Android Compose Builder • Agent Engineering Standard
-          </div>
-
-          <ul class="footer-links">
-            <li><a href="https://github.com/arbdevai/android-compose-builder" target="_blank">GitHub</a></li>
-            <li><a href="https://github.com/arbdevai/android-compose-builder/blob/main/SKILL.md" target="_blank">Spesifikasi SKILL.md</a></li>
-            <li><a href="https://github.com/arbdevai/android-compose-builder/blob/main/LICENSE" target="_blank">Lisensi MIT</a></li>
-          </ul>
+    <footer class="border-t border-charcoal-700 bg-charcoal-950 mt-16 sm:mt-24 py-8 sm:py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2 text-xs text-slate-400">
+          <span class="w-2 h-2 rounded-full bg-lime-neon"></span>
+          <span>Android Compose Builder • Agent Engineering Standard</span>
         </div>
-
-        <div class="footer-copy">
-          Dilisensikan di bawah MIT License. Dirancang untuk ekosistem AI coding agent generasi berikutnya.
+        <div class="flex items-center gap-6 text-xs text-slate-400">
+          <a href="https://github.com/arbdevai/android-compose-builder" target="_blank" class="hover:text-lime-neon transition-colors">GitHub Repository</a>
+          <a href="https://github.com/arbdevai/android-compose-builder/blob/main/SKILL.md" target="_blank" class="hover:text-lime-neon transition-colors">SKILL.md Spec</a>
+          <a href="https://github.com/arbdevai/android-compose-builder/blob/main/LICENSE" target="_blank" class="hover:text-lime-neon transition-colors">Lisensi MIT</a>
         </div>
       </div>
     </footer>
+
   </div>
 
-  <!-- Interactive Fluid Physics Animation Script -->
+  <!-- Interactive Background Canvas Physics -->
   <script>
-    // -------------------------------------------------------------------------
-    // Fluid Interactive Background Canvas (Physics Nodes & Spring Easing)
-    // -------------------------------------------------------------------------
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
-
     let width = canvas.width = window.innerWidth;
     let height = canvas.height = window.innerHeight;
 
@@ -1413,8 +572,8 @@
     });
 
     const nodes = [];
-    const nodeCount = Math.min(Math.floor((width * height) / 18000), 65);
-    let mouse = { x: width / 2, y: height / 2, radius: 140 };
+    const nodeCount = Math.min(Math.floor((width * height) / 22000), width < 768 ? 25 : 50);
+    const mouse = { x: width / 2, y: height / 2, radius: 120 };
 
     window.addEventListener('mousemove', (e) => {
       mouse.x = e.clientX;
@@ -1432,30 +591,25 @@
       constructor() {
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        this.vx = (Math.random() - 0.5) * 0.7;
-        this.vy = (Math.random() - 0.5) * 0.7;
-        this.radius = Math.random() * 2 + 1;
-        this.baseX = this.x;
-        this.baseY = this.y;
+        this.vx = (Math.random() - 0.5) * 0.6;
+        this.vy = (Math.random() - 0.5) * 0.6;
+        this.radius = Math.random() * 1.8 + 1;
       }
 
       update() {
         this.x += this.vx;
         this.y += this.vy;
-
         if (this.x < 0 || this.x > width) this.vx *= -1;
         if (this.y < 0 || this.y > height) this.vy *= -1;
 
-        // Fluid spring reaction to cursor
         const dx = mouse.x - this.x;
         const dy = mouse.y - this.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-
         if (dist < mouse.radius) {
           const force = (mouse.radius - dist) / mouse.radius;
           const angle = Math.atan2(dy, dx);
-          this.x -= Math.cos(angle) * force * 2.5;
-          this.y -= Math.sin(angle) * force * 2.5;
+          this.x -= Math.cos(angle) * force * 2;
+          this.y -= Math.sin(angle) * force * 2;
         }
       }
 
@@ -1463,119 +617,95 @@
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fillStyle = '#CCFF00';
-        ctx.globalAlpha = 0.5;
+        ctx.globalAlpha = 0.45;
         ctx.fill();
       }
     }
 
     function initNodes() {
       nodes.length = 0;
-      for (let i = 0; i < nodeCount; i++) {
-        nodes.push(new Node());
-      }
+      for (let i = 0; i < nodeCount; i++) nodes.push(new Node());
     }
-
     initNodes();
 
     function renderCanvas() {
       ctx.clearRect(0, 0, width, height);
-
-      // Draw subtle grid points
       for (let i = 0; i < nodes.length; i++) {
         nodes[i].update();
         nodes[i].draw();
-
         for (let j = i + 1; j < nodes.length; j++) {
           const dx = nodes[i].x - nodes[j].x;
           const dy = nodes[i].y - nodes[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < 130) {
+          if (dist < 110) {
             ctx.beginPath();
             ctx.moveTo(nodes[i].x, nodes[i].y);
             ctx.lineTo(nodes[j].x, nodes[j].y);
             ctx.strokeStyle = '#CCFF00';
-            ctx.globalAlpha = (1 - dist / 130) * 0.15;
-            ctx.lineWidth = 0.8;
+            ctx.globalAlpha = (1 - dist / 110) * 0.12;
+            ctx.lineWidth = 0.7;
             ctx.stroke();
           }
         }
       }
-
       requestAnimationFrame(renderCanvas);
     }
-
     renderCanvas();
 
-    // -------------------------------------------------------------------------
-    // Interactive Copy Button with Tactile Feedback
-    // -------------------------------------------------------------------------
+    // Copy Button Interaction
     const copyBtn = document.getElementById('copyBtn');
-    const copyText = document.getElementById('copyText');
-    const installCmd = "curl -fsSL https://raw.githubusercontent.com/arbdevai/android-compose-builder/main/install.sh | bash";
+    const copyLabel = document.getElementById('copyLabel');
+    const cmdText = document.getElementById('cmdText');
 
     copyBtn.addEventListener('click', async () => {
+      const textToCopy = cmdText.innerText.trim();
       try {
-        await navigator.clipboard.writeText(installCmd);
-        copyBtn.style.background = '#CCFF00';
-        copyBtn.style.color = '#0A0D10';
-        copyText.textContent = 'Tersalin!';
+        await navigator.clipboard.writeText(textToCopy);
+        copyLabel.textContent = 'Tersalin!';
+        copyBtn.classList.add('bg-lime-neon', 'text-charcoal-950');
         setTimeout(() => {
-          copyBtn.style.background = '';
-          copyBtn.style.color = '';
-          copyText.textContent = 'Salin';
-        }, 2200);
-      } catch (err) {
-        // Fallback
-        const textarea = document.createElement('textarea');
-        textarea.value = installCmd;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        copyText.textContent = 'Tersalin!';
-        setTimeout(() => { copyText.textContent = 'Salin'; }, 2200);
+          copyLabel.textContent = 'Salin Perintah';
+          copyBtn.classList.remove('bg-lime-neon', 'text-charcoal-950');
+        }, 2000);
+      } catch (e) {
+        copyLabel.textContent = 'Tersalin!';
+        setTimeout(() => { copyLabel.textContent = 'Salin Perintah'; }, 2000);
       }
     });
 
-    // -------------------------------------------------------------------------
-    // Interactive CLI Tabs with Smooth Easing
-    // -------------------------------------------------------------------------
-    const tabBtns = document.querySelectorAll('.cli-tab-btn');
-    const panels = {
-      'agy': document.getElementById('panel-agy'),
-      'claude': document.getElementById('panel-claude'),
-      'codex': document.getElementById('panel-codex'),
-      'cursor': document.getElementById('panel-cursor')
+    // Mobile Menu Drawer
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileDrawer.classList.toggle('hidden');
+    });
+
+    // CLI Switcher Tabs
+    const cliTabs = document.querySelectorAll('.cli-tab');
+    const cliContents = {
+      agy: document.getElementById('cli-agy'),
+      claude: document.getElementById('cli-claude'),
+      codex: document.getElementById('cli-codex'),
+      cursor: document.getElementById('cli-cursor')
     };
 
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tabBtns.forEach(b => b.classList.remove('active'));
-        Object.values(panels).forEach(p => p.classList.remove('active'));
+    cliTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        cliTabs.forEach(t => {
+          t.classList.remove('bg-lime-neon', 'text-charcoal-950', 'shadow-sm');
+          t.classList.add('text-slate-400');
+        });
+        tab.classList.remove('text-slate-400');
+        tab.classList.add('bg-lime-neon', 'text-charcoal-950', 'shadow-sm');
 
-        btn.classList.add('active');
-        const tabKey = btn.getAttribute('data-tab');
-        if (panels[tabKey]) {
-          panels[tabKey].classList.add('active');
-        }
-      });
-    });
-
-    // -------------------------------------------------------------------------
-    // Mobile Drawer Navigation
-    // -------------------------------------------------------------------------
-    const menuToggle = document.getElementById('menuToggle');
-    const mobileDrawer = document.getElementById('mobileDrawer');
-    const mobileLinks = document.querySelectorAll('.mobile-nav-link');
-
-    menuToggle.addEventListener('click', () => {
-      mobileDrawer.classList.toggle('open');
-    });
-
-    mobileLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        mobileDrawer.classList.remove('open');
+        const target = tab.getAttribute('data-target');
+        Object.keys(cliContents).forEach(k => {
+          if (k === target) {
+            cliContents[k].classList.remove('hidden');
+          } else {
+            cliContents[k].classList.add('hidden');
+          }
+        });
       });
     });
   </script>

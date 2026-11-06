@@ -2,45 +2,55 @@
 
 When working on Android projects with this repository or when the `android-compose-builder` skill is activated, you must strictly follow these rules:
 
-## 1. UI & Skeleton Screens (Anti-Loading Spinner)
+## 1. Zero Half-Baked Features (Tuntas Hulu ke Hilir)
+- Dilarang keras meninggalkan stub `// TODO`, fungsi tanpa isi, atau UI tanpa koneksi ke ViewModel/Repository.
+- Selesaikan fitur secara vertikal penuh (DTO/Data -> ViewModel -> Compose Screen) sebelum menganggap tugas selesai.
+
+## 2. Zero AI Slop & Kebijakan Bebas Emoji (Zero Emoji)
+- Dilarang elemen dekorasi norak: no pulsing green dots (`animate-pulse`), no glowing borders, no marquee.
+- Dilarang menggunakan emoji dekoratif di UI, teks string, maupun commit message.
+- Wajib menggunakan Vector Icon resmi Material3 (`androidx.compose.material:material-icons-extended`) atau XML Vector Drawable.
+
+## 3. Lingkungan Chroot HP & CI/CD Hygiene
+- Zero local Gradle compilation (`./gradlew assembleRelease`); serahkan kompilasi biner ke GitHub Actions.
+- Dilarang melakukan micro-push per 1-2 baris edit. Push hanya dilakukan ketika satu set fitur tuntas dan lolos verifikasi sintaksis lokal.
+- Pantau CI dengan interval tepat 60 detik (`gh run watch <RUN_ID> --interval 60`).
+- Zero status halusinasi tanpa bukti riil output perintah `gh run view`.
+
+## 4. Dukungan Multi-Medan & Native (C/C++ NDK & Rust)
+- Dukungan penuh untuk komputasi berat, audio low-latency, crypto, dan native engines melalui panduan di `references/ndk_and_rust.md`.
+
+## 5. UI & Skeleton Screens (Anti-Loading Spinner)
 - Never show a full-screen `CircularProgressIndicator` on an empty screen.
 - Always use Skeleton screens with a subtle shimmer effect that mirrors the target layout (`SkeletonBox`, `SkeletonCard`, `SkeletonDashboard`).
-- Use pure Jetpack Compose `Modifier.shimmerEffect()` based on `rememberInfiniteTransition` and `Brush.linearGradient`.
-- Reserve spinners only for inline action buttons or small top-bar indicators.
+- Use pure Jetpack Compose `Modifier.shimmerEffect()`.
 
-## 2. Concurrency, Mutex & Hardware Resilience (Anti-Deadlock)
-- When communicating with embedded devices, routers, or single-session hardware:
-  - Guard login and session requests with `kotlinx.coroutines.sync.Mutex` (`authMutex.withLock`) to prevent session thrashing.
-  - Never call a method that acquires a `Semaphore` permit from inside a block that already holds that permit (avoids deadlock).
-  - Pre-authenticate before launching parallel `async` coroutines.
+## 6. Concurrency, Mutex & Hardware Resilience (Anti-Deadlock)
+- Guard login and session requests with `Mutex.withLock`.
+- Never call a method that acquires a `Semaphore` permit from inside a block that already holds that permit (avoids deadlock).
+- Pre-authenticate before launching parallel `async` coroutines.
 
-## 3. Zero Dummy Data Policy
-- Never leave mock/dummy data in production screens.
-- Use actual device/API endpoints, reverse-engineered payloads, and tolerant DTO parsers (`ignoreUnknownKeys = true`).
+## 7. Zero Dummy Data & Clean Tone
+- Never leave mock/dummy data in production screens. Use tolerant DTO parsers (`ignoreUnknownKeys = true`).
+- Use concise, direct, professional language. Prohibit hyperbole, overly informal slang, and dramatic copy.
 
-## 4. Professional Non-Alay Microcopy
-- Use concise, direct, professional language.
-- Prohibit hyperbole, overly informal slang ("kak", "bestie", "bobob cantik"), and dramatic copy.
+## 8. In-App Updater & Storage Hygiene
+- Stream directly via OkHttp to `.part` file; perform 4-layer `isApkValid` check before renaming to `.apk`.
+- Clean up legacy APK installers before downloading new versions.
 
-## 5. Build & CI/CD (Anti-Hallucination)
-- Never run heavy local Gradle commands (`./gradlew assembleRelease`).
-- Rely on GitHub Actions CI for building signed APKs.
-- Monitor workflow runs with a strict 1-minute interval: `gh run watch <RUN_ID> --interval 60`.
-- Never claim or hallucinate build success without verified output from `gh run view` or GitHub APIs.
-
-## 6. In-App Updater & Storage Hygiene
-- Automatically clean up legacy APK installers before downloading new versions and upon successful launch.
-- Check file existence before triggering download to avoid duplicate bandwidth usage.
-
-## 7. Pre-Flight Syntax & Memory-Safe Verification
-- Run `python3 scripts/verify_kotlin_syntax.py .` before commit.
+## 9. Pre-Flight Syntax Verification
+- Run `python3 scripts/verify_kotlin_syntax.py .` before commit/push. Must produce 0 hard errors.
 - Never call suspend functions directly in non-suspending Compose lambdas without `LaunchedEffect` or `coroutineScope.launch`.
 - Never access properties directly on `kotlin.Result<T>` without `.getOrNull()` / `.getOrThrow()`.
-- Ensure common Compose modifier extension imports (`Modifier.border`, `Modifier.clip`, etc.) and internal cross-package symbols are properly imported.
-- Always include `onDispose { ... }` in `DisposableEffect` to prevent listener leaks.
-- Prefer `collectAsStateWithLifecycle()` over `collectAsState()`.
-- Use `// @validator-ignore` or `// @validator-ignore-file` for legacy or ambiguous third-party code without breaking architecture.
 
-## 8. Release Keystore & Signing (Zero Hesitation)
+## 10. Release Keystore & Signing (Zero Hesitation)
 - Never spin in circles or hesitate if `keytool` is missing; install it instantly: `sudo apt-get update && sudo apt-get install -y openjdk-17-jre-headless`.
-- Use `python3 scripts/setup_release_keystore.py` or run `keytool -genkeypair -noprompt -dname "..."` non-interactively to populate GitHub Secrets (`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`).
+- Use `python3 scripts/setup_release_keystore.py` or run `keytool -genkeypair -noprompt -dname "..."` non-interactively to populate GitHub Secrets.
+
+## 11. Living Session Memory (Anti-Amnesia Sesi Baru)
+- Seluruh keputusan arsitektur, status tugas, dan riwayat bug wajib disimpan persisten di `docs/PRD.md` dan `docs/STATE.md`.
+- Di setiap sesi baru atau giliran kerja, AI wajib membaca kedua file tersebut terlebih dahulu sebelum bertindak.
+
+## 12. Wawancara PRD & Scaffolding Tata Letak Anti-Berantakan
+- Jika `docs/PRD.md` belum ada, dilarang langsung menulis kode; sajikan kuesioner terstruktur dengan opsi pilihan ganda ke user.
+- Tata letak Compose wajib mengikuti pola hierarkis: `Scaffold` + `contentWindowInsets` + `.padding(innerPadding)` + `.imePadding()` untuk mencegah UI berantakan atau tertutup keyboard.
