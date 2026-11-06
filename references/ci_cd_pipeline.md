@@ -66,3 +66,25 @@ Untuk menyiapkan signing rilis tanpa interaksi terminal:
   python3 scripts/setup_release_keystore.py
   ```
 - Skrip ini otomatis mengecek keberadaan `keytool` (atau menginstalnya jika diizinkan), membuat keystore 2048-bit RSA secara non-interaktif, dan mendaftarkan 4 GitHub Secret (`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`) via `gh secret set`.
+
+---
+
+## 6. Pencegahan Kegagalan Build CI & Isolasi Tooling
+
+Sebelum melakukan `git push` pertama kali ke repositori GitHub, pastikan 4 syarat infrastruktur berikut terpenuhi:
+
+1. **Kelengkapan Gradle Wrapper:**
+   - Berkas `gradlew` (dengan izin eksekusi `chmod +x`) dan folder `gradle/wrapper/` (`gradle-wrapper.jar` & `gradle-wrapper.properties`) wajib tersedia di root proyek.
+2. **Konfigurasi `gradle.properties`:**
+   - Wajib memuat `android.useAndroidX=true` dan `ksp.useKSP2=false`:
+     ```properties
+     org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+     android.useAndroidX=true
+     android.nonTransitiveRClass=true
+     kotlin.code.style=official
+     ksp.useKSP2=false
+     ```
+3. **Aturan Room DAO vs KSP2 (`unexpected jvm signature V`):**
+   - Pada Room Database, setiap fungsi `@Dao` dengan anotasi `@Query("DELETE ...")` atau `@Query("UPDATE ...")` yang menggunakan `suspend` **wajib** memiliki tipe kembalian `: Int` (jumlah baris terdampak), bukan `Unit` atau tanpa tipe kembalian.
+4. **Isolasi Folder `scripts/` (Anti-Leak ke Git):**
+   - Folder `scripts/` adalah tooling lokal chroot. Pastikan `scripts/` selalu berada di dalam `.gitignore` proyek agar tidak ikut ter-commit dan terunggah ke repositori GitHub aplikasi.

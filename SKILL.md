@@ -45,6 +45,10 @@ Skill arsitektur dan pengembangan aplikasi Android modern berbasis Jetpack Compo
 - **Kondisional Cerdas:** Eksekusi validator ini **HANYA** jika commit melibatkan perubahan pada berkas kode Android (`.kt` atau `.xml`).
 - Jika perubahan hanya mencakup aset web (`web/`), dokumentasi (`.md`), atau skrip konfigurasi shell/installer, **lewati validator Kotlin** agar tidak menjadi formalitas buta (mengecek 0 file).
 - Jika ada file Kotlin/XML yang diubah, pastikan menghasilkan **0 Hard Errors** sebelum memicu workflow CI. Jika terdapat error, AI wajib melakukan *self-healing* otomatis sebelum staging/commit.
+- **Isolasi Tooling Chroot (Anti-Leak Folder `scripts/`):** Dilarang keras meng-commit folder `scripts/` (maupun `__pycache__`) ke repositori Git proyek aplikasi. Jalankan skrip langsung dari path instalasi skill atau pastikan `scripts/` telah tercantum di dalam `.gitignore`.
+- **Standarisasi Build, Room & KSP Stability:**
+  1. Pastikan root proyek selalu memiliki `gradlew` (executable), `gradle/wrapper/`, dan `gradle.properties` (`android.useAndroidX=true` dan `ksp.useKSP2=false`).
+  2. Setiap fungsi `@Dao` Room yang menggunakan `@Query("DELETE ...")` atau `@Query("UPDATE ...")` dengan modifier `suspend` **WAJIB** mengembalikan tipe `: Int` (bukan `Unit`/kosong) untuk mencegah crash fatal compiler KSP2 (`unexpected jvm signature V`).
 
 ### G. Protokol Memori Persisten & Wawancara PRD (Anti-Amnesia)
 - **DILARANG MENGANDALKAN MEMORI CHAT:** Seluruh kesepakatan desain, status pekerjaan, dan catatan bug wajib dicatat di disk dalam folder `docs/` (`docs/PRD.md` dan `docs/STATE.md`).

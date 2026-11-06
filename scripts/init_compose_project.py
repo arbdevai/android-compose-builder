@@ -60,6 +60,34 @@ include(":app")
     with open(os.path.join(target_dir, "build.gradle.kts"), "w") as fp:
         fp.write(root_build)
 
+    # 2b. gradle.properties (Mandatory AndroidX, JVM memory, KSP1 stability)
+    with open(os.path.join(target_dir, "gradle.properties"), "w") as fp:
+        fp.write("""org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+android.useAndroidX=true
+android.nonTransitiveRClass=true
+kotlin.code.style=official
+ksp.useKSP2=false
+""")
+
+    # 2c. Gradle Wrapper (gradlew & gradle/wrapper)
+    skill_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    assets_gradle = os.path.join(skill_root, "assets", "gradle")
+    if os.path.exists(assets_gradle):
+        src_gradlew = os.path.join(assets_gradle, "gradlew")
+        dest_gradlew = os.path.join(target_dir, "gradlew")
+        if os.path.exists(src_gradlew):
+            shutil.copy2(src_gradlew, dest_gradlew)
+            os.chmod(dest_gradlew, 0o755)
+
+        src_wrapper_dir = os.path.join(assets_gradle, "wrapper")
+        dest_wrapper_dir = os.path.join(target_dir, "gradle", "wrapper")
+        if os.path.exists(src_wrapper_dir):
+            os.makedirs(dest_wrapper_dir, exist_ok=True)
+            for item in os.listdir(src_wrapper_dir):
+                s = os.path.join(src_wrapper_dir, item)
+                d = os.path.join(dest_wrapper_dir, item)
+                shutil.copy2(s, d)
+
     # 3. gradle/libs.versions.toml
     gradle_dir = os.path.join(target_dir, "gradle")
     os.makedirs(gradle_dir, exist_ok=True)
@@ -188,6 +216,9 @@ android {{
     packaging {{
         resources {{
             excludes += "/META-INF/{{AL2.0,LGPL2.1}}"
+        }}
+        jniLibs {{
+            useLegacyPackaging = true
         }}
     }}
 }}
@@ -508,16 +539,23 @@ jobs:
     with open(os.path.join(gh_dir, "build-apk.yml"), "w") as fp:
         fp.write(ci_content)
 
-    # 8. .gitignore
+    # 8. .gitignore (Anti-Leak Chroot Tooling & Release Keys)
     with open(os.path.join(target_dir, ".gitignore"), "w") as fp:
         fp.write(""".gradle/
 build/
 app/build/
 *.jks
 *.keystore
+release.keystore
 local.properties
 .idea/
 *.iml
+
+# Chroot Tooling Isolation (Anti-Leak ke Git)
+scripts/
+*.part
+native/**/target/
+app/src/main/jniLibs/
 """)
 
     # 9. docs/PRD.md dan docs/STATE.md (Persistent Memory System)

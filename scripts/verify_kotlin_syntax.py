@@ -400,6 +400,22 @@ def check_kotlin_file(filepath):
     if not bracket_ok:
         errors.append(bracket_err)
 
+    # 8. Deteksi Room @Dao Query DELETE/UPDATE suspend tanpa return type Int (KSP2 'unexpected jvm signature V')
+    if "@Dao" in content:
+        dao_query_re = re.compile(
+            r'@Query\s*\(\s*["\']\s*(?:DELETE|UPDATE)\b[^"\']*["\']\s*\)\s*(?:@\w+\s*)*suspend\s+fun\s+([a-zA-Z0-9_]+)\s*\([^)]*\)\s*(?::\s*([a-zA-Z0-9_<>]+))?',
+            re.IGNORECASE
+        )
+        for m in dao_query_re.finditer(content):
+            fn_name = m.group(1)
+            ret_type = m.group(2)
+            line_no = content[:m.start()].count('\n') + 1
+            if not is_line_suppressed(lines, line_no, "room-ksp-unit"):
+                if not ret_type or ret_type == "Unit":
+                    errors.append(
+                        f"{filepath}:{line_no}: Fungsi Room DAO '{fn_name}' pada query DELETE/UPDATE suspend wajib mengembalikan ': Int' (bukan Unit/kosong) untuk mencegah crash fatal KSP2 'unexpected jvm signature V'."
+                    )
+
     # =========================================================================
     # SOFT WARNINGS (MEMORY LEAK & LIFECYCLE ADVISORY - NON-BLOCKING)
     # =========================================================================
@@ -464,6 +480,45 @@ def main():
     warnings = []
     checked_kt = 0
     checked_xml = 0
+
+    # Validasi Infrastruktur Build & Isolasi Tooling pada Root Proyek Android
+    is_android_root = os.path.exists(os.path.join(root_dir, "settings.gradle.kts")) or os.path.exists(os.path.join(root_dir, "build.gradle.kts"))
+    is_skill_repo = os.path.exists(os.path.join(root_dir, "SKILL.md"))
+
+    if is_android_root and not is_skill_repo:
+        gradlew_path = os.path.join(root_dir, "gradlew")
+        if not os.path.exists(gradlew_path):
+            errors.append(f"{root_dir}: Berkas 'gradlew' tidak ditemukan di root proyek. Runner CI akan gagal mengeksekusi build.")
+
+        wrapper_props = os.path.join(root_dir, "gradle", "wrapper", "gradle-wrapper.properties")
+        if not os.path.exists(wrapper_props):
+            errors.append(f"{root_dir}: Berkas 'gradle/wrapper/gradle-wrapper.properties' tidak ditemukan.")
+
+        gradle_props = os.path.join(root_dir, "gradle.properties")
+        if not os.path.exists(gradle_props):
+            errors.append(f"{root_dir}: Berkas 'gradle.properties' tidak ditemukan. Wajib memuat 'android.useAndroidX=true'.")
+        else:
+            try:
+                with open(gradle_props, "r", encoding="utf-8") as gp:
+                    gp_txt = gp.read()
+                    if "android.useAndroidX=true" not in gp_txt:
+                        errors.append(f"{gradle_props}: Tidak memuat 'android.useAndroidX=true'. AGP akan gagal mengompilasi dependensi AndroidX.")
+            except Exception:
+                pass
+
+        if os.path.exists(os.path.join(root_dir, "scripts")):
+            gitignore_path = os.path.join(root_dir, ".gitignore")
+            has_scripts_ignored = False
+            if os.path.exists(gitignore_path):
+                try:
+                    with open(gitignore_path, "r", encoding="utf-8") as gi:
+                        gi_txt = gi.read()
+                        if "scripts/" in gi_txt or "/scripts" in gi_txt or "\nscripts\n" in gi_txt:
+                            has_scripts_ignored = True
+                except Exception:
+                    pass
+            if not has_scripts_ignored:
+                errors.append(f"{gitignore_path}: Folder lokal 'scripts/' terdeteksi di proyek tetapi belum dimasukkan ke '.gitignore' (risiko bocor ke Git).")
 
     kt_files = []
     class_map = {}

@@ -36,3 +36,7 @@ All AI coding agents (Antigravity CLI, Claude Code, Codex CLI, Cursor, Copilot) 
 11. **Wawancara PRD & Scaffolding Tata Letak Anti-Berantakan**:
     - Jika `docs/PRD.md` belum ada, dilarang langsung menulis kode; sajikan kuesioner terstruktur dengan opsi pilihan ganda ke user.
     - Tata letak Compose wajib mengikuti pola hierarkis: `Scaffold` + `contentWindowInsets` + `.padding(innerPadding)` + `.imePadding()` untuk mencegah UI berantakan atau tertutup keyboard.
+12. **Gradle Wrapper, Properties, Room KSP2 & Anti-Leak `scripts/`**:
+    - Setiap repositori aplikasi wajib memiliki `gradlew`, `gradle/wrapper/`, dan `gradle.properties` (`android.useAndroidX=true` dan `ksp.useKSP2=false`) sebelum push pertama ke CI.
+    - Fungsi `suspend` di dalam `@Dao` Room yang menggunakan `@Query("DELETE ...")` atau `@Query("UPDATE ...")` wajib mendeklarasikan tipe kembalian `: Int` (bukan `Unit`) agar tidak memicu crash KSP2 (`unexpected jvm signature V`).
+    - Direktori `scripts/` di workspace aplikasi wajib dimasukkan ke `.gitignore` (atau dijalankan langsung dari path skill) dan dilarang keras ikut ter-commit ke repositori Git aplikasi.

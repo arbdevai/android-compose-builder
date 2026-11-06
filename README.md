@@ -104,8 +104,10 @@ Skill ini menetapkan 9 aturan ketat yang wajib dipatuhi oleh setiap AI agent:
 
 ### 7. Pre-Flight Linter & Deteksi Kebocoran Memori (Zero-CI-Failure)
 - Skrip mandiri `verify_kotlin_syntax.py` wajib dijalankan sebelum setiap git commit:
+  - Validasi pre-flight kelengkapan `gradlew`, `gradle/wrapper/`, `gradle.properties` (`android.useAndroidX=true` & `ksp.useKSP2=false`), serta isolasi `.gitignore` pada folder `scripts/` agar skrip chroot tidak bocor ke repositori aplikasi.
   - Validasi keseimbangan tanda kurung dan blok kode dengan string parsing yang sadar escape literal.
   - Deteksi pemanggilan fungsi `suspend` di dalam lambda Compose non-suspending.
+  - Deteksi fungsi `@Dao` `suspend` dengan `@Query("DELETE ...")` atau `@Query("UPDATE ...")` yang tidak mendeklarasikan tipe kembalian `: Int` (mencegah crash KSP2 `unexpected jvm signature V`).
   - Validasi pembongkaran anggota `kotlin.Result<T>`.
   - Pengecekan impor ekstensi modifier (`Modifier.border`, `Modifier.clip`, dsb.).
   - Kewajiban blok `onDispose { ... }` pada seluruh `DisposableEffect`.
@@ -201,6 +203,7 @@ Aktifkan sinkronisasi otomatis agar definisi skill selalu mutakhir setiap termin
 android-compose-builder/
 ├── assets/
 │   ├── banner.svg                   # Banner arsitektur resmi (Matte Charcoal x Lime Neon)
+│   ├── gradle/                      # Bundel standar gradlew & gradle-wrapper (8.9)
 │   └── icons/                       # Paket ikon visual SVG vektor mandiri (Bebas Emoji)
 ├── scripts/
 │   ├── init_compose_project.py      # Generator proyek Jetpack Compose + CI workflow
