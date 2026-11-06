@@ -36,8 +36,9 @@ When working on Android projects with this repository or when the `android-compo
 - Stream directly via OkHttp to `.part` file; perform 4-layer `isApkValid` check before renaming to `.apk`.
 - Clean up legacy APK installers before downloading new versions.
 
-## 9. Pre-Flight Syntax Verification
-- Run `python3 scripts/verify_kotlin_syntax.py .` before commit/push. Must produce 0 hard errors.
+## 9. Pre-Flight Syntax Verification Kontekstual (Anti-Ritual Robotik)
+- Run `python3 scripts/verify_kotlin_syntax.py .` **hanya jika** ada modifikasi file Kotlin (`.kt`) atau layout Android (`.xml`). Lewati jika commit hanya berkas web (`web/`) atau markdown (`.md`).
+- Must produce 0 hard errors sebelum commit/push jika file Kotlin disentuh.
 
 ## 10. Release Keystore & Signing (Zero Hesitation)
 - Run `python3 scripts/setup_release_keystore.py` to populate GitHub Secrets non-interactively.

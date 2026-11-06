@@ -23,8 +23,10 @@ All AI coding agents (Antigravity CLI, Claude Code, Codex CLI, Cursor, Copilot) 
    - Anti-deadlock: nol pemanggilan nested permit pada `Semaphore`.
    - Pre-auth sekuensial sebelum worker async paralel.
 7. **Clean Tone & Microcopy**: Bahasa teknis, lugas, to-the-point, tanpa basa-basi, anti-alay.
-8. **Pre-Flight Verification Wajib**:
-   - Wajib eksekusi `python3 scripts/verify_kotlin_syntax.py .` sebelum commit/push (wajib 0 hard error).
+8. **Pre-Flight Verification Kontekstual (Anti-Ritual Robotik)**:
+   - Eksekusi `python3 scripts/verify_kotlin_syntax.py .` **hanya jika** ada modifikasi file Kotlin (`.kt`) atau layout Android (`.xml`).
+   - Jangan jalankan verifikasi Kotlin jika commit hanya mengubah aset web (`web/`), dokumen (`.md`), atau skrip konfigurasi.
+   - Wajib 0 hard error sebelum commit/push jika file Kotlin disentuh.
 9. **Release Keystore & Signing (Anti-Muter-Muter)**:
    - Jika `keytool` tidak ada, install langsung tanpa ragu (`sudo apt update && sudo apt install -y openjdk-17-jre-headless`).
    - Gunakan `python3 scripts/setup_release_keystore.py` untuk mengunggah 4 GitHub Secrets secara otomatis.

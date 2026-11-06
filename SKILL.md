@@ -37,12 +37,14 @@ Skill arsitektur dan pengembangan aplikasi Android modern berbasis Jetpack Compo
 ### E. Gaya Bahasa & Komunikasi (Teknis, Ringkas, Anti-Alay)
 - Komunikasi dan teks antarmuka (*microcopy*) wajib **lugas, to-the-point, sedikit teknis, dan bebas basa-basi**. Dilarang menggunakan gaya bahasa sok akrab, manja, hiperbolis, atau khas customer-service template.
 
-### F. Verifikasi Sintaksis Pre-Flight (Wajib Sebelum Push)
-- Sebelum melakukan commit dan push, wajib menjalankan validator lokal berbasis Python:
+### F. Verifikasi Sintaksis Pre-Flight Kontekstual (Anti-Ritual Robotik)
+- Jalankan validator lokal berbasis Python:
   ```bash
   python3 scripts/verify_kotlin_syntax.py .
   ```
-- Pastikan menghasilkan **0 Hard Errors** sebelum memicu workflow CI. Jika terdapat error, AI wajib melakukan *self-healing* secara otomatis sebelum melangkah ke proses staging/commit.
+- **Kondisional Cerdas:** Eksekusi validator ini **HANYA** jika commit melibatkan perubahan pada berkas kode Android (`.kt` atau `.xml`).
+- Jika perubahan hanya mencakup aset web (`web/`), dokumentasi (`.md`), atau skrip konfigurasi shell/installer, **lewati validator Kotlin** agar tidak menjadi formalitas buta (mengecek 0 file).
+- Jika ada file Kotlin/XML yang diubah, pastikan menghasilkan **0 Hard Errors** sebelum memicu workflow CI. Jika terdapat error, AI wajib melakukan *self-healing* otomatis sebelum staging/commit.
 
 ### G. Protokol Memori Persisten & Wawancara PRD (Anti-Amnesia)
 - **DILARANG MENGANDALKAN MEMORI CHAT:** Seluruh kesepakatan desain, status pekerjaan, dan catatan bug wajib dicatat di disk dalam folder `docs/` (`docs/PRD.md` dan `docs/STATE.md`).
