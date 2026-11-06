@@ -1,164 +1,179 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="100%" height="100%" fill="none">
-  <!-- Clean Charcoal Solid Matte Canvas -->
-  <rect width="1200" height="400" rx="12" fill="#0C0F12"/>
-  <rect x="1" y="1" width="1198" height="398" rx="11" fill="none" stroke="#1C242C" stroke-width="1.5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="100%" height="100%" fill="none">
+  <!-- Clean Light Canvas -->
+  <rect width="1200" height="420" rx="8" fill="#FFFFFF"/>
+  <rect x="1" y="1" width="1198" height="418" rx="7" fill="none" stroke="#E2E8F0" stroke-width="1.5"/>
 
-  <!-- Minimalist Technical Accent Line (Lime Neon) -->
-  <rect x="0" y="0" width="1200" height="3" fill="#CCFF00"/>
+  <!-- Top Accent Bar: Official Android Green -->
+  <rect x="0" y="0" width="1200" height="4" fill="#16A34A"/>
 
-  <!-- Subtle Blueprint Grid (Precise & Clean, No Gradients) -->
+  <!-- Subtle Blueprint Grid (Neutral Slate Gray) -->
   <defs>
-    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
-      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#161D24" stroke-width="1"/>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#F1F5F9" stroke-width="1"/>
     </pattern>
   </defs>
-  <rect width="1200" height="400" rx="12" fill="url(#grid)" opacity="0.75"/>
+  <rect width="1200" height="420" rx="8" fill="url(#grid)"/>
 
   <!-- Corner Alignment Crosshairs -->
-  <g stroke="#CCFF00" stroke-width="1" opacity="0.4">
-    <path d="M 28 20 L 28 36 M 20 28 L 36 28"/>
-    <path d="M 1172 20 L 1172 36 M 1164 28 L 1180 28"/>
-    <path d="M 28 364 L 28 380 M 20 372 L 36 372"/>
-    <path d="M 1172 364 L 1172 380 M 1164 372 L 1180 372"/>
+  <g stroke="#16A34A" stroke-width="1" opacity="0.6">
+    <path d="M 24 16 L 24 32 M 16 24 L 32 24"/>
+    <path d="M 1176 16 L 1176 32 M 1168 24 L 1184 24"/>
+    <path d="M 24 388 L 24 404 M 16 396 L 32 396"/>
+    <path d="M 1176 388 L 1176 404 M 1168 396 L 1184 396"/>
   </g>
 
-  <!-- ================= LEFT: REPO IDENTITY & VALUE PROPOSITION ================= -->
+  <!-- ================= LEFT COLUMN: ARSITEKTUR & IDENTITAS ================= -->
 
-  <!-- Top Monospace Label -->
-  <g transform="translate(64, 52)">
-    <rect width="288" height="24" rx="4" fill="#141B1F" stroke="#CCFF00" stroke-width="1" stroke-opacity="0.3"/>
-    <circle cx="12" cy="12" r="3.5" fill="#CCFF00"/>
-    <text x="24" y="16" font-family="ui-monospace, 'SF Mono', 'Roboto Mono', Menlo, monospace" font-size="10.5" font-weight="700" fill="#CCFF00" letter-spacing="1">
-      CHROOT ARM MOBILE // CLOUD CI // NATIVE
+  <!-- Scope Tag -->
+  <g transform="translate(60, 44)">
+    <rect width="330" height="26" rx="4" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+    <rect x="10" y="9" width="8" height="8" rx="2" fill="#16A34A"/>
+    <text x="26" y="17" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600" fill="#334155" letter-spacing="0.5">
+      CHROOT ARM MOBILE • CLOUD CI • NATIVE
     </text>
   </g>
 
-  <!-- Main Hero Title (Flat, High Legibility, No Messy Gradients) -->
-  <text x="64" y="122" font-family="-apple-system, BlinkMacSystemFont, 'Google Sans', 'Inter', 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="40" fill="#FFFFFF" letter-spacing="-0.8">
-    Android Compose <tspan fill="#CCFF00">Builder</tspan>
+  <!-- Framework Title -->
+  <text x="60" y="116" font-family="'Inter', -apple-system, sans-serif" font-weight="800" font-size="38" fill="#0F172A" letter-spacing="-0.5">
+    Android Compose <tspan fill="#16A34A">Builder</tspan>
   </text>
 
-  <!-- Core Value Proposition Statement -->
-  <text x="64" y="156" font-family="-apple-system, BlinkMacSystemFont, 'Google Sans', 'Inter', 'Segoe UI', Roboto, sans-serif" font-weight="500" font-size="16" fill="#E2E8F0" letter-spacing="-0.2">
-    Bikin APK Android Modern Tanpa Build Lokal — 100% Cloud CI via GitHub Actions
+  <!-- Subtitle -->
+  <text x="60" y="148" font-family="'Inter', -apple-system, sans-serif" font-weight="600" font-size="15" fill="#334155">
+    Standar Rekayasa Jetpack Compose Tanpa Beban Build Gradle Lokal
   </text>
 
-  <text x="64" y="182" font-family="-apple-system, BlinkMacSystemFont, 'Google Sans', 'Inter', 'Segoe UI', Roboto, sans-serif" font-weight="400" font-size="13.5" fill="#8899A6">
-    Tulis kode Kotlin + Jetpack Compose, verifikasi pre-flight mandiri, lalu biarkan GitHub yang kompilasi &amp; merilis signed APK.
+  <text x="60" y="172" font-family="'Inter', -apple-system, sans-serif" font-weight="400" font-size="13" fill="#64748B">
+    Dioptimasi untuk devbox chroot ARM HP. Kompilasi biner didelegasikan ke GitHub Actions.
   </text>
 
-  <!-- Architectural Feature Matrix (Matte Charcoal Panels + Neon Lime Dot) -->
-  <g transform="translate(64, 226)">
+  <!-- 4 Feature Badges -->
+  <g transform="translate(60, 210)">
     <!-- Card 1 -->
     <g transform="translate(0, 0)">
-      <rect width="250" height="64" rx="6" fill="#11161B" stroke="#1D2630" stroke-width="1"/>
-      <circle cx="20" cy="24" r="3" fill="#CCFF00"/>
-      <text x="32" y="27" font-family="-apple-system, BlinkMacSystemFont, 'Google Sans', sans-serif" font-size="12.5" font-weight="700" fill="#FFFFFF">
+      <rect width="248" height="70" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+      <rect x="16" y="16" width="6" height="6" rx="1.5" fill="#16A34A"/>
+      <text x="30" y="22" font-family="'Inter', sans-serif" font-size="12" font-weight="700" fill="#0F172A">
         Zero Local Build
       </text>
-      <text x="32" y="46" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" fill="#788896">
-        Bebas beban Gradle daemon &amp; RAM
+      <text x="30" y="42" font-family="'Inter', sans-serif" font-size="11" fill="#64748B">
+        0 MB SDK lokal • Bebas OOM
+      </text>
+      <text x="30" y="58" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="600" fill="#16A34A">
+        RAM HP &lt; 50 MB
       </text>
     </g>
 
     <!-- Card 2 -->
-    <g transform="translate(266, 0)">
-      <rect width="250" height="64" rx="6" fill="#11161B" stroke="#1D2630" stroke-width="1"/>
-      <circle cx="20" cy="24" r="3" fill="#CCFF00"/>
-      <text x="32" y="27" font-family="-apple-system, BlinkMacSystemFont, 'Google Sans', sans-serif" font-size="12.5" font-weight="700" fill="#FFFFFF">
-        GitHub Actions CI/CD
+    <g transform="translate(260, 0)">
+      <rect width="248" height="70" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+      <rect x="16" y="16" width="6" height="6" rx="1.5" fill="#0F172A"/>
+      <text x="30" y="22" font-family="'Inter', sans-serif" font-size="12" font-weight="700" fill="#0F172A">
+        Native Engine Ready
       </text>
-      <text x="32" y="46" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" fill="#788896">
-        Kompilasi headless runner di cloud
+      <text x="30" y="42" font-family="'Inter', sans-serif" font-size="11" fill="#64748B">
+        C/C++ NDK CMake • Rust UniFFI
+      </text>
+      <text x="30" y="58" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="600" fill="#334155">
+        arm64-v8a ABI filter
       </text>
     </g>
 
     <!-- Card 3 -->
-    <g transform="translate(0, 76)">
-      <rect width="250" height="64" rx="6" fill="#11161B" stroke="#1D2630" stroke-width="1"/>
-      <circle cx="20" cy="24" r="3" fill="#CCFF00"/>
-      <text x="32" y="27" font-family="-apple-system, BlinkMacSystemFont, 'Google Sans', sans-serif" font-size="12.5" font-weight="700" fill="#FFFFFF">
-        Auto-Signed Keystore
+    <g transform="translate(0, 82)">
+      <rect width="248" height="70" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+      <rect x="16" y="16" width="6" height="6" rx="1.5" fill="#D97706"/>
+      <text x="30" y="22" font-family="'Inter', sans-serif" font-size="12" font-weight="700" fill="#0F172A">
+        Living Session Memory
       </text>
-      <text x="32" y="46" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" fill="#788896">
-        1-Click GitHub Secrets signing
+      <text x="30" y="42" font-family="'Inter', sans-serif" font-size="11" fill="#64748B">
+        docs/PRD.md &amp; docs/STATE.md
+      </text>
+      <text x="30" y="58" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="600" fill="#D97706">
+        Anti-Amnesia Sesi Baru
       </text>
     </g>
 
     <!-- Card 4 -->
-    <g transform="translate(266, 76)">
-      <rect width="250" height="64" rx="6" fill="#11161B" stroke="#1D2630" stroke-width="1"/>
-      <circle cx="20" cy="24" r="3" fill="#CCFF00"/>
-      <text x="32" y="27" font-family="-apple-system, BlinkMacSystemFont, 'Google Sans', sans-serif" font-size="12.5" font-weight="700" fill="#FFFFFF">
-        Streaming In-App Updater
+    <g transform="translate(260, 82)">
+      <rect width="248" height="70" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+      <rect x="16" y="16" width="6" height="6" rx="1.5" fill="#7C3AED"/>
+      <text x="30" y="22" font-family="'Inter', sans-serif" font-size="12" font-weight="700" fill="#0F172A">
+        Streaming In-App Update
       </text>
-      <text x="32" y="46" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" fill="#788896">
-        OkHttp .part &amp; deep DEX validation
+      <text x="30" y="42" font-family="'Inter', sans-serif" font-size="11" fill="#64748B">
+        OkHttp .part • 4-lapis validasi
+      </text>
+      <text x="30" y="58" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="600" fill="#7C3AED">
+        Zero Corrupted APK
       </text>
     </g>
   </g>
 
-  <!-- ================= RIGHT: INDUSTRIAL WORKFLOW SCHEMATIC ================= -->
+  <!-- ================= RIGHT COLUMN: WORKFLOW SCHEMATIC ================= -->
 
-  <!-- Workflow Pipeline Container -->
-  <g transform="translate(630, 48)">
-    <rect width="506" height="304" rx="8" fill="#101519" stroke="#1D2730" stroke-width="1.2"/>
+  <g transform="translate(620, 44)">
+    <!-- Window Frame -->
+    <rect width="520" height="336" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.2"/>
     
-    <!-- Header of Schematic -->
-    <rect x="0" y="0" width="506" height="34" rx="8" fill="#141B21"/>
-    <path d="M 0 34 L 506 34" stroke="#1D2730" stroke-width="1"/>
-    <circle cx="18" cy="17" r="4" fill="#E11D48" opacity="0.7"/>
-    <circle cx="32" cy="17" r="4" fill="#FBBF24" opacity="0.7"/>
-    <circle cx="46" cy="17" r="4" fill="#22C55E" opacity="0.7"/>
-    <text x="64" y="21" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#8899A6" font-weight="600">
+    <!-- Title Bar -->
+    <rect width="520" height="34" rx="6" fill="#F1F5F9"/>
+    <path d="M 0 34 L 520 34" stroke="#E2E8F0" stroke-width="1"/>
+    <circle cx="18" cy="17" r="4" fill="#EF4444"/>
+    <circle cx="32" cy="17" r="4" fill="#F59E0B"/>
+    <circle cx="46" cy="17" r="4" fill="#10B981"/>
+    <text x="64" y="21" font-family="'JetBrains Mono', monospace" font-size="11" fill="#475569" font-weight="600">
       WORKFLOW PIPELINE: ZERO LOCAL BUILD
     </text>
 
-    <!-- Step 1: Local Coding & Pre-Flight -->
-    <g transform="translate(24, 52)">
-      <rect width="458" height="60" rx="6" fill="#0C1013" stroke="#222D38" stroke-width="1"/>
-      <rect x="0" y="0" width="4" height="60" rx="2" fill="#CCFF00"/>
-      <text x="18" y="24" font-family="ui-monospace, Menlo, monospace" font-size="10.5" font-weight="700" fill="#CCFF00">
-        STEP 01: LOCAL WORKSPACE (RINGAN &amp; CEPAT)
+    <!-- Step 1 -->
+    <g transform="translate(20, 48)">
+      <rect width="480" height="66" rx="6" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
+      <rect x="0" y="0" width="4" height="66" rx="2" fill="#16A34A"/>
+      <text x="18" y="24" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#16A34A">
+        01. LOKAL CHROOT ARM
       </text>
-      <text x="18" y="44" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" fill="#CBD5E1">
-        Tulis Jetpack Compose &amp; jalankan pre-flight linter: <tspan font-family="ui-monospace, monospace" fill="#CCFF00">verify_kotlin_syntax.py</tspan>
-      </text>
-    </g>
-
-    <!-- Connecting Directional Arrow 1 -->
-    <g transform="translate(253, 118)">
-      <line x1="0" y1="0" x2="0" y2="12" stroke="#CCFF00" stroke-width="1.5" stroke-dasharray="3 3"/>
-      <polygon points="-4,12 4,12 0,18" fill="#CCFF00"/>
-    </g>
-
-    <!-- Step 2: Git Push to Main -->
-    <g transform="translate(24, 138)">
-      <rect width="458" height="60" rx="6" fill="#0C1013" stroke="#222D38" stroke-width="1"/>
-      <rect x="0" y="0" width="4" height="60" rx="2" fill="#CCFF00"/>
-      <text x="18" y="24" font-family="ui-monospace, Menlo, monospace" font-size="10.5" font-weight="700" fill="#CCFF00">
-        STEP 02: GIT PUSH TO REPO (DELEGASI CLOUD)
-      </text>
-      <text x="18" y="44" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" fill="#CBD5E1">
-        Commit dengan prefix <tspan font-family="ui-monospace, monospace" fill="#FFFFFF">"Release v..."</tspan> &amp; push via GitHub token aman
+      <text x="18" y="46" font-family="'Inter', sans-serif" font-size="12" fill="#334155">
+        Tulis Jetpack Compose &amp; linter mandiri: <tspan font-family="'JetBrains Mono', monospace" font-weight="600" fill="#0F172A">verify_kotlin_syntax.py</tspan> (~20ms)
       </text>
     </g>
 
-    <!-- Connecting Directional Arrow 2 -->
-    <g transform="translate(253, 204)">
-      <line x1="0" y1="0" x2="0" y2="12" stroke="#CCFF00" stroke-width="1.5" stroke-dasharray="3 3"/>
-      <polygon points="-4,12 4,12 0,18" fill="#CCFF00"/>
+    <!-- Arrow 1 -->
+    <g transform="translate(260, 118)">
+      <line x1="0" y1="0" x2="0" y2="12" stroke="#16A34A" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <polygon points="-4,12 4,12 0,17" fill="#16A34A"/>
     </g>
 
-    <!-- Step 3: GitHub Actions Cloud Build -->
-    <g transform="translate(24, 224)">
-      <rect width="458" height="60" rx="6" fill="#131C14" stroke="#CCFF00" stroke-width="1" stroke-opacity="0.4"/>
-      <rect x="0" y="0" width="4" height="60" rx="2" fill="#CCFF00"/>
-      <text x="18" y="24" font-family="ui-monospace, Menlo, monospace" font-size="10.5" font-weight="700" fill="#CCFF00">
-        STEP 03: GITHUB ACTIONS RUNNER (PRODUKSI)
+    <!-- Step 2 -->
+    <g transform="translate(20, 138)">
+      <rect width="480" height="66" rx="6" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
+      <rect x="0" y="0" width="4" height="66" rx="2" fill="#0F172A"/>
+      <text x="18" y="24" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#0F172A">
+        02. GIT COMMIT &amp; PUSH
       </text>
-      <text x="18" y="44" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" fill="#E2E8F0">
-        Kompilasi Gradle di cloud, signing APK otomatis &amp; publish GitHub Release
+      <text x="18" y="46" font-family="'Inter', sans-serif" font-size="12" fill="#334155">
+        Batch commit tuntas (0 TODO) dengan prefix SemVer: <tspan font-family="'JetBrains Mono', monospace" font-weight="600" fill="#16A34A">Release v1.0.0</tspan>
+      </text>
+    </g>
+
+    <!-- Arrow 2 -->
+    <g transform="translate(260, 208)">
+      <line x1="0" y1="0" x2="0" y2="12" stroke="#16A34A" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <polygon points="-4,12 4,12 0,17" fill="#16A34A"/>
+    </g>
+
+    <!-- Step 3 -->
+    <g transform="translate(20, 228)">
+      <rect width="480" height="74" rx="6" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1"/>
+      <rect x="0" y="0" width="4" height="74" rx="2" fill="#16A34A"/>
+      <text x="18" y="24" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#15803D">
+        03. GITHUB ACTIONS CLOUD RUNNER
+      </text>
+      <text x="18" y="44" font-family="'Inter', sans-serif" font-size="12" fill="#166534">
+        Kompilasi headless Ubuntu, auto-signing release keystore
+      </text>
+      <text x="18" y="60" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600" fill="#15803D">
+        ➔ Produksi Signed APK siap unduh di GitHub Release
       </text>
     </g>
   </g>
