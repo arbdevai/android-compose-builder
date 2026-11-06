@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>Android Compose Builder — Zero Local Build APK Engineering Standard</title>
-  <meta name="description" content="Standar Rekayasa AI Agent untuk bikin aplikasi Android Kotlin + Jetpack Compose tanpa build lokal. 100% kompilasi cloud via GitHub Actions.">
+  <title>Android Compose Builder — Agent Skill for Jetpack Compose & Native Engineering</title>
+  <meta name="description" content="Skill rekayasa aplikasi Android Kotlin + Jetpack Compose untuk AI coding agent. Dioptimasi untuk chroot mobile, kompilasi cloud via GitHub Actions, native C++/Rust, dan memori sesi disk-first.">
   <link rel="icon" type="image/svg+xml" href="assets/icons/install.svg">
   
-  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <!-- Typography: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -20,42 +20,25 @@
       theme: {
         extend: {
           colors: {
-            charcoal: {
-              950: '#07090C',
-              900: '#0B0E12',
-              850: '#101419',
-              800: '#151B22',
-              700: '#1E2631',
-              600: '#2A3644',
+            oled: {
+              black: '#000000',
+              card: '#0D1117',
+              cardHover: '#161B22',
+              border: '#21262D',
+              borderHover: '#30363D',
+              subtle: '#161B22',
             },
-            lime: {
-              neon: '#CCFF00',
-              glow: 'rgba(204, 255, 0, 0.2)',
-              mint: '#3DDC84',
+            accent: {
+              green: '#3DDC84',
+              blue: '#58A6FF',
+              yellow: '#E3B341',
+              red: '#F85149',
+              muted: '#8B949E',
             }
           },
           fontFamily: {
             sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
             mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
-          },
-          animation: {
-            'shimmer': 'shimmer 2s infinite linear',
-            'float': 'float 4s ease-in-out infinite',
-            'pulse-glow': 'pulseGlow 2.5s ease-in-out infinite',
-          },
-          keyframes: {
-            shimmer: {
-              '0%': { transform: 'translateX(-100%)' },
-              '100%': { transform: 'translateX(100%)' },
-            },
-            float: {
-              '0%, 100%': { transform: 'translateY(0px)' },
-              '50%': { transform: 'translateY(-6px)' },
-            },
-            pulseGlow: {
-              '0%, 100%': { opacity: '0.4' },
-              '50%': { opacity: '0.85' },
-            }
           }
         }
       }
@@ -63,595 +46,410 @@
   </script>
 
   <style>
-    /* Custom Scrollbar */
+    /* Clean Minimalist Scrollbar */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: #0B0E12;
+      background: #000000;
     }
     ::-webkit-scrollbar-thumb {
-      background: #1E2631;
+      background: #21262D;
       border-radius: 3px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #CCFF00;
+      background: #3DDC84;
     }
 
-    /* Bento Spotlight Hover Card Effect */
-    .bento-card {
-      position: relative;
-      background: #101419;
-      border: 1px solid #1E2631;
-      border-radius: 1rem;
-      overflow: hidden;
-      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Structured Card Style - No Glowing / Pulsing Slop */
+    .feature-card {
+      background: #0D1117;
+      border: 1px solid #21262D;
+      border-radius: 0.75rem;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
     }
-    .bento-card:hover {
-      border-color: rgba(204, 255, 0, 0.45);
-      transform: translateY(-3px);
-      box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.7), 0 0 24px rgba(204, 255, 0, 0.08);
+    .feature-card:hover {
+      border-color: #30363D;
+      background: #121820;
     }
 
-    /* Skeleton Animation */
-    .skeleton-box {
+    /* Native Shimmer Animation */
+    @keyframes shimmerAnim {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    .shimmer-active {
       position: relative;
       overflow: hidden;
-      background: #18202A;
+      background: #161B22;
     }
-    .skeleton-box::after {
+    .shimmer-active::after {
       content: '';
       position: absolute;
       inset: 0;
       transform: translateX(-100%);
-      background: linear-gradient(90deg, transparent, rgba(204, 255, 0, 0.12), transparent);
-      animation: shimmer 1.8s infinite;
+      background: linear-gradient(90deg, transparent, rgba(61, 220, 132, 0.12), transparent);
+      animation: shimmerAnim 1.6s infinite ease-in-out;
     }
   </style>
 </head>
-<body class="bg-charcoal-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-lime-neon selection:text-charcoal-950 overflow-x-hidden w-full max-w-full">
+<body class="bg-oled-black text-slate-200 font-sans antialiased min-h-screen flex flex-col selection:bg-accent-green selection:text-oled-black overflow-x-hidden">
 
-  <!-- Ambient Interactive Canvas Background -->
-  <canvas id="bg-canvas" class="fixed inset-0 pointer-events-none z-0 opacity-50"></canvas>
-
-  <div class="relative z-10 flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
-    
-    <!-- Top Sticky Navigation -->
-    <header class="sticky top-0 z-50 backdrop-blur-xl bg-charcoal-950/85 border-b border-charcoal-700/80 transition-colors">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        
-        <!-- Brand Logo -->
-        <a href="#" class="flex items-center gap-2.5 min-w-0 group">
-          <div class="w-8 h-8 rounded-lg bg-charcoal-850 border border-charcoal-700 flex items-center justify-center flex-shrink-0 group-hover:border-lime-neon transition-colors shadow-sm">
-            <svg class="w-4 h-4 text-lime-neon" viewBox="0 0 24 24" fill="currentColor">
-              <polygon points="13 2 4 14 11 14 10 22 20 10 13 10 13 2" />
-            </svg>
-          </div>
-          <span class="font-bold text-sm sm:text-base tracking-tight truncate text-slate-100 group-hover:text-white transition-colors">
-            Android Compose <span class="text-lime-neon font-black">Builder</span>
-          </span>
-          <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-lime-neon/10 text-lime-neon border border-lime-neon/30 uppercase tracking-wider">
-            Cloud CI
-          </span>
-        </a>
-
-        <!-- Desktop Navigation Links -->
-        <nav class="hidden md:flex items-center gap-6">
-          <a href="#bento" class="text-xs lg:text-sm font-medium text-slate-400 hover:text-lime-neon transition-colors">Bento Features</a>
-          <a href="#pipeline" class="text-xs lg:text-sm font-medium text-slate-400 hover:text-lime-neon transition-colors">Alur Cloud CI</a>
-          <a href="#cli" class="text-xs lg:text-sm font-medium text-slate-400 hover:text-lime-neon transition-colors">Multi-CLI</a>
-          <a href="https://github.com/arbdevai/android-compose-builder" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs lg:text-sm font-mono font-semibold bg-charcoal-850 hover:bg-lime-neon text-lime-neon hover:text-charcoal-950 border border-charcoal-600 hover:border-lime-neon transition-all duration-200 hover:scale-105 shadow-sm">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-            </svg>
-            GitHub
-          </a>
-        </nav>
-
-        <!-- Mobile Menu Hamburger Button -->
-        <button id="mobileMenuBtn" aria-label="Toggle Navigation" class="md:hidden p-2 rounded-lg bg-charcoal-850 border border-charcoal-700 text-slate-200 hover:text-lime-neon hover:border-lime-neon transition-colors focus:outline-none">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-50 bg-oled-black/90 backdrop-blur-md border-b border-oled-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center gap-2.5 group">
+        <div class="w-7 h-7 rounded bg-oled-card border border-oled-border flex items-center justify-center text-accent-green group-hover:border-accent-green transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+            <line x1="12" y1="18" x2="12.01" y2="18"/>
           </svg>
-        </button>
-      </div>
-
-      <!-- Mobile Navigation Drawer -->
-      <div id="mobileDrawer" class="hidden md:hidden bg-charcoal-900 border-b border-charcoal-700 px-4 py-3 space-y-2.5 transition-all">
-        <a href="#bento" class="block py-2 text-sm font-medium text-slate-300 hover:text-lime-neon">Bento Features</a>
-        <a href="#pipeline" class="block py-2 text-sm font-medium text-slate-300 hover:text-lime-neon">Alur Cloud CI</a>
-        <a href="#cli" class="block py-2 text-sm font-medium text-slate-300 hover:text-lime-neon">Multi-CLI</a>
-        <a href="https://github.com/arbdevai/android-compose-builder" target="_blank" class="block py-2 text-sm font-semibold text-lime-neon">Lihat di GitHub →</a>
-      </div>
-    </header>
-
-    <!-- Main Content Container -->
-    <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 space-y-16 sm:space-y-24">
-
-      <!-- Hero Section -->
-      <section class="text-center space-y-6 max-w-4xl mx-auto pt-4">
-        
-        <!-- Status Pill -->
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-charcoal-850 border border-charcoal-700 text-xs sm:text-sm text-slate-300 shadow-sm animate-float">
-          <span class="w-2 h-2 rounded-full bg-lime-neon animate-ping"></span>
-          <span class="font-mono text-lime-neon font-semibold">ZERO LOCAL BUILD</span>
-          <span class="text-slate-500">•</span>
-          <span>Google Dev Agent Engineering Standard</span>
         </div>
+        <span class="font-bold text-sm tracking-tight text-white">
+          android-compose-builder
+        </span>
+        <span class="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-oled-card border border-oled-border text-accent-muted">
+          v1.1.0
+        </span>
+      </a>
 
-        <!-- Headline -->
-        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
-          Bikin APK Android Modern<br class="hidden sm:inline">
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-lime-neon via-lime-mint to-emerald-400">
-            Tanpa Kompilasi Lokal
-          </span>
-        </h1>
+      <!-- Navigation Links -->
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="#principles" class="text-xs font-medium text-slate-400 hover:text-white transition-colors">Prinsip</a>
+        <a href="#architecture" class="text-xs font-medium text-slate-400 hover:text-white transition-colors">Arsitektur</a>
+        <a href="#references" class="text-xs font-medium text-slate-400 hover:text-white transition-colors">Modul Referensi</a>
+        <a href="#install" class="text-xs font-medium text-slate-400 hover:text-white transition-colors">Instalasi</a>
+        <a href="https://github.com/arbdevai/android-compose-builder" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-mono font-medium bg-oled-card hover:bg-oled-cardHover text-slate-200 border border-oled-border hover:border-slate-500 transition-colors">
+          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          GitHub
+        </a>
+      </nav>
 
-        <!-- Subheading -->
-        <p class="text-base sm:text-lg lg:text-xl text-slate-400 font-normal max-w-2xl mx-auto leading-relaxed">
-          Tulis kode Kotlin &amp; Jetpack Compose di devbox ringan Anda. Biarkan runner cloud GitHub Actions yang melakukan kompilasi headless Gradle, auto-signing, dan merilis signed APK produksi.
+      <!-- Mobile Menu Button -->
+      <button id="mobileMenuBtn" aria-label="Toggle Menu" class="md:hidden p-1.5 rounded bg-oled-card border border-oled-border text-slate-300 hover:text-white">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div id="mobileDrawer" class="hidden md:hidden bg-oled-card border-b border-oled-border px-4 py-3 space-y-2 text-xs">
+      <a href="#principles" class="block py-1.5 text-slate-300 hover:text-white">Prinsip</a>
+      <a href="#architecture" class="block py-1.5 text-slate-300 hover:text-white">Arsitektur</a>
+      <a href="#references" class="block py-1.5 text-slate-300 hover:text-white">Modul Referensi</a>
+      <a href="#install" class="block py-1.5 text-slate-300 hover:text-white">Instalasi</a>
+      <a href="https://github.com/arbdevai/android-compose-builder" target="_blank" class="block py-1.5 text-accent-green font-semibold">GitHub Repository</a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-20">
+
+    <!-- Hero Section -->
+    <section class="max-w-4xl mx-auto text-center space-y-6">
+      
+      <!-- Scope Pill -->
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-oled-card border border-oled-border text-xs font-mono text-slate-300">
+        <span class="text-accent-green font-semibold">Android Jetpack Compose Builder</span>
+        <span class="text-slate-600">/</span>
+        <span class="text-slate-400">Chroot Mobile &amp; Cloud CI Workflow</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+        Pengembangan Android Modern<br>
+        <span class="text-accent-green">Tanpa Kompilasi Gradle Lokal</span>
+      </h1>
+
+      <!-- Technical Description -->
+      <p class="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
+        Skill rekayasa mandiri (agentic) untuk AI coding agent yang berjalan di lingkungan terbatas seperti chroot ARM mobile. Menghapus kompilasi biner berat dari perangkat lokal dan mendelegasikannya sepenuhnya ke GitHub Actions CI.
+      </p>
+
+      <!-- 1-Click Terminal Command -->
+      <div class="max-w-2xl mx-auto pt-2" id="install">
+        <div class="bg-oled-card border border-oled-border rounded-lg p-2.5 sm:pl-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-2 overflow-x-auto py-1 font-mono text-xs text-slate-300">
+            <span class="text-accent-green select-none">$</span>
+            <code id="cmdText" class="whitespace-nowrap select-all text-slate-100">curl -fsSL https://raw.githubusercontent.com/arbdevai/android-compose-builder/main/install.sh | bash</code>
+          </div>
+          <button id="copyBtn" class="flex-shrink-0 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded bg-oled-subtle hover:bg-oled-cardHover text-xs font-mono font-medium text-slate-200 border border-oled-border hover:border-slate-400 transition-colors">
+            <svg class="w-3.5 h-3.5 text-accent-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            <span id="copyLabel">Salin</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Metrics -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto pt-2 text-left font-mono">
+        <div class="p-3 rounded-lg bg-oled-card border border-oled-border">
+          <div class="text-lg sm:text-xl font-bold text-accent-green">0 MB</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Local Android SDK</div>
+        </div>
+        <div class="p-3 rounded-lg bg-oled-card border border-oled-border">
+          <div class="text-lg sm:text-xl font-bold text-white">100%</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">GitHub Actions CI</div>
+        </div>
+        <div class="p-3 rounded-lg bg-oled-card border border-oled-border">
+          <div class="text-lg sm:text-xl font-bold text-accent-blue">Disk-First</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Living Session Memory</div>
+        </div>
+        <div class="p-3 rounded-lg bg-oled-card border border-oled-border">
+          <div class="text-lg sm:text-xl font-bold text-slate-200">NDK &amp; Rust</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Native Layer Ready</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Operational Principles -->
+    <section id="principles" class="space-y-6">
+      <div class="border-b border-oled-border pb-3">
+        <h2 class="text-lg sm:text-xl font-bold text-white tracking-tight">
+          Prinsip Operasional Utama (Golden Rules)
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">
+          Aturan ketat yang mengeliminasi masalah umum AI coding: kompilasi lokal OOM, fitur setengah jadi, dan micro-push tidak efisien.
         </p>
+      </div>
 
-        <!-- Interactive 1-Line Terminal Install Box -->
-        <div class="w-full max-w-2xl mx-auto pt-2">
-          <div class="bg-charcoal-900 border border-charcoal-700 hover:border-lime-neon rounded-xl p-3 sm:p-2.5 sm:pl-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xl transition-all group">
-            <div class="flex items-center gap-2 min-w-0 overflow-x-auto py-1 scrollbar-none">
-              <span class="font-mono text-lime-neon font-bold text-sm">$</span>
-              <code id="cmdText" class="font-mono text-xs sm:text-sm text-slate-200 whitespace-nowrap select-all">
-                curl -fsSL https://raw.githubusercontent.com/arbdevai/android-compose-builder/main/install.sh | bash
-              </code>
-            </div>
-            <button id="copyBtn" class="flex-shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 rounded-lg bg-charcoal-800 hover:bg-lime-neon text-lime-neon hover:text-charcoal-950 font-mono text-xs font-bold border border-charcoal-600 hover:border-lime-neon transition-all duration-200 active:scale-95 shadow-sm">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke-width="2"/>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke-width="2"/>
-              </svg>
-              <span id="copyLabel">Salin Perintah</span>
-            </button>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        <!-- Rule 1 -->
+        <div class="feature-card p-5 space-y-3">
+          <div class="flex items-center justify-between text-xs font-mono">
+            <span class="text-accent-green font-bold">ATURAN 01</span>
+            <span class="text-slate-500">CHROOT WORKFLOW</span>
           </div>
-        </div>
-
-        <!-- Metric Badges -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto pt-4 text-left">
-          <div class="p-3.5 rounded-xl bg-charcoal-900/90 border border-charcoal-700/80">
-            <div class="text-xl sm:text-2xl font-bold font-mono text-lime-neon">0 MB</div>
-            <div class="text-xs text-slate-400 font-medium mt-0.5">Local SDK Required</div>
-          </div>
-          <div class="p-3.5 rounded-xl bg-charcoal-900/90 border border-charcoal-700/80">
-            <div class="text-xl sm:text-2xl font-bold font-mono text-white">100%</div>
-            <div class="text-xs text-slate-400 font-medium mt-0.5">GitHub Actions CI</div>
-          </div>
-          <div class="p-3.5 rounded-xl bg-charcoal-900/90 border border-charcoal-700/80">
-            <div class="text-xl sm:text-2xl font-bold font-mono text-lime-neon">20 ms</div>
-            <div class="text-xs text-slate-400 font-medium mt-0.5">Pre-Flight Linter</div>
-          </div>
-          <div class="p-3.5 rounded-xl bg-charcoal-900/90 border border-charcoal-700/80">
-            <div class="text-xl sm:text-2xl font-bold font-mono text-white">4-Tier</div>
-            <div class="text-xs text-slate-400 font-medium mt-0.5">APK Deep Validation</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===================================================================
-           BENTO GRID ARCHITECTURE SHOWCASE
-           =================================================================== -->
-      <section id="bento" class="space-y-6">
-        <div class="text-center max-w-2xl mx-auto space-y-2">
-          <span class="font-mono text-xs font-bold text-lime-neon uppercase tracking-wider">BENTO ARCHITECTURE</span>
-          <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Pilar Rekayasa Standar Industri
-          </h2>
-          <p class="text-sm sm:text-base text-slate-400">
-            Arsitektur modular yang dirancang untuk mencegah OOM, deadlock hardware, APK corrupt, dan kegagalan CI.
+          <h3 class="text-base font-bold text-white">Zero Local Gradle Build</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Dilarang menjalankan <code class="font-mono text-slate-300">./gradlew assembleRelease</code> di lingkungan lokal. Kompilasi biner, proguard, signing, dan packaging APK diserahkan sepenuhnya ke cloud runner GitHub Actions.
           </p>
         </div>
 
-        <!-- The Responsive Bento Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 w-full">
-          
-          <!-- Bento 1: Cloud CI Engine (Spans 2 columns, 2 rows on large) -->
-          <div class="bento-card md:col-span-2 lg:col-span-2 lg:row-span-2 p-5 sm:p-7 flex flex-col justify-between">
-            <div class="space-y-4">
-              <div class="flex items-center justify-between">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-lime-neon/10 text-lime-neon border border-lime-neon/20">
-                  CORE PARADIGM
-                </span>
-                <span class="text-xs font-mono text-slate-500">PILAR 01</span>
-              </div>
-              <h3 class="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                Zero Local Build Engine
-              </h3>
-              <p class="text-sm text-slate-400 leading-relaxed">
-                Menghapus kewajiban instalasi Android Studio dan Gradle lokal (~20 GB). AI coding agent Anda bekerja di container ringan tanpa risiko kehabisan memori atau CPU throttling.
-              </p>
-
-              <!-- Interactive Pipeline Mockup inside Card -->
-              <div class="space-y-2.5 pt-2 font-mono text-xs">
-                <div class="p-3 rounded-lg bg-charcoal-900 border border-charcoal-700 flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-lime-neon"></span>
-                    <span class="text-slate-300">Local Devbox (Compose Code)</span>
-                  </div>
-                  <span class="text-lime-neon font-semibold text-[11px]">0 MB SDK</span>
-                </div>
-                <div class="flex justify-center text-slate-600">↓ commit: Release v1.0.0</div>
-                <div class="p-3 rounded-lg bg-charcoal-900 border border-charcoal-700 flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
-                    <span class="text-slate-300">GitHub Actions (Ubuntu Cloud)</span>
-                  </div>
-                  <span class="text-blue-400 font-semibold text-[11px]">Headless Runner</span>
-                </div>
-                <div class="flex justify-center text-slate-600">↓ build signed APK</div>
-                <div class="p-3 rounded-lg bg-charcoal-900 border border-lime-neon/40 flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-lime-mint"></span>
-                    <span class="text-slate-300">GitHub Release Artifact</span>
-                  </div>
-                  <span class="text-lime-mint font-semibold text-[11px]">Ready APK</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="pt-4 border-t border-charcoal-800 text-xs text-slate-400 flex items-center justify-between">
-              <span>Keberhasilan dipantau via CLI</span>
-              <code class="text-lime-neon font-mono">gh run watch --interval 60</code>
-            </div>
+        <!-- Rule 2 -->
+        <div class="feature-card p-5 space-y-3">
+          <div class="flex items-center justify-between text-xs font-mono">
+            <span class="text-accent-green font-bold">ATURAN 02</span>
+            <span class="text-slate-500">VERTICAL SLICE</span>
           </div>
-
-          <!-- Bento 2: Streaming In-App Updater (Spans 2 columns) -->
-          <div class="bento-card md:col-span-1 lg:col-span-2 p-5 sm:p-6 flex flex-col justify-between space-y-4">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-charcoal-800 text-lime-neon border border-charcoal-700">
-                  ANTI-APK CORRUPT
-                </span>
-                <span class="text-xs font-mono text-slate-500">PILAR 05</span>
-              </div>
-              <h3 class="text-lg sm:text-xl font-bold text-white">Streaming OkHttp &amp; .part Isolation</h3>
-              <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                Dilarang menggunakan Android DownloadManager. Unduh langsung dengan buffer 64 KB ke file sementara <code class="text-lime-neon font-mono">.part</code>. Rename atomik hanya setelah lolos verifikasi integritas 4 lapis (GET_SIGNING_CERTIFICATES &amp; DEX components check).
-              </p>
-            </div>
-
-            <!-- Simulated Download Progress Bar -->
-            <div class="p-3 rounded-lg bg-charcoal-900 border border-charcoal-700 space-y-1.5 font-mono text-xs">
-              <div class="flex justify-between text-slate-300 text-[11px]">
-                <span>app-v1.0.4-release.apk.part</span>
-                <span class="text-lime-neon font-bold">100% Validated</span>
-              </div>
-              <div class="w-full bg-charcoal-800 h-2 rounded-full overflow-hidden">
-                <div class="bg-gradient-to-r from-lime-mint to-lime-neon h-full w-full rounded-full"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Bento 3: Native Skeleton Shimmer (1 column) -->
-          <div class="bento-card p-5 sm:p-6 flex flex-col justify-between space-y-3">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="text-[11px] font-mono font-bold text-lime-neon">UX STANDARD</span>
-                <span class="text-xs font-mono text-slate-500">PILAR 02</span>
-              </div>
-              <h3 class="text-base sm:text-lg font-bold text-white">Native Skeleton Shimmer</h3>
-              <p class="text-xs text-slate-400">
-                Reject loading spinner di layar kosong. Menggunakan kilau animasi Compose murni tanpa library pihak ketiga.
-              </p>
-            </div>
-
-            <!-- Live Skeleton Shimmer Mockup Component -->
-            <div class="p-3 rounded-lg bg-charcoal-900 border border-charcoal-700 space-y-2">
-              <div class="skeleton-box h-3 w-3/4 rounded"></div>
-              <div class="skeleton-box h-2.5 w-full rounded"></div>
-              <div class="skeleton-box h-2.5 w-1/2 rounded"></div>
-            </div>
-          </div>
-
-          <!-- Bento 4: Resilient Mutex & Anti-Deadlock (1 column) -->
-          <div class="bento-card p-5 sm:p-6 flex flex-col justify-between space-y-3">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="text-[11px] font-mono font-bold text-lime-neon">CONCURRENCY</span>
-                <span class="text-xs font-mono text-slate-500">PILAR 03</span>
-              </div>
-              <h3 class="text-base sm:text-lg font-bold text-white">Mutex &amp; Anti-Deadlock</h3>
-              <p class="text-xs text-slate-400">
-                Otentikasi atomik dengan <code class="text-lime-neon font-mono text-[11px]">Mutex.withLock</code> dan larangan re-entrancy Semaphore saat berkomunikasi dengan hardware/router.
-              </p>
-            </div>
-
-            <div class="p-2.5 rounded-lg bg-charcoal-900 border border-charcoal-700 font-mono text-[11px] text-slate-400">
-              <span class="text-blue-400">authMutex</span>.<span class="text-lime-neon">withLock</span> {<br>
-              &nbsp;&nbsp;ensureValidSession()<br>
-              }
-            </div>
-          </div>
-
-          <!-- Bento 5: Pre-Flight Linter (2 columns on large) -->
-          <div class="bento-card md:col-span-2 lg:col-span-2 p-5 sm:p-6 flex flex-col justify-between space-y-4">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-charcoal-800 text-lime-neon border border-charcoal-700">
-                  ZERO-CI-FAILURE
-                </span>
-                <span class="text-xs font-mono text-slate-500">PILAR 07</span>
-              </div>
-              <h3 class="text-lg sm:text-xl font-bold text-white">Pre-Flight Memory-Safe Linter</h3>
-              <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                Skrip mandiri <code class="text-lime-neon font-mono text-xs">verify_kotlin_syntax.py</code> memverifikasi coroutine boundaries,Result unwrap, bracket balance, DisposableEffect leak, dan advisory non-blocking dalam hitungan milidetik sebelum git push.
-              </p>
-            </div>
-
-            <div class="p-3 rounded-lg bg-charcoal-900 border border-charcoal-700 font-mono text-xs text-slate-300 flex items-center justify-between">
-              <span class="text-slate-400">$ python3 scripts/verify_kotlin_syntax.py</span>
-              <span class="text-lime-neon font-bold">✓ PASSED</span>
-            </div>
-          </div>
-
-          <!-- Bento 6: Auto Release Keystore (1 column) -->
-          <div class="bento-card p-5 sm:p-6 flex flex-col justify-between space-y-3">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="text-[11px] font-mono font-bold text-lime-neon">AUTOMATION</span>
-                <span class="text-xs font-mono text-slate-500">PILAR 08</span>
-              </div>
-              <h3 class="text-base sm:text-lg font-bold text-white">1-Click Keystore Setup</h3>
-              <p class="text-xs text-slate-400">
-                Deteksi otomatis `keytool`, pembuatan keystore rilis non-interaktif, dan upload 4 GitHub Secrets otomatis dalam 3 detik.
-              </p>
-            </div>
-            <div class="text-[11px] font-mono text-slate-400 bg-charcoal-900 p-2 rounded border border-charcoal-700 truncate">
-              KEYSTORE_BASE64 • KEY_ALIAS
-            </div>
-          </div>
-
-          <!-- Bento 7: SemVer & Dynamic Changelog (1 column) -->
-          <div class="bento-card p-5 sm:p-6 flex flex-col justify-between space-y-3">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="text-[11px] font-mono font-bold text-lime-neon">RELEASE STD</span>
-                <span class="text-xs font-mono text-slate-500">PILAR 06</span>
-              </div>
-              <h3 class="text-base sm:text-lg font-bold text-white">SemVer &amp; Zero-Emoji</h3>
-              <p class="text-xs text-slate-400">
-                Formula strictly monotonic: <code class="text-lime-neon font-mono text-[10px]">MAJOR*10000 + MINOR*100 + PATCH</code>, dan ekstraksi catatan rilis 100% dinamis dari git commit.
-              </p>
-            </div>
-            <div class="text-[11px] font-mono text-lime-mint bg-charcoal-900 p-2 rounded border border-charcoal-700">
-              1.0.5 → versionCode 10005
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- ===================================================================
-           PIPELINE SECTION (Visual Timeline)
-           =================================================================== -->
-      <section id="pipeline" class="space-y-6">
-        <div class="text-center max-w-2xl mx-auto space-y-2">
-          <span class="font-mono text-xs font-bold text-lime-neon uppercase tracking-wider">WORKFLOW TIMELINE</span>
-          <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Dari Baris Kode ke APK Siap Pasang
-          </h2>
-        </div>
-
-        <div class="p-6 sm:p-8 rounded-2xl bg-charcoal-900 border border-charcoal-700">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-            
-            <!-- Step 1 -->
-            <div class="space-y-3 p-5 rounded-xl bg-charcoal-850 border border-charcoal-700">
-              <div class="flex items-center justify-between">
-                <span class="w-7 h-7 rounded-lg bg-lime-neon text-charcoal-950 font-bold font-mono text-xs flex items-center justify-center">01</span>
-                <span class="font-mono text-xs text-lime-neon">LOKAL RINGAN</span>
-              </div>
-              <h4 class="text-base font-bold text-white">Tulis UI &amp; Linter</h4>
-              <p class="text-xs text-slate-400 leading-relaxed">
-                Rancang komponen Jetpack Compose Material 3 &amp; ViewModel. Jalankan <code class="text-lime-neon font-mono">verify_kotlin_syntax.py</code> untuk validasi sintaks &amp; leak.
-              </p>
-            </div>
-
-            <!-- Step 2 -->
-            <div class="space-y-3 p-5 rounded-xl bg-charcoal-850 border border-charcoal-700">
-              <div class="flex items-center justify-between">
-                <span class="w-7 h-7 rounded-lg bg-blue-400 text-charcoal-950 font-bold font-mono text-xs flex items-center justify-center">02</span>
-                <span class="font-mono text-xs text-blue-400">DELEGASI CLOUD</span>
-              </div>
-              <h4 class="text-base font-bold text-white">Commit &amp; Push</h4>
-              <p class="text-xs text-slate-400 leading-relaxed">
-                Buat commit dengan pesan berawalan <code class="text-white font-mono">"Release v1.0.0"</code> dan push ke GitHub. Workflow CI otomatis mendeteksi pemicu rilis.
-              </p>
-            </div>
-
-            <!-- Step 3 -->
-            <div class="space-y-3 p-5 rounded-xl bg-charcoal-850 border border-charcoal-700">
-              <div class="flex items-center justify-between">
-                <span class="w-7 h-7 rounded-lg bg-lime-mint text-charcoal-950 font-bold font-mono text-xs flex items-center justify-center">03</span>
-                <span class="font-mono text-xs text-lime-mint">PRODUKSI SELESAI</span>
-              </div>
-              <h4 class="text-base font-bold text-white">Cloud Build &amp; Release</h4>
-              <p class="text-xs text-slate-400 leading-relaxed">
-                GitHub Actions runner mengeksekusi kompilasi headless, menandatangani APK dengan release keystore, dan mengunggah APK ke GitHub Release.
-              </p>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      <!-- ===================================================================
-           MULTI-CLI COMPATIBILITY SWITCHER
-           =================================================================== -->
-      <section id="cli" class="space-y-6 max-w-4xl mx-auto">
-        <div class="text-center space-y-2">
-          <span class="font-mono text-xs font-bold text-lime-neon uppercase tracking-wider">INTEGRATION</span>
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Kompatibilitas Lintas AI Agent CLI
-          </h2>
-          <p class="text-xs sm:text-sm text-slate-400">
-            Mengadopsi spesifikasi terbuka Agent Skills Standard secara native.
+          <h3 class="text-base font-bold text-white">Tuntas Hulu ke Hilir</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Dilarang menyisakan stub <code class="font-mono text-slate-300">// TODO</code> atau mock kosong. Setiap fitur wajib diselesaikan penuh dari DTO/Repository, ViewModel (<code class="font-mono text-slate-300">StateFlow</code>), hingga Jetpack Compose Screen.
           </p>
         </div>
 
-        <div class="bg-charcoal-900 border border-charcoal-700 rounded-2xl p-4 sm:p-6 space-y-4">
-          <!-- CLI Tabs (2x2 on mobile, 4-inline on desktop) -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 p-1.5 rounded-xl bg-charcoal-950 border border-charcoal-800">
-            <button class="cli-tab py-2 px-3 rounded-lg text-xs font-mono font-bold transition-all text-charcoal-950 bg-lime-neon shadow-sm" data-target="agy">
-              Antigravity (agy)
-            </button>
-            <button class="cli-tab py-2 px-3 rounded-lg text-xs font-mono font-bold transition-all text-slate-400 hover:text-white" data-target="claude">
-              Claude Code
-            </button>
-            <button class="cli-tab py-2 px-3 rounded-lg text-xs font-mono font-bold transition-all text-slate-400 hover:text-white" data-target="codex">
-              OpenAI Codex
-            </button>
-            <button class="cli-tab py-2 px-3 rounded-lg text-xs font-mono font-bold transition-all text-slate-400 hover:text-white" data-target="cursor">
-              Cursor / Copilot
-            </button>
+        <!-- Rule 3 -->
+        <div class="feature-card p-5 space-y-3">
+          <div class="flex items-center justify-between text-xs font-mono">
+            <span class="text-accent-green font-bold">ATURAN 03</span>
+            <span class="text-slate-500">DESIGN INTEGRITY</span>
           </div>
+          <h3 class="text-base font-bold text-white">Zero AI Slop &amp; Zero Emoji</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Nol elemen dekorasi norak: dilarang pulsing dot, glowing border, dan marquee. Dilarang menggunakan emoji di UI, microcopy, maupun pesan commit. Wajib Material3 Vector Icons resmi.
+          </p>
+        </div>
 
-          <!-- CLI Code Displays -->
-          <div id="cli-agy" class="cli-content font-mono text-xs text-slate-300 p-4 rounded-xl bg-charcoal-950 border border-charcoal-800 space-y-2">
-            <div class="text-slate-500"># Pasang ke Antigravity CLI dengan live-sync symlink</div>
-            <div class="text-lime-neon">./install.sh --antigravity</div>
-            <div class="text-slate-500 pt-2"># Atau aktifkan background auto-update hook di profil shell</div>
-            <div class="text-slate-200">./install.sh --auto-update</div>
+      </div>
+    </section>
+
+    <!-- Architecture & Session Memory -->
+    <section id="architecture" class="space-y-6">
+      <div class="border-b border-oled-border pb-3">
+        <h2 class="text-lg sm:text-xl font-bold text-white tracking-tight">
+          Arsitektur Agentic &amp; Living Session Memory
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">
+          Menyelesaikan fenomena Context Fatigue dan amnesia sesi baru melalui persistensi berbasis disk.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        
+        <!-- Session State Card -->
+        <div class="feature-card p-6 space-y-4">
+          <div class="flex items-center justify-between text-xs font-mono">
+            <span class="text-accent-blue font-bold">DISK-FIRST PROTOCOL</span>
+            <span class="text-slate-500">docs/STATE.md</span>
           </div>
-
-          <div id="cli-claude" class="cli-content hidden font-mono text-xs text-slate-300 p-4 rounded-xl bg-charcoal-950 border border-charcoal-800 space-y-2">
-            <div class="text-slate-500"># Pasang untuk Claude Code CLI</div>
-            <div class="text-lime-neon">./install.sh --claude</div>
-            <div class="text-slate-500 pt-2"># Otomatis mengaitkan adapter instruksi CLAUDE.md di ~/.claude/</div>
+          <h3 class="text-base font-bold text-white">Mitigasi Kelelahan Konteks (Context Fatigue)</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Obrolan chat yang panjang mengalami degradasi atensi (<em>Lost in the Middle</em>) dan hilang saat membuka sesi baru. Seluruh status pengerjaan, kontrak arsitektur, dan catatan bug disimpan secara persisten di media penyimpanan proyek:
+          </p>
+          <div class="p-3 rounded bg-oled-black border border-oled-border font-mono text-[11px] text-slate-300 space-y-1">
+            <div class="text-accent-blue">• docs/PRD.md: Kontrak kebutuhan, target SDK, dan batasan teknis</div>
+            <div class="text-accent-green">• docs/STATE.md: Checkpoint fitur, bug yang sudah di-fix, dan tugas aktif</div>
           </div>
+          <p class="text-xs text-slate-400">
+            Di awal setiap sesi baru, AI wajib membaca kedua file tersebut sebelum melakukan aksi apapun.
+          </p>
+        </div>
 
-          <div id="cli-codex" class="cli-content hidden font-mono text-xs text-slate-300 p-4 rounded-xl bg-charcoal-950 border border-charcoal-800 space-y-2">
-            <div class="text-slate-500"># Pasang untuk OpenAI Codex CLI</div>
-            <div class="text-lime-neon">./install.sh --codex</div>
-            <div class="text-slate-500 pt-2"># Mengaitkan konfigurasi di ~/.codex/instructions.md</div>
+        <!-- Compose Layout Scaffolding Card -->
+        <div class="feature-card p-6 space-y-4">
+          <div class="flex items-center justify-between text-xs font-mono">
+            <span class="text-accent-yellow font-bold">LAYOUT STANDARD</span>
+            <span class="text-slate-500">ANTI-BERANTAKAN</span>
           </div>
-
-          <div id="cli-cursor" class="cli-content hidden font-mono text-xs text-slate-300 p-4 rounded-xl bg-charcoal-950 border border-charcoal-800 space-y-2">
-            <div class="text-slate-500"># Kompatibel langsung via aturan universal</div>
-            <div class="text-lime-neon">cp AGENTS.md .cursorrules</div>
-            <div class="text-slate-500 pt-2"># Atau sertakan AGENTS.md di root workspace proyek Anda</div>
+          <h3 class="text-base font-bold text-white">Hierarki Tata Letak Compose Terstruktur</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Mencegah antarmuka tertutup keyboard virtual atau terpotong status bar melalui formula scaffolding hierarkis yang baku:
+          </p>
+          <div class="p-3 rounded bg-oled-black border border-oled-border font-mono text-[11px] text-slate-300 space-y-1">
+            <div><span class="text-accent-blue">Scaffold</span>(contentWindowInsets = WindowInsets.<span class="text-accent-green">safeDrawing</span>) { innerPadding -></div>
+            <div class="pl-4">Column(modifier = Modifier</div>
+            <div class="pl-8 text-accent-green">.fillMaxSize()</div>
+            <div class="pl-8 text-accent-green">.padding(innerPadding) // Wajib konsumsi</div>
+            <div class="pl-8 text-accent-yellow">.imePadding()          // Geser saat keyboard aktif</div>
+            <div class="pl-8">.verticalScroll(rememberScrollState())) { ... }</div>
+            <div>}</div>
           </div>
         </div>
-      </section>
 
-    </main>
+      </div>
+    </section>
 
-    <!-- Footer -->
-    <footer class="border-t border-charcoal-700 bg-charcoal-950 mt-16 sm:mt-24 py-8 sm:py-12">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-2 text-xs text-slate-400">
-          <span class="w-2 h-2 rounded-full bg-lime-neon"></span>
-          <span>Android Compose Builder • Agent Engineering Standard</span>
+    <!-- References Matrix -->
+    <section id="references" class="space-y-6">
+      <div class="border-b border-oled-border pb-3">
+        <h2 class="text-lg sm:text-xl font-bold text-white tracking-tight">
+          Matriks Modul Referensi Mendalam (<code class="font-mono text-sm text-accent-green">references/</code>)
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">
+          Dokumentasi teknis terisolasi yang dibaca oleh agen secara on-demand sesuai kebutuhan fitur.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 font-mono text-xs">
+        
+        <!-- Ref 1 -->
+        <div class="feature-card p-4 space-y-2">
+          <div class="text-accent-green font-bold">agentic_lifecycle.md</div>
+          <div class="font-sans text-xs text-slate-400">
+            Wawancara PRD interaktif, manajemen living state, mitigasi context fatigue, dan self-healing loop.
+          </div>
         </div>
-        <div class="flex items-center gap-6 text-xs text-slate-400">
-          <a href="https://github.com/arbdevai/android-compose-builder" target="_blank" class="hover:text-lime-neon transition-colors">GitHub Repository</a>
-          <a href="https://github.com/arbdevai/android-compose-builder/blob/main/SKILL.md" target="_blank" class="hover:text-lime-neon transition-colors">SKILL.md Spec</a>
-          <a href="https://github.com/arbdevai/android-compose-builder/blob/main/LICENSE" target="_blank" class="hover:text-lime-neon transition-colors">Lisensi MIT</a>
+
+        <!-- Ref 2 -->
+        <div class="feature-card p-4 space-y-2">
+          <div class="text-accent-green font-bold">ndk_and_rust.md</div>
+          <div class="font-sans text-xs text-slate-400">
+            CMake NDK, ABI filters (arm64-v8a), JNI memory safety, dan toolchain Rust via cargo-ndk / UniFFI.
+          </div>
+        </div>
+
+        <!-- Ref 3 -->
+        <div class="feature-card p-4 space-y-2">
+          <div class="text-accent-green font-bold">ui_ux_system.md</div>
+          <div class="font-sans text-xs text-slate-400">
+            Modifier.shimmerEffect() murni, keyboard handling, Material3 icons, dan kamus microcopy profesional.
+          </div>
+        </div>
+
+        <!-- Ref 4 -->
+        <div class="feature-card p-4 space-y-2">
+          <div class="text-accent-green font-bold">in_app_updater.md</div>
+          <div class="font-sans text-xs text-slate-400">
+            OkHttp direct streaming ke file .part, atomic rename, dan verifikasi integritas biner APK 4-lapis.
+          </div>
+        </div>
+
+        <!-- Ref 5 -->
+        <div class="feature-card p-4 space-y-2">
+          <div class="text-accent-green font-bold">ci_cd_pipeline.md</div>
+          <div class="font-sans text-xs text-slate-400">
+            GitHub Actions headless runner, canonical versionCode, dynamic git changelog, dan setup release keystore.
+          </div>
+        </div>
+
+        <!-- Ref 6 -->
+        <div class="feature-card p-4 space-y-2">
+          <div class="text-accent-green font-bold">hardware_and_iot.md</div>
+          <div class="font-sans text-xs text-slate-400">
+            Otentikasi atomik Mutex.withLock, pembatasan Semaphore anti-deadlock, dan printer thermal POS ESC/POS.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Multi-CLI Setup -->
+    <section class="space-y-6">
+      <div class="border-b border-oled-border pb-3">
+        <h2 class="text-lg sm:text-xl font-bold text-white tracking-tight">
+          Kompatibilitas Multi-CLI Agent
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">
+          Dukungan lintas alat AI coding agent dengan sinkronisasi symlink otomatis.
+        </p>
+      </div>
+
+      <div class="feature-card p-5 space-y-4">
+        <!-- Tabs -->
+        <div class="flex flex-wrap gap-2 border-b border-oled-border pb-3">
+          <button class="cli-tab px-3 py-1.5 rounded text-xs font-mono font-medium bg-oled-subtle text-accent-green border border-oled-border" data-target="agy">
+            Antigravity (agy)
+          </button>
+          <button class="cli-tab px-3 py-1.5 rounded text-xs font-mono font-medium text-slate-400 hover:text-white border border-transparent" data-target="claude">
+            Claude Code
+          </button>
+          <button class="cli-tab px-3 py-1.5 rounded text-xs font-mono font-medium text-slate-400 hover:text-white border border-transparent" data-target="codex">
+            OpenAI Codex
+          </button>
+          <button class="cli-tab px-3 py-1.5 rounded text-xs font-mono font-medium text-slate-400 hover:text-white border border-transparent" data-target="cursor">
+            Cursor / Copilot
+          </button>
+        </div>
+
+        <!-- Content -->
+        <div id="cli-agy" class="cli-content font-mono text-xs text-slate-300 space-y-1">
+          <div class="text-slate-500"># Pasang ke Antigravity CLI via symlink live-sync:</div>
+          <div class="text-accent-green">./install.sh --agy</div>
+        </div>
+
+        <div id="cli-claude" class="cli-content hidden font-mono text-xs text-slate-300 space-y-1">
+          <div class="text-slate-500"># Pasang adapter pedoman Claude Code:</div>
+          <div class="text-accent-green">./install.sh --claude</div>
+        </div>
+
+        <div id="cli-codex" class="cli-content hidden font-mono text-xs text-slate-300 space-y-1">
+          <div class="text-slate-500"># Pasang adapter instruksi OpenAI Codex CLI:</div>
+          <div class="text-accent-green">./install.sh --codex</div>
+        </div>
+
+        <div id="cli-cursor" class="cli-content hidden font-mono text-xs text-slate-300 space-y-1">
+          <div class="text-slate-500"># Salin aturan ke konfigurasi root proyek:</div>
+          <div class="text-accent-green">cp AGENTS.md .cursorrules</div>
         </div>
       </div>
-    </footer>
+    </section>
 
-  </div>
+  </main>
 
-  <!-- Interactive Background Canvas Physics -->
+  <!-- Footer -->
+  <footer class="border-t border-oled-border bg-oled-black py-8 mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-mono">
+      <div>
+        android-compose-builder • Open Agent Skill
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="https://github.com/arbdevai/android-compose-builder" target="_blank" class="hover:text-slate-300">GitHub</a>
+        <a href="https://github.com/arbdevai/android-compose-builder/blob/main/SKILL.md" target="_blank" class="hover:text-slate-300">SKILL.md</a>
+        <a href="https://github.com/arbdevai/android-compose-builder/blob/main/LICENSE" target="_blank" class="hover:text-slate-300">MIT License</a>
+      </div>
+    </div>
+  </footer>
+
   <script>
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    let width = canvas.width = window.innerWidth;
-    let height = canvas.height = window.innerHeight;
-
-    window.addEventListener('resize', () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-      initNodes();
-    });
-
-    const nodes = [];
-    const nodeCount = Math.min(Math.floor((width * height) / 22000), width < 768 ? 25 : 50);
-    const mouse = { x: width / 2, y: height / 2, radius: 120 };
-
-    window.addEventListener('mousemove', (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-    });
-
-    window.addEventListener('touchmove', (e) => {
-      if (e.touches && e.touches.length > 0) {
-        mouse.x = e.touches[0].clientX;
-        mouse.y = e.touches[0].clientY;
-      }
-    }, { passive: true });
-
-    class Node {
-      constructor() {
-        this.x = Math.random() * width;
-        this.y = Math.random() * height;
-        this.vx = (Math.random() - 0.5) * 0.6;
-        this.vy = (Math.random() - 0.5) * 0.6;
-        this.radius = Math.random() * 1.8 + 1;
-      }
-
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        if (this.x < 0 || this.x > width) this.vx *= -1;
-        if (this.y < 0 || this.y > height) this.vy *= -1;
-
-        const dx = mouse.x - this.x;
-        const dy = mouse.y - this.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < mouse.radius) {
-          const force = (mouse.radius - dist) / mouse.radius;
-          const angle = Math.atan2(dy, dx);
-          this.x -= Math.cos(angle) * force * 2;
-          this.y -= Math.sin(angle) * force * 2;
-        }
-      }
-
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#CCFF00';
-        ctx.globalAlpha = 0.45;
-        ctx.fill();
-      }
-    }
-
-    function initNodes() {
-      nodes.length = 0;
-      for (let i = 0; i < nodeCount; i++) nodes.push(new Node());
-    }
-    initNodes();
-
-    function renderCanvas() {
-      ctx.clearRect(0, 0, width, height);
-      for (let i = 0; i < nodes.length; i++) {
-        nodes[i].update();
-        nodes[i].draw();
-        for (let j = i + 1; j < nodes.length; j++) {
-          const dx = nodes[i].x - nodes[j].x;
-          const dy = nodes[i].y - nodes[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 110) {
-            ctx.beginPath();
-            ctx.moveTo(nodes[i].x, nodes[i].y);
-            ctx.lineTo(nodes[j].x, nodes[j].y);
-            ctx.strokeStyle = '#CCFF00';
-            ctx.globalAlpha = (1 - dist / 110) * 0.12;
-            ctx.lineWidth = 0.7;
-            ctx.stroke();
-          }
-        }
-      }
-      requestAnimationFrame(renderCanvas);
-    }
-    renderCanvas();
-
     // Copy Button Interaction
     const copyBtn = document.getElementById('copyBtn');
     const copyLabel = document.getElementById('copyLabel');
@@ -661,15 +459,11 @@
       const textToCopy = cmdText.innerText.trim();
       try {
         await navigator.clipboard.writeText(textToCopy);
-        copyLabel.textContent = 'Tersalin!';
-        copyBtn.classList.add('bg-lime-neon', 'text-charcoal-950');
-        setTimeout(() => {
-          copyLabel.textContent = 'Salin Perintah';
-          copyBtn.classList.remove('bg-lime-neon', 'text-charcoal-950');
-        }, 2000);
+        copyLabel.textContent = 'Tersalin';
+        setTimeout(() => { copyLabel.textContent = 'Salin'; }, 2000);
       } catch (e) {
-        copyLabel.textContent = 'Tersalin!';
-        setTimeout(() => { copyLabel.textContent = 'Salin Perintah'; }, 2000);
+        copyLabel.textContent = 'Tersalin';
+        setTimeout(() => { copyLabel.textContent = 'Salin'; }, 2000);
       }
     });
 
@@ -692,11 +486,11 @@
     cliTabs.forEach(tab => {
       tab.addEventListener('click', () => {
         cliTabs.forEach(t => {
-          t.classList.remove('bg-lime-neon', 'text-charcoal-950', 'shadow-sm');
-          t.classList.add('text-slate-400');
+          t.classList.remove('bg-oled-subtle', 'text-accent-green', 'border-oled-border');
+          t.classList.add('text-slate-400', 'border-transparent');
         });
-        tab.classList.remove('text-slate-400');
-        tab.classList.add('bg-lime-neon', 'text-charcoal-950', 'shadow-sm');
+        tab.classList.remove('text-slate-400', 'border-transparent');
+        tab.classList.add('bg-oled-subtle', 'text-accent-green', 'border-oled-border');
 
         const target = tab.getAttribute('data-target');
         Object.keys(cliContents).forEach(k => {
