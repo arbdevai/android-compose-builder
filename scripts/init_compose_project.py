@@ -170,6 +170,15 @@ android {{
         }}
     }}
 
+    splits {{
+        abi {{
+            isEnable = true
+            reset()
+            include("arm64-v8a", "armeabi-v7a")
+            isUniversalApk = false
+        }}
+    }}
+
     signingConfigs {{
         create("release") {{
             val keystorePath = System.getenv("SAPAY_KEYSTORE") ?: System.getenv("RELEASE_KEYSTORE")
@@ -438,9 +447,18 @@ fun SkeletonBox(
     with open(os.path.join(ui_components_dir, "SkeletonComponents.kt"), "w") as fp:
         fp.write(skeleton_content)
 
-    # 7. CI/CD GitHub Actions (.github/workflows/build-apk.yml)
+    # 7. CI/CD GitHub Actions (.github/workflows/build-apk.yml) & Auto-Changelog Script
     gh_dir = os.path.join(target_dir, ".github", "workflows")
+    gh_scripts_dir = os.path.join(target_dir, ".github", "scripts")
     os.makedirs(gh_dir, exist_ok=True)
+    os.makedirs(gh_scripts_dir, exist_ok=True)
+
+    src_rel_notes = os.path.join(skill_root, "scripts", "generate_release_notes.py")
+    if os.path.exists(src_rel_notes):
+        dest_rel_notes = os.path.join(gh_scripts_dir, "generate_release_notes.py")
+        shutil.copy2(src_rel_notes, dest_rel_notes)
+        os.chmod(dest_rel_notes, 0o755)
+
     ci_content = """name: Build Android APK
 
 on:
@@ -462,6 +480,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -528,13 +548,23 @@ jobs:
             echo "is_release=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Generate professional zero-emoji release notes
+        if: steps.check_release.outputs.is_release == 'true'
+        run: |
+          python3 .github/scripts/generate_release_notes.py \\
+            --tag "${{ steps.check_release.outputs.tag }}" \\
+            --apk-dir "app/build/outputs/apk/release" \\
+            --repo "${{ github.repository }}" \\
+            --output "RELEASE_NOTES.md"
+
       - name: Publish tagged release
         if: steps.check_release.outputs.is_release == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.check_release.outputs.tag }}
           files: app/build/outputs/apk/release/*.apk
-          generate_release_notes: true
+          body_path: RELEASE_NOTES.md
+          generate_release_notes: false
 """
     with open(os.path.join(gh_dir, "build-apk.yml"), "w") as fp:
         fp.write(ci_content)

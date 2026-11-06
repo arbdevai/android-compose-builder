@@ -90,8 +90,11 @@ fun installApk(context: Context, apkFile: File) {
 
 ---
 
-## 4. Pembersihan File Sampah & Komparasi Versi SemVer
+## 4. Deteksi Arsitektur CPU Otomatis (`arm64-v8a` vs `armeabi-v7a`) & Pembersihan File
 
+- **ABI Split & Pemilihan Aset Pintar (`Build.SUPPORTED_ABIS`):**
+  Pada aplikasi dengan pustaka native atau mesin besar (seperti GeckoView / Rust / NDK), aktifkan `splits.abi` untuk menghasilkan 2 APK terpisah (`app-arm64-v8a-release.apk` dan `app-armeabi-v7a-release.apk`).
+  Di dalam `UpdateManager`, periksa `Build.SUPPORTED_ABIS` untuk mengambil ABI utama perangkat (`arm64-v8a` untuk 64-bit atau `armeabi-v7a` untuk 32-bit), lalu pilih aset dari array JSON `assets` GitHub Release yang namanya memuat ABI tersebut. Jangan pernah mengizinkan perangkat 32-bit (`armeabi-v7a`) mengunduh APK khusus `arm64-v8a`.
 - **Pembersihan Otomatis Saat Cek Update:**
   Sebelum mengunduh file baru, pindai direktori unduhan (`downloadDir`) dan hapus seluruh file `.apk` serta sisa `.part` versi lama agar tidak memakan ruang penyimpanan pengguna.
 - **Komparasi Versi Numerik:**
