@@ -176,8 +176,8 @@
       </div>
     </section>
 
-    <!-- Visual Architecture Banner (Pure SVG Vector) -->
-    <section class="space-y-2">
+    <!-- Visual Architecture Banner -->
+    <section>
       <div class="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900">
         <img 
           src="assets/banner.svg" 
@@ -185,10 +185,6 @@
           class="w-full h-auto block"
           loading="eager"
         >
-      </div>
-      <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400 px-1">
-        <span>Arsitektur Sistem: Jetpack Compose + Chroot ARM + Cloud CI</span>
-        <span>Spesifikasi Teknis v1.1 (Vector SVG Murni)</span>
       </div>
     </section>
 
@@ -286,8 +282,8 @@
       <div class="bg-slate-900 text-slate-200 rounded-lg p-4 font-mono text-xs overflow-x-auto border border-slate-800">
         <span class="text-slate-500">// Formula hierarkis wajib untuk seluruh layar input Compose</span><br>
         <span class="text-purple-400">@Composable</span><br>
-        <span class="text-blue-400">fun</span> <span class="text-yellow-300">FormScreen</span>(viewModel: FormViewModel) {<br>
-        &nbsp;&nbsp;<span class="text-blue-400">Scaffold</span>(<br>
+        <span class="text-amber-400">fun</span> <span class="text-emerald-400">FormScreen</span>(viewModel: FormViewModel) {<br>
+        &nbsp;&nbsp;<span class="text-slate-100 font-semibold">Scaffold</span>(<br>
         &nbsp;&nbsp;&nbsp;&nbsp;contentWindowInsets = WindowInsets.<span class="text-green-400">safeDrawing</span><br>
         &nbsp;&nbsp;) { innerPadding -&gt;<br>
         &nbsp;&nbsp;&nbsp;&nbsp;Column(<br>
@@ -295,7 +291,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.<span class="text-green-400">fillMaxSize</span>()<br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.<span class="text-green-400">padding</span>(innerPadding) <span class="text-slate-500">// Wajib konsumsi padding scaffold</span><br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.<span class="text-amber-400">imePadding</span>()          <span class="text-slate-500">// Otomatis mengangkat form saat keyboard virtual muncul</span><br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.<span class="text-blue-400">verticalScroll</span>(rememberScrollState())<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.<span class="text-slate-100 font-semibold">verticalScroll</span>(rememberScrollState())<br>
         &nbsp;&nbsp;&nbsp;&nbsp;) {<br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-slate-400">// Konten form / input data produksi</span><br>
         &nbsp;&nbsp;&nbsp;&nbsp;}<br>

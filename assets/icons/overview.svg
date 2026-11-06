@@ -1,7 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
-  <rect width="24" height="24" rx="6" fill="#12161A" stroke="#25303B" stroke-width="1"/>
-  <path d="M6 4h8l4 4v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z" stroke="#CCFF00" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M14 4v4h4" stroke="#CCFF00" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-  <line x1="8" y1="12" x2="14" y2="12" stroke="#CCFF00" stroke-width="1.6" stroke-linecap="round"/>
-  <line x1="8" y1="16" x2="12" y2="16" stroke="#3DDC84" stroke-width="1.6" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="10"/>
+  <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
 </svg>
