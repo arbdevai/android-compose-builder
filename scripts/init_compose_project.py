@@ -582,7 +582,7 @@ local.properties
 *.iml
 
 # Chroot Tooling Isolation (Anti-Leak ke Git)
-scripts/
+/scripts/
 *.part
 native/**/target/
 app/src/main/jniLibs/
