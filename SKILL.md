@@ -29,6 +29,11 @@ Skill arsitektur dan pengembangan aplikasi Android modern berbasis Jetpack Compo
 - **NOL ELEMEN DEKORASI NORAK:** Dilarang menambahkan animasi dekoratif tanpa fungsi nyata, seperti titik hijau berkedip/berdenyut (*pulsing green dot* / `animate-pulse`), efek glow berlebihan, atau teks berjalan (*marquee*).
 - **NOL EMOJI DEKORATIF:** Dilarang menggunakan emoji (seperti 🚀, ✨, 📦, 🛠️, 🎉) di dalam antarmuka UI, teks tombol, judul, release notes, maupun pesan commit Git.
 - **Wajib Ikon Vektor Resmi:** Gunakan selalu Vector Icon dari `androidx.compose.material:material-icons-extended` atau XML Vector Drawable di `res/drawable/`.
+- **ANTI-POLA "TAILWIND / SAAS TINT SLOP" (LARANGAN WARNA HITAM KEBIRUAN & BADGE TRANSPARAN):**
+  - **Dilarang Keras Warna Hitam Kebiruan / Navy Gelap:** Jangan pernah menggunakan warna latar belakang heksadesimal kebiruan seperti `#0F172A`, `#111622`, `#1E293B`, atau navy gelap yang dicampur cyan/biru untuk merepresentasikan dark mode. Warna ini adalah template web SaaS/Tailwind generik yang kotor dan merusak tampilan aplikasi mobile native.
+  - **Wajib Skala Netral (True Neutral / OLED):** Gunakan heksadesimal netral dengan nilai R=G=B (tanpa saturasi/bias warna), misalnya `#000000` (OLED Black), `#121212` (Material Dark baku), `#1E1E1E`, atau `#242424`.
+  - **Dilarang Efek Kartu Berwarna Transparan (Tinted Box / Glassmorphism):** Dilarang membungkus status/alert dengan kartu berwarna cerah bertransparansi tipis (seperti `Color(0xFF10B981).copy(alpha = 0.12f)` dengan border hijau tipis). Gunakan kontainer solid Material 3 standar (`MaterialTheme.colorScheme.surfaceVariant`), lalu tandai status hanya lewat teks atau ikon titik/badge kecil tanpa mewarnai seluruh kartu secara transparan.
+  - **Standar Ikon Launcher (Icon APK):** Ikon aplikasi wajib memiliki latar belakang solid netral murni (bukan hitam kebiruan) dengan bentuk vektor kontras tinggi, tegas, dan merepresentasikan fungsi aplikasi sesungguhnya.
 
 ### D. Kebijakan Anti Data Dummy (Zero Dummy Data)
 - **Dilarang Data Bohongan di UI:** Jangan pernah menampilkan data statis buatan sendiri pada layar produksi.

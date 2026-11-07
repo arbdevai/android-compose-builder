@@ -12,9 +12,13 @@ Panduan standar antarmuka Jetpack Compose Material3: bebas *AI Slop*, bebas emoj
 - **DILARANG EMOJI DEKORATIF:**
   - **Jangan pernah** menempatkan emoji (seperti 🚀, ✨, 📦, 🛠️, 🎉) di judul halaman, tombol aksi, dialog, maupun label form.
   - Selalu gunakan **Vector Icon** resmi dari `androidx.compose.material.icons.filled.*` / `outlined.*` atau resource XML Vector Drawable di `res/drawable/`.
+- **DILARANG POLA "TAILWIND / SAAS TINT SLOP" (LARANGAN HITAM KEBIRUAN & TINT TRANSPARAN):**
+  - **Latar Belakang Netral Murni (Zero Color Tint):** Dilarang memakai warna hitam kebiruan/navy gelap (seperti `#0F172A`, `#111622`, `#1E293B`, atau sejenisnya) untuk dark mode aplikasi maupun ikon launcher. Gunakan skala abu-abu/hitam murni di mana nilai R=G=B: `#000000` (True OLED), `#121212` (Google Material Dark), atau `#181818`.
+  - **Larangan Kartu Berwarna Transparan (Anti-Glassmorphism Sirup):** Jangan pernah membungkus kartu status/alert dengan background warna hijau/merah/kuning transparan (contoh: `Color(0xFF10B981).copy(alpha = 0.12f)` + border hijau transparan). Ini adalah pola web micro-SaaS murahan. Di Android native, gunakan warna permukaan solid Material 3 (`surfaceVariant` / `surfaceContainer`) dan nyatakan status melalui teks atau ikon aksen kecil yang proporsional.
 - **Adaptive Vector Icon untuk Launcher:**
   - Ikon aplikasi wajib mengikuti spesifikasi Android Adaptive Icon di `res/mipmap-anydpi-v26/ic_launcher.xml`.
   - Pisahkan background dan foreground bersih (kanvas 108dp dengan safe zone 72dp).
+  - Background ikon launcher wajib berwarna solid murni (misal `#000000` atau `#121212`), tanpa campuran saturasi biru/cyan atau gradasi artificial.
 
 ---
 

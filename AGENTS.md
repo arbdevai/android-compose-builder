@@ -10,6 +10,10 @@ All AI coding agents (Antigravity CLI, Claude Code, Codex CLI, Cursor, Copilot) 
    - Dilarang elemen dekorasi norak: no pulsing green dots (`animate-pulse`), no glowing borders, no marquee.
    - Dilarang menggunakan emoji dekoratif di UI, teks string, maupun commit message.
    - Wajib menggunakan Vector Icon resmi Material3 (`androidx.compose.material:material-icons-extended`) atau XML Vector Drawable.
+   - **Anti-Pola "Tailwind / SaaS Tint Slop" (Larangan Hitam Kebiruan & Tint Transparan):**
+     - Dilarang keras memakai warna hitam kebiruan/navy gelap (`#0F172A`, `#111622`, `#1E2638`) untuk dark mode aplikasi maupun background icon APK. Wajib gunakan warna hitam/abu-abu netral sejati (R=G=B) seperti `#000000` (True OLED) atau `#121212` (Material Dark).
+     - Dilarang membuat kotak status/alert dengan background warna hijau/merah transparan bergaya glassmorphism sirup (`Color(0xFF10B981).copy(alpha = 0.12f)` + border hijau transparan). Gunakan kontainer solid Material 3 standar (`surfaceVariant`), tandai status hanya dengan teks atau dot/ikon kecil yang proporsional.
+     - Latar belakang launcher icon (Icon APK) wajib solid murni tanpa saturasi warna tersembunyi.
 3. **Lingkungan Chroot HP & CI/CD Hygiene**:
    - Zero local Gradle compilation (`./gradlew assembleRelease`); serahkan kompilasi biner ke GitHub Actions.
    - Dilarang melakukan micro-push per 1-2 baris edit. Push hanya dilakukan ketika satu set fitur tuntas dan lolos verifikasi sintaksis lokal.
