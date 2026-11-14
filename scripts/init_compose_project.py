@@ -13,6 +13,33 @@ import os
 import sys
 import argparse
 import subprocess
+import shutil
+
+# =============================================================================
+# PINNED PRODUCTION VERSIONS (Single Config Block - Audit & Upgrade Here)
+# =============================================================================
+PINNED_VERSIONS = {
+    "compile_sdk": 36,
+    "min_sdk": 26,
+    "target_sdk": 36,
+    "agp": "8.13.0",
+    "kotlin": "2.2.20",
+    "compose_bom": "2025.09.00",
+    "activity_compose": "1.11.0",
+    "core_ktx": "1.17.0",
+    "lifecycle": "2.9.4",
+    "navigation": "2.9.4",
+    "datastore": "1.1.7",
+    "retrofit": "3.0.0",
+    "retrofit_serialization_converter": "1.0.0",
+    "okhttp": "5.1.0",
+    "serialization": "1.9.0",
+    "coroutines": "1.10.2",
+    "coil": "3.3.0",
+    "zxing": "3.5.3",
+    "work": "2.10.0",
+    "junit": "4.13.2",
+}
 
 def init_project(target_dir, app_name, package_name):
     target_dir = os.path.abspath(target_dir)
@@ -89,56 +116,57 @@ ksp.useKSP2=false
                 shutil.copy2(s, d)
 
     # 3. gradle/libs.versions.toml
+    v = PINNED_VERSIONS
     gradle_dir = os.path.join(target_dir, "gradle")
     os.makedirs(gradle_dir, exist_ok=True)
-    toml_content = """[versions]
-agp = "8.13.0"
-kotlin = "2.2.20"
-compose-bom = "2025.09.00"
-activity-compose = "1.11.0"
-core-ktx = "1.17.0"
-lifecycle = "2.9.4"
-navigation = "2.9.4"
-datastore = "1.1.7"
-retrofit = "3.0.0"
-okhttp = "5.1.0"
-serialization = "1.9.0"
-coil = "3.3.0"
-zxing = "3.5.3"
-work = "2.10.0"
-junit = "4.13.2"
+    toml_content = f"""[versions]
+agp = "{v['agp']}"
+kotlin = "{v['kotlin']}"
+compose-bom = "{v['compose_bom']}"
+activity-compose = "{v['activity_compose']}"
+core-ktx = "{v['core_ktx']}"
+lifecycle = "{v['lifecycle']}"
+navigation = "{v['navigation']}"
+datastore = "{v['datastore']}"
+retrofit = "{v['retrofit']}"
+okhttp = "{v['okhttp']}"
+serialization = "{v['serialization']}"
+coil = "{v['coil']}"
+zxing = "{v['zxing']}"
+work = "{v['work']}"
+junit = "{v['junit']}"
 
 [libraries]
-androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
-androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
-androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
-androidx-compose-ui = { module = "androidx.compose.ui:ui" }
-androidx-compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
-androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
-androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
-androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
-androidx-compose-material-icons = { module = "androidx.compose.material:material-icons-extended" }
-androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
-androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
-androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
-androidx-datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
-retrofit-kotlinx-serialization = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version = "1.0.0" }
-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
-okhttp-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
-kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version = "1.10.2" }
-coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
-coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
-zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
-androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
-junit = { module = "junit:junit", version.ref = "junit" }
+androidx-core-ktx = {{ module = "androidx.core:core-ktx", version.ref = "core-ktx" }}
+androidx-activity-compose = {{ module = "androidx.activity:activity-compose", version.ref = "activity-compose" }}
+androidx-compose-bom = {{ module = "androidx.compose:compose-bom", version.ref = "compose-bom" }}
+androidx-compose-ui = {{ module = "androidx.compose.ui:ui" }}
+androidx-compose-ui-graphics = {{ module = "androidx.compose.ui:ui-graphics" }}
+androidx-compose-ui-tooling-preview = {{ module = "androidx.compose.ui:ui-tooling-preview" }}
+androidx-compose-ui-tooling = {{ module = "androidx.compose.ui:ui-tooling" }}
+androidx-compose-material3 = {{ module = "androidx.compose.material3:material3" }}
+androidx-compose-material-icons = {{ module = "androidx.compose.material:material-icons-extended" }}
+androidx-lifecycle-runtime-compose = {{ module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }}
+androidx-lifecycle-viewmodel-compose = {{ module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }}
+androidx-navigation-compose = {{ module = "androidx.navigation:navigation-compose", version.ref = "navigation" }}
+androidx-datastore = {{ module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }}
+retrofit = {{ module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }}
+retrofit-kotlinx-serialization = {{ module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version = "{v['retrofit_serialization_converter']}" }}
+okhttp = {{ module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }}
+okhttp-logging = {{ module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }}
+kotlinx-serialization-json = {{ module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }}
+kotlinx-coroutines-android = {{ module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version = "{v['coroutines']}" }}
+coil-compose = {{ module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }}
+coil-network-okhttp = {{ module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }}
+zxing-core = {{ module = "com.google.zxing:core", version.ref = "zxing" }}
+androidx-work-runtime-ktx = {{ module = "androidx.work:work-runtime-ktx", version.ref = "work" }}
+junit = {{ module = "junit:junit", version.ref = "junit" }}
 
 [plugins]
-android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+android-application = {{ id = "com.android.application", version.ref = "agp" }}
+kotlin-android = {{ id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }}
+kotlin-compose = {{ id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }}
+kotlin-serialization = {{ id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }}
 """
     with open(os.path.join(gradle_dir, "libs.versions.toml"), "w") as fp:
         fp.write(toml_content)
@@ -155,12 +183,12 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 
 android {{
     namespace = "{package_name}"
-    compileSdk = 36
+    compileSdk = {PINNED_VERSIONS['compile_sdk']}
 
     defaultConfig {{
         applicationId = "{package_name}"
-        minSdk = 26
-        targetSdk = 36
+        minSdk = {PINNED_VERSIONS['min_sdk']}
+        targetSdk = {PINNED_VERSIONS['target_sdk']}
         versionCode = 1
         versionName = "1.0.0"
 
@@ -459,7 +487,8 @@ fun SkeletonBox(
         shutil.copy2(src_rel_notes, dest_rel_notes)
         os.chmod(dest_rel_notes, 0o755)
 
-    ci_content = """name: Build Android APK
+    compile_sdk = PINNED_VERSIONS["compile_sdk"]
+    ci_content = f"""name: Build Android APK
 
 on:
   push:
@@ -470,7 +499,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: android-${{ github.ref }}
+  group: android-${{{{ github.ref }}}}
   cancel-in-progress: true
 
 jobs:
@@ -494,15 +523,15 @@ jobs:
         id: android-sdk-cache
         with:
           path: |
-            ${{ env.ANDROID_HOME }}/platforms/android-36
-            ${{ env.ANDROID_HOME }}/build-tools/36.0.0
-          key: android-sdk-36-36.0.0
+            ${{{{ env.ANDROID_HOME }}}}/platforms/android-{compile_sdk}
+            ${{{{ env.ANDROID_HOME }}}}/build-tools/{compile_sdk}.0.0
+          key: android-sdk-{compile_sdk}-{compile_sdk}.0.0
 
       - name: Accept Android SDK licenses & install components
         if: steps.android-sdk-cache.outputs.cache-hit != 'true'
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses >/dev/null 2>&1 || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-{compile_sdk}" "build-tools;{compile_sdk}.0.0" || true
 
       - name: Set up Gradle with caching
         uses: gradle/actions/setup-gradle@v4
@@ -514,7 +543,7 @@ jobs:
 
       - name: Decode release keystore
         env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_BASE64: ${{{{ secrets.KEYSTORE_BASE64 }}}}
         run: |
           test -n "$KEYSTORE_BASE64"
           mkdir -p "$RUNNER_TEMP/signing"
@@ -523,16 +552,16 @@ jobs:
 
       - name: Build signed release APK
         env:
-          RELEASE_KEYSTORE: ${{ runner.temp }}/signing/release.keystore
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          RELEASE_KEYSTORE: ${{{{ runner.temp }}}}/signing/release.keystore
+          KEYSTORE_PASSWORD: ${{{{ secrets.KEYSTORE_PASSWORD }}}}
+          KEY_ALIAS: ${{{{ secrets.KEY_ALIAS }}}}
+          KEY_PASSWORD: ${{{{ secrets.KEY_PASSWORD }}}}
         run: ./gradlew assembleRelease --build-cache --parallel --stacktrace
 
       - name: Upload release APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-${{ github.sha }}
+          name: app-release-${{{{ github.sha }}}}
           path: app/build/outputs/apk/release/*.apk
           if-no-files-found: error
           retention-days: 14
@@ -540,9 +569,9 @@ jobs:
       - name: Check for Release
         id: check_release
         run: |
-          if [[ "${{ github.event.head_commit.message }}" == Release\\ v* ]]; then
+          if [[ "${{{{ github.event.head_commit.message }}}}" == Release\\ v* ]]; then
             echo "is_release=true" >> $GITHUB_OUTPUT
-            TAG=$(echo "${{ github.event.head_commit.message }}" | grep -o 'v[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+' | head -n 1)
+            TAG=$(echo "${{{{ github.event.head_commit.message }}}}" | grep -o 'v[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+' | head -n 1)
             echo "tag=$TAG" >> $GITHUB_OUTPUT
           else
             echo "is_release=false" >> $GITHUB_OUTPUT
@@ -552,16 +581,16 @@ jobs:
         if: steps.check_release.outputs.is_release == 'true'
         run: |
           python3 .github/scripts/generate_release_notes.py \\
-            --tag "${{ steps.check_release.outputs.tag }}" \\
+            --tag "${{{{ steps.check_release.outputs.tag }}}}" \\
             --apk-dir "app/build/outputs/apk/release" \\
-            --repo "${{ github.repository }}" \\
+            --repo "${{{{ github.repository }}}}" \\
             --output "RELEASE_NOTES.md"
 
       - name: Publish tagged release
         if: steps.check_release.outputs.is_release == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.check_release.outputs.tag }}
+          tag_name: ${{{{ steps.check_release.outputs.tag }}}}
           files: app/build/outputs/apk/release/*.apk
           body_path: RELEASE_NOTES.md
           generate_release_notes: false

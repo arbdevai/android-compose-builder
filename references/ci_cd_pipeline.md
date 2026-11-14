@@ -43,18 +43,20 @@ Contoh:
 
 ---
 
-## 4. Pemantauan CI yang Aman (Interval 60 Detik)
+## 4. Pemantauan CI, Ekstraksi Pola Kegagalan & Link APK Release
 
-Untuk menghindari pemblokiran kuota GitHub API:
+Untuk menghindari pemblokiran kuota GitHub API dan memastikan pengguna hanya menerima APK jadi:
+- Setelah fitur tuntas dan lolos `verify_kotlin_syntax.py`, pastikan `KEYSTORE_BASE64` sudah terdaftar (`gh secret list`; jika belum, jalankan `python3 scripts/setup_release_keystore.py`), lalu AI langsung menjalankan `git commit -m "Release vX.Y.Z"` (wajib prefix `Release v` agar step `Publish tagged release` aktif) dan `git push` secara mandiri.
 - Pantau workflow run dengan interval tepat 60 detik:
   ```bash
   gh run watch <RUN_ID> --interval 60
   ```
-- Jika build CI gagal, periksa log dengan:
+- Jika build CI gagal, periksa log kegagalan dengan:
   ```bash
   gh run view <RUN_ID> --log-failed
   ```
-- Perbaiki kodenya secara tuntas, verifikasi lagi di lokal dengan Python, lalu push commit perbaikan.
+- **Ekstraksi Pola Kegagalan:** Klasifikasikan akar masalah dari log CI (`Unresolved reference`, `OptIn`, `KSP`, `aapt2`, dsb.), catat di `docs/STATE.md` (`## Known CI Failure Patterns`) agar tidak terulang, perbaiki kodenya secara tuntas, verifikasi lagi di lokal dengan `verify_kotlin_syntax.py`, lalu push commit perbaikan.
+- Setelah CI berstatus `completed/success`, ambil dan serahkan langsung link Release APK (`gh release view --json url,assets`) sebagai hasil akhir ke pengguna.
 
 ---
 

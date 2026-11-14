@@ -416,6 +416,43 @@ def check_kotlin_file(filepath):
                         f"{filepath}:{line_no}: Fungsi Room DAO '{fn_name}' pada query DELETE/UPDATE suspend wajib mengembalikan ': Int' (bukan Unit/kosong) untuk mencegah crash fatal KSP2 'unexpected jvm signature V'."
                     )
 
+    # 9. Deteksi API ExperimentalMaterial3Api tanpa @OptIn(ExperimentalMaterial3Api::class) (HARD ERROR)
+    m3_experimental_apis = [
+        "TopAppBar", "CenterAlignedTopAppBar", "MediumTopAppBar", "LargeTopAppBar",
+        "ModalBottomSheet", "SwipeToDismissBox", "DatePickerDialog", "TimePicker",
+        "SearchBar", "DockedSearchBar", "SingleChoiceSegmentedButtonRow",
+        "MultiChoiceSegmentedButtonRow", "PullToRefreshBox", "TooltipBox",
+    ]
+    has_m3_optin = (
+        "ExperimentalMaterial3Api" in content
+        and ("@OptIn" in content or "@file:OptIn" in content or "@ExperimentalMaterial3Api" in content)
+    )
+    if not has_m3_optin and "androidx.compose.material3" in content:
+        m3_exp_re = re.compile(r'\b(' + '|'.join(m3_experimental_apis) + r')\s*\(')
+        for m in m3_exp_re.finditer(content):
+            api_name = m.group(1)
+            line_no = content[:m.start()].count('\n') + 1
+            if not is_line_suppressed(lines, line_no, "optin-m3"):
+                errors.append(
+                    f"{filepath}:{line_no}: '{api_name}' memerlukan '@OptIn(ExperimentalMaterial3Api::class)' agar tidak gagal compile di CI."
+                )
+                break
+
+    # 10. Deteksi penggunaan Modifier / Compose Runtime inti tanpa import (HARD ERROR)
+    if "androidx.compose" in content:
+        if re.search(r'\bModifier\.', content) and not re.search(r'^\s*import\s+androidx\.compose\.ui\.(?:Modifier|\*)', content, re.MULTILINE):
+            if "object Modifier" not in content and "interface Modifier" not in content and not is_line_suppressed(lines, 1, "compose-import"):
+                errors.append(
+                    f"{filepath}: Menggunakan 'Modifier.' tanpa 'import androidx.compose.ui.Modifier'."
+                )
+        runtime_calls = re.search(r'\b(?:remember|mutableStateOf|LaunchedEffect|DisposableEffect|SideEffect)\s*(?:\(|\{)', content)
+        if runtime_calls and not re.search(r'^\s*import\s+androidx\.compose\.runtime\.', content, re.MULTILINE):
+            line_no = content[:runtime_calls.start()].count('\n') + 1
+            if not is_line_suppressed(lines, line_no, "compose-import"):
+                errors.append(
+                    f"{filepath}:{line_no}: Menggunakan '{runtime_calls.group(0).strip()}' tanpa import 'androidx.compose.runtime.*'."
+                )
+
     # =========================================================================
     # SOFT WARNINGS (MEMORY LEAK & LIFECYCLE ADVISORY - NON-BLOCKING)
     # =========================================================================
@@ -469,7 +506,20 @@ def check_kotlin_file(filepath):
 
 def check_xml_file(filepath):
     try:
-        ET.parse(filepath)
+        tree = ET.parse(filepath)
+        root = tree.getroot()
+        # Cek Vector Drawable pathData kosong (penyebab crash aapt2 di CI)
+        android_ns = "{http://schemas.android.com/apk/res/android}"
+        if root.tag == "vector":
+            for elem in root.iter():
+                if elem.tag == "path":
+                    pd = elem.attrib.get(f"{android_ns}pathData", None)
+                    if pd is not None and not pd.strip():
+                        return False, f"{filepath}: Atribut 'android:pathData' kosong pada <vector>/<path> (akan menggagalkan aapt2 di CI)."
+                    for color_attr in ("fillColor", "strokeColor"):
+                        cval = elem.attrib.get(f"{android_ns}{color_attr}", "")
+                        if cval.startswith("#") and not re.match(r'^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$', cval):
+                            return False, f"{filepath}: Nilai warna '{cval}' pada 'android:{color_attr}' tidak valid."
         return True, None
     except Exception as e:
         return False, f"{filepath}: Format XML tidak valid ({e})"
@@ -503,6 +553,18 @@ def main():
                     gp_txt = gp.read()
                     if "android.useAndroidX=true" not in gp_txt:
                         errors.append(f"{gradle_props}: Tidak memuat 'android.useAndroidX=true'. AGP akan gagal mengompilasi dependensi AndroidX.")
+                    if "ksp.useKSP2=false" not in gp_txt:
+                        # Cek apakah proyek menggunakan KSP di build.gradle.kts atau libs.versions.toml
+                        uses_ksp = False
+                        for gf in ("build.gradle.kts", "app/build.gradle.kts", "gradle/libs.versions.toml"):
+                            gpath = os.path.join(root_dir, gf)
+                            if os.path.exists(gpath):
+                                with open(gpath, "r", encoding="utf-8") as gfp:
+                                    if "ksp" in gfp.read().lower():
+                                        uses_ksp = True
+                                        break
+                        if uses_ksp:
+                            errors.append(f"{gradle_props}: Proyek menggunakan KSP tetapi belum memuat 'ksp.useKSP2=false' (berisiko crash KSP2 di CI).")
             except Exception:
                 pass
 

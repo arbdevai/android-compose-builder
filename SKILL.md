@@ -15,10 +15,13 @@ Skill arsitektur dan pengembangan aplikasi Android modern berbasis Jetpack Compo
 
 ## 1. Aturan Emas Operasional (Golden Rules)
 
-### A. Alur Kerja Chroot HP: Zero Local Build & Smart Push
+### A. Alur Kerja Chroot HP: Zero Local Build, Autopilot Push & CI Failure Loop
 - **DILARANG BUILD GRADLE LOKAL:** Jangan pernah menjalankan perintah `./gradlew` (seperti `assembleRelease`, `compileDebugKotlin`) di dalam chroot lokal. Kompilasi lokal akan membebani RAM/CPU HP dan memicu OOM-kill.
-- **DILARANG PUSH SETENGAH JALAN:** Jangan melakukan `git push` untuk setiap perbaikan 1–2 baris. Push hanya dilakukan ketika satu rangkaian fitur telah **selesai secara tuntas** dan lolos verifikasi sintaksis lokal.
-- **Pendelegasian Penuh ke GitHub Actions:** Seluruh proses build binary APK, packaging, dan signing diserahkan ke cloud runner GitHub Actions.
+- **DILARANG PUSH SETENGAH JALAN:** Jangan melakukan `git push` untuk setiap perbaikan 1–2 baris saat masih ngoding.
+- **AUTOPILOT DELIVERY (JANGAN SURUH USER PUSH):** Begitu satu rangkaian fitur selesai dan lolos `python3 scripts/verify_kotlin_syntax.py .` (0 hard error), AI **WAJIB** langsung menjalankan `git add`, `git commit`, `git push`, memantau GitHub Actions (`gh run watch <RUN_ID> --interval 60`), dan menyerahkan **link download APK jadi dari GitHub Release** ke pengguna. Dilarang berhenti di lokal dan menyuruh pengguna melakukan `git push` manual (kecuali `gh` belum login / remote tidak ada).
+  - **Format Commit Rilis:** Untuk memicu `Publish tagged release` di `build-apk.yml`, commit final rilis **WAJIB** diawali `Release vX.Y.Z` (misal `Release v1.0.0`).
+  - **Keystore Repo Baru:** Sebelum push pertama di repo baru, cek `gh secret list` untuk memastikan `KEYSTORE_BASE64` tersedia; jika belum ada, jalankan `python3 scripts/setup_release_keystore.py`.
+- **CI FAILURE PATTERN LOOP:** Jika build CI gagal, AI wajib membaca log kegagalan (`gh run view <RUN_ID> --log-failed`), mengidentifikasi pola error utamanya (misal: `Unresolved reference`, `KSP`, `aapt2`, `OptIn`), mencatat pola tersebut di `docs/STATE.md` agar tidak terulang, memperbaiki kode, memverifikasi ulang dengan `verify_kotlin_syntax.py`, dan push perbaikan sampai Release APK hijau. Jika pola tersebut sudah dijadikan rule deterministik di `verify_kotlin_syntax.py`, hapus dari `docs/STATE.md` agar konteks tetap ramping.
 
 ### B. Anti-Fitur Setengah Jadi (Tuntas Hulur ke Hilir)
 - **DILARANG MENYISAKAN STUB / TODO:** Dilarang keras meninggalkan komentar `// TODO`, fungsi tanpa implementasi, atau mock kosong.

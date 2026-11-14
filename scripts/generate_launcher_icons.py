@@ -32,6 +32,21 @@ DENSITIES = {
 #   3. accent: Elemen sorotan (spacebar, prompt cursor, titik aktif)
 # -----------------------------------------------------------------------------
 OBJECT_PRESETS = {
+    "brand": {
+        "description": "Monogram geometris SA solid murni (default produksi)",
+        "body_path": "",
+        "elements_path": """
+            M54.91,26.93 L67.8,49.37 L63.86,56.5 L54.91,40.43 L49.45,49.83 L67.35,81.07 L43.84,81.07 L38.23,75.0 L55.82,75.0 L41.41,49.37 Z
+            M37.17,56.05 L40.96,62.57 L30.19,81.07 L22.0,81.07 Z
+            M71.9,56.35 L86.0,81.07 L77.81,81.07 L67.8,63.02 Z
+        """,
+        "accent_path": "",
+        "monochrome_path": """
+            M54.91,26.93 L67.8,49.37 L63.86,56.5 L54.91,40.43 L49.45,49.83 L67.35,81.07 L43.84,81.07 L38.23,75.0 L55.82,75.0 L41.41,49.37 Z
+            M37.17,56.05 L40.96,62.57 L30.19,81.07 L22.0,81.07 Z
+            M71.9,56.35 L86.0,81.07 L77.81,81.07 L67.8,63.02 Z
+        """
+    },
     "keyboard": {
         "description": "Papan ketik mekanikal solid multi-row dengan spacebar aksen",
         "body_path": "M29,31 L79,31 A7,7 0 0,1 86,38 L86,67 A7,7 0 0,1 79,74 L29,74 A7,7 0 0,1 22,67 L22,38 A7,7 0 0,1 29,31 Z",
@@ -129,7 +144,7 @@ def detect_best_preset(app_name):
         return "chat"
     if any(k in lower for k in ["tool", "opt", "fix", "repair", "clean"]):
         return "tool"
-    return "keyboard"
+    return "brand"
 
 def hex_to_rgb(hex_str, default=(18, 18, 18)):
     clean = hex_str.strip().lstrip("#")
@@ -198,6 +213,34 @@ def generate_icons(
         fp.write(bg_xml)
 
     # 3. Generate ic_launcher_foreground.xml (Multi-Layer Solid Geometry)
+    fg_layers = []
+    if body_d:
+        fg_layers.append(f"""    <!-- Layer 1: Solid Main Housing / Body -->
+    <path
+        android:fillColor="{body_hex}"
+        android:strokeColor="{body_hex}"
+        android:strokeWidth="1.2"
+        android:pathData="{body_d}" />""")
+    if elements_d:
+        fg_layers.append(f"""    <!-- Layer 2: Functional Elements / Keycaps / Visual Lines -->
+    <path
+        android:fillColor="{elements_hex}"
+        android:strokeColor="{elements_hex}"
+        android:strokeWidth="1.0"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="{elements_d}" />""")
+    if accent_d:
+        fg_layers.append(f"""    <!-- Layer 3: Solid Accent Anchor -->
+    <path
+        android:fillColor="{accent_hex}"
+        android:strokeColor="{accent_hex}"
+        android:strokeWidth="1.0"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="{accent_d}" />""")
+
+    fg_body = "\n\n".join(fg_layers)
     fg_xml = f"""<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -205,30 +248,7 @@ def generate_icons(
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Layer 1: Solid Main Housing / Body -->
-    <path
-        android:fillColor="{body_hex}"
-        android:strokeColor="{body_hex}"
-        android:strokeWidth="1.2"
-        android:pathData="{body_d}" />
-
-    <!-- Layer 2: Functional Elements / Keycaps / Visual Lines -->
-    <path
-        android:fillColor="{elements_hex}"
-        android:strokeColor="{elements_hex}"
-        android:strokeWidth="1.0"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="{elements_d}" />
-
-    <!-- Layer 3: Solid Accent Anchor -->
-    <path
-        android:fillColor="{accent_hex}"
-        android:strokeColor="{accent_hex}"
-        android:strokeWidth="1.0"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="{accent_d}" />
+{fg_body}
 </vector>
 """
     with open(os.path.join(drawable_dir, "ic_launcher_foreground.xml"), "w", encoding="utf-8") as fp:
@@ -284,8 +304,8 @@ def generate_icons(
 def main():
     parser = argparse.ArgumentParser(description="Solid Android Adaptive & Themed Vector Icon Generator (Anti-Letter / Anti-Slop)")
     parser.add_argument("res_dir", nargs="?", default="app/src/main/res", help="Path ke direktori res aplikasi")
-    parser.add_argument("--app-name", default="Sboard", help="Nama aplikasi (digunakan untuk auto-deteksi objek)")
-    parser.add_argument("--type", choices=["auto", "keyboard", "terminal", "code", "tool", "chat"], default="auto", help="Preset objek visual nyata (default: auto)")
+    parser.add_argument("--app-name", default="App", help="Nama aplikasi (digunakan untuk auto-deteksi objek)")
+    parser.add_argument("--type", choices=["auto", "brand", "keyboard", "terminal", "code", "tool", "chat"], default="auto", help="Preset objek visual nyata (default: auto)")
     parser.add_argument("--bg", default="#000000", help="Warna solid background (default: #000000 True Black)")
     parser.add_argument("--body", default="#1E1E1E", help="Warna bodi objek (default: #1E1E1E Dark Neutral)")
     parser.add_argument("--elements", default="#ECEFF4", help="Warna elemen tuts/konten (default: #ECEFF4 White)")
