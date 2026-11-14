@@ -66,9 +66,9 @@ curl -fsSL https://raw.githubusercontent.com/arbdevai/android-compose-builder/ma
 
 Skill ini menetapkan 9 aturan ketat yang wajib dipatuhi oleh setiap AI agent:
 
-### 1. Zero Local Gradle Build (Pendelegasian Penuh ke Cloud)
+### 1. Zero Local Gradle Build & Autopilot Delivery
 - **Larangan Keras:** Dilarang menjalankan `./gradlew build`, `./gradlew assembleDebug`, atau `./gradlew assembleRelease` di terminal lokal.
-- **Standar:** Seluruh kompilasi didelegasikan ke GitHub Actions. Keberhasilan build dipantau via GitHub CLI (`gh run watch --interval 60` dan `gh release view`).
+- **Standar:** Seluruh kompilasi didelegasikan ke GitHub Actions. Setelah lolos `verify_kotlin_syntax.py`, AI langsung commit (`Release vX.Y.Z`), push, memantau CI (`gh run watch --interval 60`), melakukan *CI Failure Pattern Loop* jika gagal, dan menyerahkan link APK Release ke pengguna.
 
 ### 2. Skeleton Screen & Shimmer Native (Anti-Spinner Kosong)
 - **Larangan:** Dilarang menampilkan `CircularProgressIndicator` di tengah layar kosong saat transisi data.
@@ -104,13 +104,13 @@ Skill ini menetapkan 9 aturan ketat yang wajib dipatuhi oleh setiap AI agent:
 
 ### 7. Pre-Flight Linter & Deteksi Kebocoran Memori (Zero-CI-Failure)
 - Skrip mandiri `verify_kotlin_syntax.py` wajib dijalankan sebelum setiap git commit:
-  - Validasi pre-flight kelengkapan `gradlew`, `gradle/wrapper/`, `gradle.properties` (`android.useAndroidX=true` & `ksp.useKSP2=false`), serta isolasi `.gitignore` pada folder `scripts/` agar skrip chroot tidak bocor ke repositori aplikasi.
+  - Validasi pre-flight kelengkapan `gradlew`, `gradle/wrapper/`, `gradle.properties` (`android.useAndroidX=true` & `ksp.useKSP2=false` bila proyek memakai KSP), serta isolasi `.gitignore` pada folder `scripts/`.
+  - Deteksi API `ExperimentalMaterial3Api` tanpa `@OptIn(ExperimentalMaterial3Api::class)` dan pemakaian `Modifier.` / `remember` / `mutableStateOf` tanpa import Compose inti.
+  - Validasi XML `aapt2`: mendeteksi `android:pathData=""` kosong serta format warna `#hex` tidak valid pada `<vector>` XML.
   - Validasi keseimbangan tanda kurung dan blok kode dengan string parsing yang sadar escape literal.
   - Deteksi pemanggilan fungsi `suspend` di dalam lambda Compose non-suspending.
   - Deteksi fungsi `@Dao` `suspend` dengan `@Query("DELETE ...")` atau `@Query("UPDATE ...")` yang tidak mendeklarasikan tipe kembalian `: Int` (mencegah crash KSP2 `unexpected jvm signature V`).
-  - Validasi pembongkaran anggota `kotlin.Result<T>`.
-  - Pengecekan impor ekstensi modifier (`Modifier.border`, `Modifier.clip`, dsb.).
-  - Kewajiban blok `onDispose { ... }` pada seluruh `DisposableEffect`.
+  - Validasi pembongkaran anggota `kotlin.Result<T>`, impor ekstensi modifier (`Modifier.border`, `Modifier.clip`, dsb.), dan kewajiban blok `onDispose { ... }` pada `DisposableEffect`.
   - Advisory peringatan memori non-blocking (`collectAsStateWithLifecycle`, leak `Context`, deteksi `GlobalScope`).
   - Dukungan non-blind suppression (`// @validator-ignore`, `// @validator-ignore-file`, `@Suppress`).
 
@@ -120,7 +120,7 @@ Skill ini menetapkan 9 aturan ketat yang wajib dipatuhi oleh setiap AI agent:
 
 ### 9. Paten Bebas "AI Slop" pada Ikon & UI
 - Dilarang keras menggunakan gambar hasil generasi AI 3D hiperbolis yang pecah atau tidak simetris.
-- Wajib menggunakan Android Adaptive Vector Icons (XML SVG bersih pada canvas 108x108 dp dengan safe zone 66 dp).
+- Wajib menggunakan Android Adaptive Vector Icons (XML SVG bersih pada canvas 108x108 dp dengan safe zone 66–72 dp) beserta `ic_launcher_monochrome.xml` untuk Material You Themed Icons, dengan preset default `brand` (monogram vektor murni).
 - Generator raster PNG terintegrasi (`mdpi` hingga `xxxhdpi`) berbasis Python zlib murni tanpa dependensi library eksternal.
 
 ---
@@ -144,7 +144,7 @@ Skill ini mematuhi **Agent Skills Standard** dan kompatibel langsung di berbagai
 Untuk membuat repositori aplikasi Android Jetpack Compose baru yang sudah terkonfigurasi workflow build APK cloud:
 
 ```bash
-python3 scripts/init_compose_project.py /path/ke/proyek/baru com.example.myapp "My Application"
+python3 scripts/init_compose_project.py --dir /path/ke/proyek/baru --name "My Application" --package com.example.myapp
 ```
 
 ### 2. Setup Keystore & GitHub Secrets dalam 1 Langkah
@@ -162,10 +162,17 @@ python3 scripts/verify_kotlin_syntax.py
 ```
 
 ### 4. Pembuatan Ikon Adaptif Android (Vector & PNG Mipmap)
-Menghasilkan aset XML Adaptive Icon dan raster PNG siap pakai tanpa library eksternal:
+Menghasilkan aset XML Adaptive Icon dan raster PNG siap pakai tanpa library eksternal (default preset `brand` monogram vektor murni):
 
 ```bash
-python3 scripts/generate_launcher_icons.py --package com.example.myapp --color "#00E676"
+python3 scripts/generate_launcher_icons.py app/src/main/res --app-name "MyApp" --bg "#000000" --elements "#ECEFF4"
+```
+
+### 5. Smoke Test Kesehatan Skill (< 5 Detik)
+Memvalidasi end-to-end bahwa generator proyek, template CI, Adaptive Icon XML, dan linter sintaksis berfungsi normal di `/tmp`:
+
+```bash
+python3 scripts/smoke_test_skill.py
 ```
 
 ---
@@ -209,12 +216,13 @@ android-compose-builder/
 │   ├── init_compose_project.py      # Generator proyek Jetpack Compose + CI workflow
 │   ├── setup_release_keystore.py    # Otomasi keystore & upload GitHub secrets signing
 │   ├── generate_launcher_icons.py   # Generator Adaptive Vector XML & PNG Mipmap
-│   └── verify_kotlin_syntax.py      # Pre-flight linter sintaks & anti-memory-leak
-├── SKILL.md                         # Spesifikasi detail instruksi & implementasi skill
-├── AGENTS.md                        # Aturan standar universal AI coding agents
-├── GEMINI.md                        # Instruksi khusus Gemini & Google Antigravity
-├── CLAUDE.md                        # Instruksi konfigurasi Claude Code CLI
-├── CODEX.md                         # Instruksi konfigurasi OpenAI Codex CLI
+│   ├── verify_kotlin_syntax.py      # Pre-flight linter sintaks & pola kegagalan CI
+│   └── smoke_test_skill.py          # Smoke test end-to-end untuk kesehatan skill
+├── SKILL.md                         # Single Source of Truth instruksi & aturan skill
+├── AGENTS.md                        # Pointer universal AI coding agents -> SKILL.md
+├── GEMINI.md                        # Pointer Gemini & Antigravity -> SKILL.md
+├── CLAUDE.md                        # Pointer Claude Code CLI -> SKILL.md
+├── CODEX.md                         # Pointer OpenAI Codex CLI -> SKILL.md
 ├── install.sh                       # Installer otomatis multi-CLI berbasis Bash
 ├── install.py                       # Installer alternatif mandiri berbasis Python
 ├── LICENSE                          # Lisensi resmi MIT
