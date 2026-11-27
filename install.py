@@ -72,11 +72,11 @@ def deploy_skill(source_dir: Path, target_dir: Path, use_symlink: bool = True):
         try:
             target_dir.mkdir(parents=True, exist_ok=True)
             for item in source_dir.iterdir():
-                if item.name in ("web", ".git", ".github"):
+                if item.name in ("web", "pro", ".git", ".github"):
                     continue
                 dest = target_dir / item.name
                 dest.symlink_to(item.resolve(), target_is_directory=item.is_dir())
-            print(f"    Linked: {target_dir} -> {source_dir} (Live Sync, Web Excluded)")
+            print(f"    Linked: {target_dir} -> {source_dir} (Live Sync, Web & Pro Excluded)")
             return
         except Exception as e:
             print(f"    \033[33m[!] Symlink creation failed ({e}), falling back to copy.\033[0m")
