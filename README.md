@@ -1,1 +1,279 @@
-PHAgYWxpZ249ImNlbnRlciI+CiAgPGltZyBzcmM9ImFzc2V0cy9iYW5uZXIuc3ZnIiBhbHQ9IkFuZHJvaWQgQ29tcG9zZSBCdWlsZGVyIEJhbm5lciIgd2lkdGg9IjEwMCUiPgo8L3A+Cgo8cCBhbGlnbj0iY2VudGVyIj4KICA8YSBocmVmPSJMSUNFTlNFIj48aW1nIHNyYz0iaHR0cHM6Ly9pbWcuc2hpZWxkcy5pby9iYWRnZS9MaWNlbnNlLVBvbHlGb3JtJTIwTm9uY29tbWVyY2lhbC1ibHVlLnN2Zz9zdHlsZT1mbGF0LXNxdWFyZSIgYWx0PSJMaWNlbnNlOiBQb2x5Rm9ybSBOb25jb21tZXJjaWFsIj48L2E+CiAgPGEgaHJlZj0iaHR0cHM6Ly9kZXZlbG9wZXIuYW5kcm9pZC5jb20vamV0cGFjay9jb21wb3NlIj48aW1nIHNyYz0iaHR0cHM6Ly9pbWcuc2hpZWxkcy5pby9iYWRnZS9QbGF0Zm9ybS1BbmRyb2lkJTIwJTdDJTIwSmV0cGFjayUyMENvbXBvc2UtM0REQzg0LnN2Zz9zdHlsZT1mbGF0LXNxdWFyZSZsb2dvPWFuZHJvaWQmbG9nb0NvbG9yPXdoaXRlIiBhbHQ9IlBsYXRmb3JtIj48L2E+CiAgPGEgaHJlZj0iaHR0cHM6Ly9rb3RsaW5sYW5nLm9yZy8iPjxpbWcgc3JjPSJodHRwczovL2ltZy5zaGllbGRzLmlvL2JhZGdlL0tvdGxpbi0yLjArLTdGNTJGRi5zdmc/c3R5bGU9ZmxhdC1zcXVhcmUmbG9nbz1rb3RsaW4mbG9nb0NvbG9yPXdoaXRlIiBhbHQ9IktvdGxpbiI+PC9hPgogIDxhIGhyZWY9IiNrb21wYXRpYmlsaXRhcy1tdWx0aS1jbGkiPjxpbWcgc3JjPSJodHRwczovL2ltZy5zaGllbGRzLmlvL2JhZGdlL0FJJTIwQWdlbnRzLUFudGlncmF2aXR5JTIwJTdDJTIwQ2xhdWRlJTIwJTdDJTIwQ29kZXgtQ0NGRjAwLnN2Zz9zdHlsZT1mbGF0LXNxdWFyZSZsb2dvPWdvb2dsZSZsb2dvQ29sb3I9YmxhY2siIGFsdD0iQUkgQWdlbnRzIj48L2E+CiAgPGEgaHJlZj0iaHR0cHM6Ly9naXRodWIuY29tL2FyYmRldmFpL2FuZHJvaWQtY29tcG9zZS1idWlsZGVyL2FjdGlvbnMiPjxpbWcgc3JjPSJodHRwczovL2ltZy5zaGllbGRzLmlvL2JhZGdlL0NJJTJGQ0QtMTAwJTI1JTIwR2l0SHViJTIwQWN0aW9ucy0yMDg4RkYuc3ZnP3N0eWxlPWZsYXQtc3F1YXJlJmxvZ289Z2l0aHViYWN0aW9ucyZsb2dvQ29sb3I9d2hpdGUiIGFsdD0iQ0kvQ0QiPjwvYT4KPC9wPgoKLS0tCgojIyBHcmF0aXMgdnMgUHJvCgpTa2lsbCBpbmkgdGVyc2VkaWEgZGFsYW0gZHVhIHZlcnNpLiBWZXJzaSAqKkdyYXRpcyB0ZXRhcCBncmF0aXMgc2VsYW1hbnlhKioKKFBvbHlGb3JtIE5vbmNvbW1lcmNpYWwpIHNlYmFnYWkgcG9ydG9mb2xpbyDigJQgdGlkYWsgYWRhIGZpdHVyIHlhbmcgZGlhbWJpbC4KCnwgfCBHcmF0aXMgKFBvbHlGb3JtIE5vbmNvbW1lcmNpYWwpIHwgUHJvIChiZXJiYXlhcikgfAp8IC0tLSB8IC0tLSB8IC0tLSB8CnwgYFNLSUxMLm1kYCArIDkgc3RhbmRhciByZWtheWFzYSB8IFlhIHwgWWEgfAp8IDYgcmVmZXJlbnNpIG1lbmRhbGFtIHwgWWEgfCBZYSB8CnwgNiBzY3JpcHQgb3RvbWFzaSAobGludGVyLCBnZW5lcmF0b3IsIGtleXN0b3JlLCBpa29uKSB8IFlhIHwgWWEgfAp8IEluc3RhbGxlciBtdWx0aS1DTEkgKE11c2UsIEFudGlncmF2aXR5LCBDbGF1ZGUsIENvZGV4KSB8IFlhIHwgWWEgfAp8ICoqVGVtcGxhdGUgS2FzaXIgbGVuZ2thcCoqIChSb29tLCBjaGVja291dCBhdG9taWssIHJpd2F5YXQpIHwg4oCUIHwgWWEgfAp8ICoqU2NyaXB0IHNjYWZmb2xkIFBybyoqIHwg4oCUIHwgWWEgfAp8ICoqUGFuZHVhbiBQbGF5IFN0b3JlICYgTW9uZXRpc2FzaSoqIHwg4oCUIHwgWWEgfAp8ICoqUGFuZHVhbiBQcm9kdWN0aW9uIEhhcmRlbmluZyoqIHwg4oCUIHwgWWEgfAp8IFVwZGF0ZSB8IFNlbGFtYW55YSB8IDEyIGJ1bGFuIHwKCioqSGFyZ2EgUHJvICh1c3VsYW4pOiBScDE0OS4wMDAgc2VrYWxpIGJheWFyKiogKEluZG9uZXNpYSkgLyAqKiQyOSoqCihpbnRlcm5hc2lvbmFsKS4gRGV0YWlsIGhhcmdhIGRpIFtQUklDSU5HLm1kXShQUklDSU5HLm1kKSwgbGlzZW5zaSBQcm8gZGkKW0xJQ0VOU0UtQ09NTUVSQ0lBTC5tZF0oTElDRU5TRS1DT01NRVJDSUFMLm1kKS4gSXNpIHBha2V0IFBybyBhZGEgZGkgcmVwbwpwcml2YXQgW2FyYmRldmFpL2FuZHJvaWQtY29tcG9zZS1idWlsZGVyLXByb10oaHR0cHM6Ly9naXRodWIuY29tL2FyYmRldmFpL2FuZHJvaWQtY29tcG9zZS1idWlsZGVyLXBybykKKGFrc2VzIGRpYmVyaWthbiBzZXRlbGFoIHBlbWJlbGlhbikuIFRhdXRhbiBwZW1iZWxpYW4gKEd1bXJvYWQgLyBMZW1vbiBTcXVlZXp5KQpha2FuIGRpcGFzYW5nIHNldGVsYWggbGlzdGluZyBkaWJ1YXQuCgo+IENhdGF0YW4gZGlzdHJpYnVzaTogcGFrZXQgUHJvIHRpZGFrIGFkYSBkaSByZXBvc2l0b3JpIHB1YmxpayBpbmkgZGFuIHRpZGFrCj4gaWt1dCB0ZXJwYXNhbmcgb2xlaCBpbnN0YWxsZXIgR3JhdGlzIOKAlCBQcm8gaGFueWEgZGlkaXN0cmlidXNpa2FuIHNlYmFnYWkKPiBwYWtldCBaSVAgYmVyYmF5YXIgZGFyaSByZXBvIHByaXZhdC4KCi0tLQoKIyMgPGltZyBzcmM9ImFzc2V0cy9pY29ucy9vdmVydmlldy5zdmciIHdpZHRoPSIyMiIgaGVpZ2h0PSIyMiIgYWxpZ249ImNlbnRlciIgYWx0PSJPdmVydmlldyIgLz4gS29uc2VwIEludGk6IEJpa2luIEFQSyBUYW5wYSBCdWlsZCBMb2thbCAoMTAwJSBDbG91ZCBDSSkKCioqQW5kcm9pZCBDb21wb3NlIEJ1aWxkZXIqKiBhZGFsYWggc3Blc2lmaWthc2kgc3RhbmRhciByZWtheWFzYSBhZ2VuICgqQWdlbnQgRW5naW5lZXJpbmcgU3RhbmRhcmQqKSByZXNtaSB1bnR1ayBtZXJhbmNhbmcsIG1lbWJhbmd1biwgZGFuIG1lcmlsaXMgYXBsaWthc2kgQW5kcm9pZCBtb2Rlcm4gKCoqS290bGluICsgSmV0cGFjayBDb21wb3NlIE1hdGVyaWFsIDMqKikgKip0YW5wYSBwZXJsdSBrb21waWxhc2kgR3JhZGxlIGxva2FsKiouCgojIyMgTWVuZ2FwYSBOb2wgS29tcGlsYXNpIExva2FsIChaZXJvIExvY2FsIEJ1aWxkKT8KQmlhc2FueWEsIG1lbmdlbWJhbmdrYW4gYXBsaWthc2kgQW5kcm9pZCBtZW1idXR1aGthbiBBbmRyb2lkIFN0dWRpbywgQW5kcm9pZCBTREsgKH4xNS0zMCBHQiksIGRhbiBwcm9zZXMgYGdyYWRsZXcgYXNzZW1ibGVSZWxlYXNlYCBsb2thbCB5YW5nIG1lbmd1cmFzIDgtMTYgR0IgUkFNIHNlcnRhIG1lbWljdSBDUFUgdGhyb3R0bGluZy4gRGFsYW0gbGluZ2t1bmdhbiBBSSBhZ2VudCwgY2xvdWQgY29udGFpbmVyLCBhdGF1IHJlbW90ZSBkZXZib3gsIHByb3NlcyBrb21waWxhc2kgbG9rYWwgc2VyaW5nIG1lbnllYmFia2FuIG1lbW9yaSBoYWJpcyAoKm91dCBvZiBtZW1vcnkqKSBhdGF1IHNlc2kgY29kaW5nIG1hY2V0IHRvdGFsLgoKU2tpbGwgaW5pIG1lbmd1YmFoIHBhcmFkaWdtYSB0ZXJzZWJ1dDoKMS4gKipNZXNpbiBMb2thbCBNdXJuaSB1bnR1ayBSZWtheWFzYSBLb2RlKio6IEFJIGFnZW50IGRhbiBkZXZlbG9wZXIgZm9rdXMgMTAwJSBtZW51bGlzIGFyc2l0ZWt0dXIgS290bGluLCBKZXRwYWNrIENvbXBvc2UgVUksIENvcm91dGluZXMsIGRhbiBsb2dpa2EgYXBsaWthc2kuCjIuICoqUHJlLUZsaWdodCBMaW50ZXIgUmluZ2FuIChgdmVyaWZ5X2tvdGxpbl9zeW50YXgucHlgKSoqOiBNZW12ZXJpZmlrYXNpIGtlc2VpbWJhbmdhbiBzaW50YWtzLCBiYXRhcyBjb3JvdXRpbmUgc3VzcGVuZCwgbWVtb3J5IGxlYWssIGRhbiBzaW1ib2wgaW1wb3Igc2VjYXJhIGluc3RhbiBkaSBsb2thbCBkYWxhbSBoaXR1bmdhbiBtaWxpZGV0aWsgdGFucGEgcGVybHUgbWVtYW5nZ2lsIEdyYWRsZS4KMy4gKipQZW5kZWxlZ2FzaWFuIFBlbnVoIGtlIEdpdEh1YiBBY3Rpb25zKio6IFNldGlhcCBgZ2l0IHB1c2hgIGRlbmdhbiBwZXNhbiBjb21taXQgcmlsaXMgb3RvbWF0aXMgbWVtaWN1IHJ1bm5lciBjbG91ZCBHaXRIdWIgQWN0aW9ucyB5YW5nIG1lbWlsaWtpIGNhY2hpbmcgY2VwYXQsIGtvbXBpbGFzaSBoZWFkbGVzcyB0ZXJpc29sYXNpLCBwZW5hbmRhdGFuZ2FuYW4gcmVsZWFzZSBrZXlzdG9yZSBvdG9tYXRpcywgZGFuIHBlbWJ1YXRhbiByaWxpcyBHaXRIdWIgUmVsZWFzZSBiZXJpc2lrYW4gZmlsZSBBUEsgc2lhcCB1bmR1aC4KCi0tLQoKIyMgPGltZyBzcmM9ImFzc2V0cy9pY29ucy9pbnN0YWxsLnN2ZyIgd2lkdGg9IjIyIiBoZWlnaHQ9IjIyIiBhbGlnbj0iY2VudGVyIiBhbHQ9Ikluc3RhbGwiIC8+IEluc3RhbGFzaSBDZXBhdCAoMS1MaW5lIEF1dG8tRGV0ZWN0KQoKSmFsYW5rYW4gcGVyaW50YWggYmVyaWt1dCBkaSB0ZXJtaW5hbCB1bnR1ayBtZW1hc2FuZyBhdGF1IG1lbXBlcmJhcnVpIHNraWxsIGluaSBzZWNhcmEgb3RvbWF0aXM6CgpgYGBiYXNoCmN1cmwgLWZzU0wgaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2FyYmRldmFpL2FuZHJvaWQtY29tcG9zZS1idWlsZGVyL21haW4vaW5zdGFsbC5zaCB8IGJhc2gKYGBgCgo+ICoqTWVrYW5pc21lIE90b21hdGlzOioqIFNrcmlwIGluc3RhbGxlciBzZWNhcmEgY2VyZGFzIG1lbWluZGFpIENMSSB5YW5nIHRlcnBhc2FuZyBkaSBzaXN0ZW0gKGBhZ3lgLCBgY2xhdWRlYCwgYGNvZGV4YCkgZGFuIG1lbmdhaXRrYW4gc3ltbGluayAqbGl2ZS1zeW5jKiBsYW5nc3VuZyBrZSBkaXJla3Rvcmkga29uZmlndXJhc2kgbWFzaW5nLW1hc2luZyBhZ2VudC4KCi0tLQoKIyMgPGltZyBzcmM9ImFzc2V0cy9pY29ucy9hcmNoaXRlY3R1cmUuc3ZnIiB3aWR0aD0iMjIiIGhlaWdodD0iMjIiIGFsaWduPSJjZW50ZXIiIGFsdD0iQXJjaGl0ZWN0dXJlIiAvPiBBbHVyIEtlcmphIFByb2R1a3NpIChMb2NhbCBDb2RlIHRvIENsb3VkIEFQSykKCmBgYHRleHQKWyBMT0NBTCBERVZCT1ggLyBBR0VOVCBdCiAgIOKUggogICDilJzilIDilIAgMS4gVHVsaXMgVUkgJiBMb2dpYyAoS290bGluICsgSmV0cGFjayBDb21wb3NlIE1hdGVyaWFsIDMpCiAgIOKUnOKUgOKUgCAyLiBWYWxpZGFzaSBQcmUtRmxpZ2h0IChweXRob24zIHNjcmlwdHMvdmVyaWZ5X2tvdGxpbl9zeW50YXgucHkpCiAgIOKUlOKUgOKUgCAzLiBHaXQgQ29tbWl0ICgiUmVsZWFzZSB2MS4wLjAgLSBEZXNrcmlwc2kgZml0dXIiKSAmIEdpdCBQdXNoCiAgICAgICAgICAgIOKUggogICAgICAgICAgICDilrwKWyBHSVRIVUIgQUNUSU9OUyBDTE9VRCBSVU5ORVIgXQogICDilIIKICAg4pSc4pSA4pSAIDEuIFNldHVwIEhlYWRsZXNzIEpESyAmIEFuZHJvaWQgU0RLIENhY2hlCiAgIOKUnOKUgOKUgCAyLiBFa3N0cmFrIENoYW5nZWxvZyBHaXQgRGluYW1pcyAoZ2VuZXJhdGVfcmVsZWFzZV9ub3Rlcy5weSkKICAg4pSc4pSA4pSAIDMuIEJ1aWxkIFNpZ25lZCBQcm9kdWN0aW9uIEFQSyAoZ3JhZGxldyBhc3NlbWJsZVJlbGVhc2UpCiAgIOKUlOKUgOKUgCA0LiBQdWJsaXNoIEdpdEh1YiBSZWxlYXNlIChBc2V0IEFQSyArIER5bmFtaWMgUmVsZWFzZSBOb3RlcykKICAgICAgICAgICAg4pSCCiAgICAgICAgICAgIOKWvApbIFNNQVJUUEhPTkUgUEVOR0dVTkEgXQogICDilJTilIDilIAgSW4tQXBwIFVwZGF0ZXIgKE9rSHR0cCBkaXJlY3Qgc3RyZWFtIGRvd25sb2FkICsgNC10aWVyIEFQSyBkZWVwIHZhbGlkYXRpb24pCmBgYAoKLS0tCgojIyA8aW1nIHNyYz0iYXNzZXRzL2ljb25zL2FyY2hpdGVjdHVyZS5zdmciIHdpZHRoPSIyMiIgaGVpZ2h0PSIyMiIgYWxpZ249ImNlbnRlciIgYWx0PSJBcmNoaXRlY3R1cmUiIC8+IDkgU3RhbmRhciBSZWtheWFzYSBJbmR1c3RyaQoKU2tpbGwgaW5pIG1lbmV0YXBrYW4gOSBhdHVyYW4ga2V0YXQgeWFuZyB3YWppYiBkaXBhdHVoaSBvbGVoIHNldGlhcCBBSSBhZ2VudDoKCiMjIyAxLiBaZXJvIExvY2FsIEdyYWRsZSBCdWlsZCAmIEF1dG9waWxvdCBEZWxpdmVyeQotICoqTGFyYW5nYW4gS2VyYXM6KiogRGlsYXJhbmcgbWVuamFsYW5rYW4gYC4vZ3JhZGxldyBidWlsZGAsIGAuL2dyYWRsZXcgYXNzZW1ibGVEZWJ1Z2AsIGF0YXUgYC4vZ3JhZGxldyBhc3NlbWJsZVJlbGVhc2VgIGRpIHRlcm1pbmFsIGxva2FsLgotICoqU3RhbmRhcjoqKiBTZWx1cnVoIGtvbXBpbGFzaSBkaWRlbGVnYXNpa2FuIGtlIEdpdEh1YiBBY3Rpb25zLiBTZXRlbGFoIGxvbG9zIGB2ZXJpZnlfa290bGluX3N5bnRheC5weWAsIEFJIGxhbmdzdW5nIGNvbW1pdCAoYFJlbGVhc2UgdlguWS5aYCksIHB1c2gsIG1lbWFudGF1IENJIChgZ2ggcnVuIHdhdGNoIC0taW50ZXJ2YWwgNjBgKSwgbWVsYWt1a2FuICpDSSBGYWlsdXJlIFBhdHRlcm4gTG9vcCogamlrYSBnYWdhbCwgZGFuIG1lbnllcmFoa2FuIGxpbmsgQVBLIFJlbGVhc2Uga2UgcGVuZ2d1bmEuCgojIyMgMi4gU2tlbGV0b24gU2NyZWVuICYgU2hpbW1lciBOYXRpdmUgKEFudGktU3Bpbm5lciBLb3NvbmcpCi0gKipMYXJhbmdhbjoqKiBEaWxhcmFuZyBtZW5hbXBpbGthbiBgQ2lyY3VsYXJQcm9ncmVzc0luZGljYXRvcmAgZGkgdGVuZ2FoIGxheWFyIGtvc29uZyBzYWF0IHRyYW5zaXNpIGRhdGEuCi0gKipTdGFuZGFyOioqIFdhamliIG1lbmdndW5ha2FuIGxheW91dCBza2VsZXRvbiB5YW5nIG1lbnllcnVwYWkgYmVudHVrIGtvbnRlbiBhc2xpIGRlbmdhbiBhbmltYXNpIGtpbGF1ICgqc2hpbW1lciBlZmZlY3QqKSBoYWx1cyBiZXJiYXNpcyBBUEkgSmV0cGFjayBDb21wb3NlIG11cm5pIChgcmVtZW1iZXJJbmZpbml0ZVRyYW5zaXRpb25gICsgYEJydXNoLmxpbmVhckdyYWRpZW50YCkgdGFucGEgbGlicmFyeSBwaWhhayBrZXRpZ2EuCi0gKipNb2R1bCBUZXJzZWRpYToqKiBgU2tlbGV0b25Cb3hgLCBgU2tlbGV0b25DYXJkYCwgYFNrZWxldG9uRGFzaGJvYXJkYCwgYFNrZWxldG9uTGlzdEl0ZW1gLgoKIyMjIDMuIFJlc2lsaWVuc2kgS29ua3VyZW5zaSAmIE11dGV4IChBbnRpLURlYWRsb2NrIEhhcmR3YXJlL1JvdXRlcikKLSAqKk90ZW50aWthc2kgQXRvbWlrOioqIFNlbHVydWggc2lrbHVzIGxvZ2luIGF0YXUgcmVxdWVzdCB0b2tlbiBrZSByb3V0ZXIvaGFyZHdhcmUgZGlsaW5kdW5naSBkZW5nYW4gYE11dGV4LndpdGhMb2NrYCBndW5hIG1lbmNlZ2FoICpzZXNzaW9uIHRocmFzaGluZyouCi0gKipMYXJhbmdhbiBSZS1lbnRyYW5jeSBTZW1hcGhvcmU6KiogVGlkYWsgYm9sZWggbWVuZ2FrdWlzaXNpIHBlcm1pdCBgU2VtYXBob3JlYCBiZXJzYXJhbmcgZGFyaSBkYWxhbSBibG9rIHBlcm1pdCB5YW5nIHNhbWEgZGVtaSBtZW5jZWdhaCAqZGVhZGxvY2sqLgotICoqU2VrdWVuc2lhbCBQcmUtQXV0aDoqKiBUb2tlbiBhdGF1IHNlc2kgYWt0aWYgd2FqaWIgZGlzZWxlc2Fpa2FuIHNlY2FyYSBiZXJ1cnV0YW4gc2ViZWx1bSBtZW1pY3UgY29yb3V0aW5lIHBhcmFsZWwgKGBhc3luY2ApLgoKIyMjIDQuIEtlYmlqYWthbiBBbnRpIERhdGEgRHVtbXkgKFplcm8gRHVtbXkgRGF0YSkKLSAqKkxhcmFuZ2FuOioqIERpbGFyYW5nIG1lbnllbWF0a2FuIGRhdGEgcGFsc3Ugc3RhdGlzICgqbW9jayBkYXRhKikgcGFkYSBsYXlhciBwcm9kdWtzaS4KLSAqKlN0YW5kYXI6KiogV2FqaWIgbWVuZWx1c3VyaSBlbmRwb2ludCBhdXRlbnRpaywgbWVuZGVrb2RlIHNrZW1hIG90ZW50aWthc2kgKGNvb2tpZSwgdG9rZW4sIHBheWxvYWQgdGVyZW5rcmlwc2kpLCBzZXJ0YSBtZW1ldGFrYW4gbW9kZWwgZGF0YSB5YW5nIHRvbGVyYW4gdGVyaGFkYXAgZXZvbHVzaSBmaWVsZCAoYGlnbm9yZVVua25vd25LZXlzID0gdHJ1ZWApLgoKIyMjIDUuIEluLUFwcCBVcGRhdGVyIFN0YW5kYXIgSW5kdXN0cmkgKEFudGktQVBLIEtvcnVwICYgU3RyZWFtaW5nIEJ1ZmZlcikKLSAqKkxhcmFuZ2FuIGBEb3dubG9hZE1hbmFnZXJgOioqIERpbGFyYW5nIG1lbmdhbmRhbGthbiBgRG93bmxvYWRNYW5hZ2VyYCBzaXN0ZW0geWFuZyByZW50YW4gbWFjZXQgc2FhdCBzaW55YWwgbGVtYWggYXRhdSBnYWdhbCBtZW5hbmdhbmkgSFRUUCByZWRpcmVjdCBHaXRIdWIgQ0ROLgotICoqRGlyZWN0IE9rSHR0cCBTdHJlYW1pbmc6KiogV2FqaWIgbWVuZ2d1bmFrYW4gc3RyZWFtaW5nIEhUVFAgbGFuZ3N1bmcgZGVuZ2FuIGJ1ZmZlciA2NCBLQiwgdGltZW91dCB0YW5nZ3VoICgzMHMgY29ubmVjdCwgNjBzIHJlYWQvd3JpdGUpLCBkYW4gcGVuZ2hpdHVuZ2FuIHBlcnNlbnRhc2UgcHJlc2lzaS4KLSAqKklzb2xhc2kgRmlsZSBTZW1lbnRhcmEgKGAucGFydGApOioqIE1lbmd1bmR1aCBrZSBmaWxlIHNlbWVudGFyYSBgYXBwLSR7dmVyc2lvbn0tJHtmbGF2b3J9LmFway5wYXJ0YC4gRmlsZSBoYW55YSBkaS1yZW5hbWUgbWVuamFkaSBgLmFwa2Agc2V0ZWxhaCAxMDAlIGJ5dGUgdGVydW5kdWggZGFuIGxvbG9zIHZhbGlkYXNpLiBKaWthIHRlcmphZGkgZ2FuZ2d1YW4gamFyaW5nYW4sIGZpbGUgYC5wYXJ0YCBsYW5nc3VuZyBkaWhhcHVzIG90b21hdGlzLgotICoqVmFsaWRhc2kgSW50ZWdyaXRhcyA0IExhcGlzIChgaXNBcGtWYWxpZGApOioqCiAgMS4gVmVyaWZpa2FzaSB1a3VyYW4gZmlzaWsgbWluaW11bSAoPiAxMCBNQikgZGFuIGV4YWN0IG1hdGNoIHVrdXJhbiBhc2V0IEdpdEh1Yi4KICAyLiBEZWVwIGFyY2hpdmUgJiBERVggcGFyc2luZyBtZWxhbHVpIGBnZXRQYWNrYWdlQXJjaGl2ZUluZm8oLi4uLCBHRVRfU0lHTklOR19DRVJUSUZJQ0FURVMgb3IgR0VUX0FDVElWSVRJRVMpYC4KICAzLiBTdHJpY3QgcGFja2FnZSBuYW1lICYgZmxhdm9yIG1hdGNoaW5nIChgcGtnLnBhY2thZ2VOYW1lID09IGNvbnRleHQucGFja2FnZU5hbWVgKS4KICA0LiBNb25vdG9uaWMgdmVyc2lvbiBjb2RlIHByb2dyZXNzaW9uIChgcGtnLmxvbmdWZXJzaW9uQ29kZSA+IEJ1aWxkQ29uZmlnLlZFUlNJT05fQ09ERWApLgotICoqUGVtYmVyc2loYW4gT3RvbWF0aXMgU3RvcmFnZToqKiBIYXB1cyBzZWx1cnVoIGZpbGUgaW5zdGFsbGVyIEFQSyB1c2FuZyBkYXJpIGRpcmVrdG9yaSB1bmR1aGFuIHNlYmVsdW0gbWVuZ3VuZHVoIHJpbGlzIGJhcnUgYXRhdSBzZXRlbGFoIHBlbWJhcnVhbiBzdWtzZXMgZGlwYXNhbmcuCgojIyMgNi4gRm9ybXVsYSBNb25vdG9uaWsgU2VtVmVyICYgT3RvbWFzaSBSaWxpcyBCZWJhcyBFbW9qaQotICoqRm9ybXVsYSBNb25vdG9uaWsgYHZlcnNpb25Db2RlYDoqKgogICQkXHRleHR7dmVyc2lvbkNvZGV9ID0gXHRleHR7TUFKT1J9IFx0aW1lcyAxMDAwMCArIFx0ZXh0e01JTk9SfSBcdGltZXMgMTAwICsgXHRleHR7UEFUQ0h9JCQKLSAqKlplcm8tRW1vamkgUG9saWN5OioqIERpbGFyYW5nIG1lbnllbWF0a2FuIGVtb2ppIGRla29yYXRpZiBwYWRhIGNhdGF0YW4gcmlsaXMsIGNoYW5nZWxvZywgZGFuIGRpYWxvZyB1cGRhdGUgZGFsYW0gYXBsaWthc2kgKG1lbmdhY3UgcGFkYSBzdGFuZGFyIHRla25pcyByZXNtaSBBT1NQIC8gTGludXggS2VybmVsKS4KLSAqKlplcm8tSGFyZGNvZGVkIENoYW5nZWxvZzoqKiBTZWx1cnVoIHBvaW4gY2F0YXRhbiByaWxpcyBkaWVrc3RyYWsgc2VjYXJhIGRpbmFtaXMgMTAwJSBkYXJpIGNvbW1pdCBnaXQgcmlpbCBtZWxhbHVpIHNrcmlwIGAuZ2l0aHViL3NjcmlwdHMvZ2VuZXJhdGVfcmVsZWFzZV9ub3Rlcy5weWAuCi0gKipSaWxpcyBTYXR1IFNpa2x1czoqKiBSaWxpcyBkaXBpY3Ugb3RvbWF0aXMgdmlhIHBlc2FuIGNvbW1pdCBgUmVsZWFzZSB2Li4uYCB0YW5wYSBtYW51YWwgdGFnZ2luZyBsb2thbC4KCiMjIyA3LiBQcmUtRmxpZ2h0IExpbnRlciAmIERldGVrc2kgS2Vib2NvcmFuIE1lbW9yaSAoWmVyby1DSS1GYWlsdXJlKQotIFNrcmlwIG1hbmRpcmkgYHZlcmlmeV9rb3RsaW5fc3ludGF4LnB5YCB3YWppYiBkaWphbGFua2FuIHNlYmVsdW0gc2V0aWFwIGdpdCBjb21taXQ6CiAgLSBWYWxpZGFzaSBwcmUtZmxpZ2h0IGtlbGVuZ2thcGFuIGBncmFkbGV3YCwgYGdyYWRsZS93cmFwcGVyL2AsIGBncmFkbGUucHJvcGVydGllc2AgKGBhbmRyb2lkLnVzZUFuZHJvaWRYPXRydWVgICYgYGtzcC51c2VLU1AyPWZhbHNlYCBiaWxhIHByb3llayBtZW1ha2FpIEtTUCksIHNlcnRhIGlzb2xhc2kgYC5naXRpZ25vcmVgIHBhZGEgZm9sZGVyIGBzY3JpcHRzL2AuCiAgLSBEZXRla3NpIEFQSSBgRXhwZXJpbWVudGFsTWF0ZXJpYWwzQXBpYCB0YW5wYSBgQE9wdEluKEV4cGVyaW1lbnRhbE1hdGVyaWFsM0FwaTo6Y2xhc3MpYCBkYW4gcGVtYWthaWFuIGBNb2RpZmllci5gIC8gYHJlbWVtYmVyYCAvIGBtdXRhYmxlU3RhdGVPZmAgdGFucGEgaW1wb3J0IENvbXBvc2UgaW50aS4KICAtIFZhbGlkYXNpIFhNTCBgYWFwdDJgOiBtZW5kZXRla3NpIGBhbmRyb2lkOnBhdGhEYXRhPSIiYCBrb3Nvbmcgc2VydGEgZm9ybWF0IHdhcm5hIGAjaGV4YCB0aWRhayB2YWxpZCBwYWRhIGA8dmVjdG9yPmAgWE1MLgogIC0gVmFsaWRhc2kga2VzZWltYmFuZ2FuIHRhbmRhIGt1cnVuZyBkYW4gYmxvayBrb2RlIGRlbmdhbiBzdHJpbmcgcGFyc2luZyB5YW5nIHNhZGFyIGVzY2FwZSBsaXRlcmFsLgogIC0gRGV0ZWtzaSBwZW1hbmdnaWxhbiBmdW5nc2kgYHN1c3BlbmRgIGRpIGRhbGFtIGxhbWJkYSBDb21wb3NlIG5vbi1zdXNwZW5kaW5nLgogIC0gRGV0ZWtzaSBmdW5nc2kgYEBEYW9gIGBzdXNwZW5kYCBkZW5nYW4gYEBRdWVyeSgiREVMRVRFIC4uLiIpYCBhdGF1IGBAUXVlcnkoIlVQREFURSAuLi4iKWAgeWFuZyB0aWRhayBtZW5kZWtsYXJhc2lrYW4gdGlwZSBrZW1iYWxpYW4gYDogSW50YCAobWVuY2VnYWggY3Jhc2ggS1NQMiBgdW5leHBlY3RlZCBqdm0gc2lnbmF0dXJlIFZgKS4KICAtIFZhbGlkYXNpIHBlbWJvbmdrYXJhbiBhbmdnb3RhIGBrb3RsaW4uUmVzdWx0PFQ+YCwgaW1wb3IgZWtzdGVuc2kgbW9kaWZpZXIgKGBNb2RpZmllci5ib3JkZXJgLCBgTW9kaWZpZXIuY2xpcGAsIGRzYi4pLCBkYW4ga2V3YWppYmFuIGJsb2sgYG9uRGlzcG9zZSB7IC4uLiB9YCBwYWRhIGBEaXNwb3NhYmxlRWZmZWN0YC4KICAtIEFkdmlzb3J5IHBlcmluZ2F0YW4gbWVtb3JpIG5vbi1ibG9ja2luZyAoYGNvbGxlY3RBc1N0YXRlV2l0aExpZmVjeWNsZWAsIGxlYWsgYENvbnRleHRgLCBkZXRla3NpIGBHbG9iYWxTY29wZWApLgogIC0gRHVrdW5nYW4gbm9uLWJsaW5kIHN1cHByZXNzaW9uIChgLy8gQHZhbGlkYXRvci1pZ25vcmVgLCBgLy8gQHZhbGlkYXRvci1pZ25vcmUtZmlsZWAsIGBAU3VwcHJlc3NgKS4KCiMjIyA4LiBPdG9tYXNpIEtleXN0b3JlICYgU2lnbmluZyBDSSAoQW50aS1NdXRlci1NdXRlcikKLSBTa3JpcCBgc2V0dXBfcmVsZWFzZV9rZXlzdG9yZS5weWAgbWVuZGV0ZWtzaSBkYW4gbWVuZ2luc3RhbCBga2V5dG9vbGAgb3RvbWF0aXMgamlrYSBiZWx1bSBhZGEgKGBvcGVuamRrLTE3LWpyZS1oZWFkbGVzc2ApLgotIFBlbWJ1YXRhbiByZWxlYXNlIGtleXN0b3JlIG5vbi1pbnRlcmFrdGlmLCBrb252ZXJzaSBCYXNlNjQgaW5zdGFuLCBkYW4ga29uZmlndXJhc2kgNCBzZWNyZXRzIHNpZ25pbmcga2UgR2l0SHViIHJlcG9zaXRvcnkgKGBLRVlTVE9SRV9CQVNFNjRgLCBgS0VZU1RPUkVfUEFTU1dPUkRgLCBgS0VZX0FMSUFTYCwgYEtFWV9QQVNTV09SRGApIGRhbGFtIGhpdHVuZ2FuIGRldGlrLgoKIyMjIDkuIFBhdGVuIEJlYmFzICJBSSBTbG9wIiBwYWRhIElrb24gJiBVSQotIERpbGFyYW5nIGtlcmFzIG1lbmdndW5ha2FuIGdhbWJhciBoYXNpbCBnZW5lcmFzaSBBSSAzRCBoaXBlcmJvbGlzIHlhbmcgcGVjYWggYXRhdSB0aWRhayBzaW1ldHJpcy4KLSBXYWppYiBtZW5nZ3VuYWthbiBBbmRyb2lkIEFkYXB0aXZlIFZlY3RvciBJY29ucyAoWE1MIFNWRyBiZXJzaWggcGFkYSBjYW52YXMgMTA4eDEwOCBkcCBkZW5nYW4gc2FmZSB6b25lIDY24oCTNzIgZHApIGJlc2VydGEgYGljX2xhdW5jaGVyX21vbm9jaHJvbWUueG1sYCB1bnR1ayBNYXRlcmlhbCBZb3UgVGhlbWVkIEljb25zLCBkZW5nYW4gcHJlc2V0IGRlZmF1bHQgYGJyYW5kYCAobW9ub2dyYW0gdmVrdG9yIG11cm5pKS4KLSBHZW5lcmF0b3IgcmFzdGVyIFBORyB0ZXJpbnRlZ3Jhc2kgKGBtZHBpYCBoaW5nZ2EgYHh4eGhkcGlgKSBiZXJiYXNpcyBQeXRob24gemxpYiBtdXJuaSB0YW5wYSBkZXBlbmRlbnNpIGxpYnJhcnkgZWtzdGVybmFsLgoKLS0tCgojIyA8aW1nIHNyYz0iYXNzZXRzL2ljb25zL2NvbXBhdGliaWxpdHkuc3ZnIiB3aWR0aD0iMjIiIGhlaWdodD0iMjIiIGFsaWduPSJjZW50ZXIiIGFsdD0iQ29tcGF0aWJpbGl0eSIgLz4gS29tcGF0aWJpbGl0YXMgTXVsdGktQ0xJCgpTa2lsbCBpbmkgbWVtYXR1aGkgKipBZ2VudCBTa2lsbHMgU3RhbmRhcmQqKiBkYW4ga29tcGF0aWJlbCBsYW5nc3VuZyBkaSBiZXJiYWdhaSBwbGF0Zm9ybSBBSSBhZ2VudDoKCnwgQWdlbnQgLyBMTE0gQ0xJIHwgU3RhdHVzIHwgTG9rYXNpIEludGVncmFzaSB8CnwgOi0tLSB8IDotLS06IHwgOi0tLSB8CnwgKipBbnRpZ3Jhdml0eSBDTEkgKGBhZ3lgKSoqIHwgTmF0aXZlIHwgYH4vLmdlbWluaS9jb25maWcvc2tpbGxzL2FuZHJvaWQtY29tcG9zZS1idWlsZGVyL2AgfAp8ICoqQ2xhdWRlIENvZGUgKGBjbGF1ZGVgKSoqIHwgTmF0aXZlIHwgYH4vLmNsYXVkZS9za2lsbHMvYW5kcm9pZC1jb21wb3NlLWJ1aWxkZXIvYCB8CnwgKipPcGVuQUkgQ29kZXggQ0xJIChgY29kZXhgKSoqIHwgTmF0aXZlIHwgYH4vLmNvZGV4L3NraWxscy9hbmRyb2lkLWNvbXBvc2UtYnVpbGRlci9gIHwKfCAqKkN1cnNvciAvIENvcGlsb3QgLyBXaW5kc3VyZioqIHwgTmF0aXZlIHwgQXR1cmFuIHVuaXZlcnNhbCB2aWEgW0FHRU5UUy5tZF0oQUdFTlRTLm1kKSAmIFtHRU1JTkkubWRdKEdFTUlOSS5tZCkgfAoKLS0tCgojIyA8aW1nIHNyYz0iYXNzZXRzL2ljb25zL3Rvb2xzLnN2ZyIgd2lkdGg9IjIyIiBoZWlnaHQ9IjIyIiBhbGlnbj0iY2VudGVyIiBhbHQ9IlRvb2xzIiAvPiBUb29saW5nICYgU2tyaXAgT3RvbWFzaQoKIyMjIDEuIEluaXNpYXNpIFByb3llayBDb21wb3NlIEJhcnUgTGVuZ2thcCBkZW5nYW4gR2l0SHViIEFjdGlvbnMgQ0kKVW50dWsgbWVtYnVhdCByZXBvc2l0b3JpIGFwbGlrYXNpIEFuZHJvaWQgSmV0cGFjayBDb21wb3NlIGJhcnUgeWFuZyBzdWRhaCB0ZXJrb25maWd1cmFzaSB3b3JrZmxvdyBidWlsZCBBUEsgY2xvdWQ6CgpgYGBiYXNoCnB5dGhvbjMgc2NyaXB0cy9pbml0X2NvbXBvc2VfcHJvamVjdC5weSAtLWRpciAvcGF0aC9rZS9wcm95ZWsvYmFydSAtLW5hbWUgIk15IEFwcGxpY2F0aW9uIiAtLXBhY2thZ2UgY29tLmV4YW1wbGUubXlhcHAKYGBgCgojIyMgMi4gU2V0dXAgS2V5c3RvcmUgJiBHaXRIdWIgU2VjcmV0cyBkYWxhbSAxIExhbmdrYWgKTWVtYnVhdCBmaWxlIGtleXN0b3JlIHByb2R1a3NpIGxva2FsIGRhbiBvdG9tYXRpcyBtZW5ndW5nZ2FoIDQgcmFoYXNpYSBzaWduaW5nIGtlIHJlcG9zaXRvcmkgR2l0SHViIHZpYSBgZ2ggc2VjcmV0IHNldGA6CgpgYGBiYXNoCnB5dGhvbjMgc2NyaXB0cy9zZXR1cF9yZWxlYXNlX2tleXN0b3JlLnB5CmBgYAoKIyMjIDMuIFZlcmlmaWthc2kgUHJlLUZsaWdodCBMaW50ZXIgU2ViZWx1bSBDb21taXQKTWVtZXJpa3NhIGtlc2VpbWJhbmdhbiBrdXJ1bmcsIHBlbWFuZ2dpbGFuIHN1c3BlbmQsIGRhbiBwb3RlbnNpIG1lbW9yeSBsZWFrOgoKYGBgYmFzaApweXRob24zIHNjcmlwdHMvdmVyaWZ5X2tvdGxpbl9zeW50YXgucHkKYGBgCgojIyMgNC4gUGVtYnVhdGFuIElrb24gQWRhcHRpZiBBbmRyb2lkIChWZWN0b3IgJiBQTkcgTWlwbWFwKQpNZW5naGFzaWxrYW4gYXNldCBYTUwgQWRhcHRpdmUgSWNvbiBkYW4gcmFzdGVyIFBORyBzaWFwIHBha2FpIHRhbnBhIGxpYnJhcnkgZWtzdGVybmFsIChkZWZhdWx0IHByZXNldCBgYnJhbmRgIG1vbm9ncmFtIHZla3RvciBtdXJuaSk6CgpgYGBiYXNoCnB5dGhvbjMgc2NyaXB0cy9nZW5lcmF0ZV9sYXVuY2hlcl9pY29ucy5weSBhcHAvc3JjL21haW4vcmVzIC0tYXBwLW5hbWUgIk15QXBwIiAtLWJnICIjMDAwMDAwIiAtLWVsZW1lbnRzICIjRUNFRkY0IgpgYGAKCiMjIyA1LiBTbW9rZSBUZXN0IEtlc2VoYXRhbiBTa2lsbCAoPCA1IERldGlrKQpNZW12YWxpZGFzaSBlbmQtdG8tZW5kIGJhaHdhIGdlbmVyYXRvciBwcm95ZWssIHRlbXBsYXRlIENJLCBBZGFwdGl2ZSBJY29uIFhNTCwgZGFuIGxpbnRlciBzaW50YWtzaXMgYmVyZnVuZ3NpIG5vcm1hbCBkaSBgL3RtcGA6CgpgYGBiYXNoCnB5dGhvbjMgc2NyaXB0cy9zbW9rZV90ZXN0X3NraWxsLnB5CmBgYAoKLS0tCgojIyA8aW1nIHNyYz0iYXNzZXRzL2ljb25zL2FkdmFuY2VkLnN2ZyIgd2lkdGg9IjIyIiBoZWlnaHQ9IjIyIiBhbGlnbj0iY2VudGVyIiBhbHQ9IkFkdmFuY2VkIiAvPiBQaWxpaGFuIEluc3RhbGFzaSBMYW5qdXRhbgoKIyMjIEluc3RhbGFzaSBLaHVzdXMgTGluZ2t1bmdhbgpgYGBiYXNoCi4vaW5zdGFsbC5zaCAtLWFudGlncmF2aXR5ICAgICAgICMgUGFzYW5nIGtodXN1cyBBbnRpZ3Jhdml0eSBDTEkgKGFneSkKLi9pbnN0YWxsLnNoIC0tY2xhdWRlICAgICAgICAgICAgIyBQYXNhbmcga2h1c3VzIENsYXVkZSBDb2RlIENMSQouL2luc3RhbGwuc2ggLS1jb2RleCAgICAgICAgICAgICAjIFBhc2FuZyBraHVzdXMgQ29kZXggQ0xJCi4vaW5zdGFsbC5zaCAtLWFsbCAgICAgICAgICAgICAgICMgUGFzYW5nIGtlIHNlbXVhIENMSSB5YW5nIHRlcnNlZGlhCmBgYAoKIyMjIFBlbWJhdGFzYW4gUGVyLVByb3llayAoKldvcmtzcGFjZSBTY29wZSopCmBgYGJhc2gKY2QgL3BhdGgva2UvcHJveWVrL2FuZHJvaWQKL3BhdGgva2UvYW5kcm9pZC1jb21wb3NlLWJ1aWxkZXIvaW5zdGFsbC5zaCAtLXdvcmtzcGFjZQpgYGAKCiMjIyBQZW1iYXJ1YW4gT3RvbWF0aXMgZGkgQmFja2dyb3VuZApBa3RpZmthbiBzaW5rcm9uaXNhc2kgb3RvbWF0aXMgYWdhciBkZWZpbmlzaSBza2lsbCBzZWxhbHUgbXV0YWtoaXIgc2V0aWFwIHRlcm1pbmFsIGRpYnVrYToKCmBgYGJhc2gKLi9pbnN0YWxsLnNoIC0tYXV0by11cGRhdGUgICAgICAgIyBNZW5nYWt0aWZrYW4gYmFja2dyb3VuZCBob29rIGRpIHByb2ZpbCBzaGVsbAouL2luc3RhbGwuc2ggLS11cGRhdGUgICAgICAgICAgICAjIE1lbGFrdWthbiB1cGRhdGUgaW5zdGFuIGtlIGNvbW1pdCBHaXRIdWIgdGVyYmFydQouL2luc3RhbGwuc2ggLS1kaXNhYmxlLWF1dG8tdXBkYXRlCmBgYAoKLS0tCgojIyA8aW1nIHNyYz0iYXNzZXRzL2ljb25zL3N0cnVjdHVyZS5zdmciIHdpZHRoPSIyMiIgaGVpZ2h0PSIyMiIgYWxpZ249ImNlbnRlciIgYWx0PSJTdHJ1Y3R1cmUiIC8+IFN0cnVrdHVyIFJlcG9zaXRvcmkKCmBgYHRleHQKYW5kcm9pZC1jb21wb3NlLWJ1aWxkZXIvCuKUnOKUgOKUgCBhc3NldHMvCuKUgiAgIOKUnOKUgOKUgCBiYW5uZXIuc3ZnICAgICAgICAgICAgICAgICAgICMgQmFubmVyIGFyc2l0ZWt0dXIgcmVzbWkgKE1hdHRlIENoYXJjb2FsIHggTGltZSBOZW9uKQrilIIgICDilJzilIDilIAgZ3JhZGxlLyAgICAgICAgICAgICAgICAgICAgICAjIEJ1bmRlbCBzdGFuZGFyIGdyYWRsZXcgJiBncmFkbGUtd3JhcHBlciAoOC45KQrilIIgICDilJTilIDilIAgaWNvbnMvICAgICAgICAgICAgICAgICAgICAgICAjIFBha2V0IGlrb24gdmlzdWFsIFNWRyB2ZWt0b3IgbWFuZGlyaSAoQmViYXMgRW1vamkpCuKUnOKUgOKUgCBzY3JpcHRzLwrilIIgICDilJzilIDilIAgaW5pdF9jb21wb3NlX3Byb2plY3QucHkgICAgICAjIEdlbmVyYXRvciBwcm95ZWsgSmV0cGFjayBDb21wb3NlICsgQ0kgd29ya2Zsb3cK4pSCICAg4pSc4pSA4pSAIHNldHVwX3JlbGVhc2Vfa2V5c3RvcmUucHkgICAgIyBPdG9tYXNpIGtleXN0b3JlICYgdXBsb2FkIEdpdEh1YiBzZWNyZXRzIHNpZ25pbmcK4pSCICAg4pSc4pSA4pSAIGdlbmVyYXRlX2xhdW5jaGVyX2ljb25zLnB5ICAgIyBHZW5lcmF0b3IgQWRhcHRpdmUgVmVjdG9yIFhNTCAmIFBORyBNaXBtYXAK4pSCICAg4pSc4pSA4pSAIHZlcmlmeV9rb3RsaW5fc3ludGF4LnB5ICAgICAgIyBQcmUtZmxpZ2h0IGxpbnRlciBzaW50YWtzICYgcG9sYSBrZWdhZ2FsYW4gQ0kK4pSCICAg4pSU4pSA4pSAIHNtb2tlX3Rlc3Rfc2tpbGwucHkgICAgICAgICAgIyBTbW9rZSB0ZXN0IGVuZC10by1lbmQgdW50dWsga2VzZWhhdGFuIHNraWxsCuKUnOKUgOKUgCBTS0lMTC5tZCAgICAgICAgICAgICAgICAgICAgICAgICAjIFNpbmdsZSBTb3VyY2Ugb2YgVHJ1dGggaW5zdHJ1a3NpICYgYXR1cmFuIHNraWxsCuKUnOKUgOKUgCBBR0VOVFMubWQgICAgICAgICAgICAgICAgICAgICAgICAjIFBvaW50ZXIgdW5pdmVyc2FsIEFJIGNvZGluZyBhZ2VudHMgLT4gU0tJTEwubWQK4pSc4pSA4pSAIEdFTUlOSS5tZCAgICAgICAgICAgICAgICAgICAgICAgICMgUG9pbnRlciBHZW1pbmkgJiBBbnRpZ3Jhdml0eSAtPiBTS0lMTC5tZArilJzilIDilIAgQ0xBVURFLm1kICAgICAgICAgICAgICAgICAgICAgICAgIyBQb2ludGVyIENsYXVkZSBDb2RlIENMSSAtPiBTS0lMTC5tZArilJzilIDilIAgQ09ERVgubWQgICAgICAgICAgICAgICAgICAgICAgICAgIyBQb2ludGVyIE9wZW5BSSBDb2RleCBDTEkgLT4gU0tJTEwubWQK4pSc4pSA4pSAIGluc3RhbGwuc2ggICAgICAgICAgICAgICAgICAgICAgICMgSW5zdGFsbGVyIG90b21hdGlzIG11bHRpLUNMSSBiZXJiYXNpcyBCYXNoCuKUnOKUgOKUgCBpbnN0YWxsLnB5ICAgICAgICAgICAgICAgICAgICAgICAjIEluc3RhbGxlciBhbHRlcm5hdGlmIG1hbmRpcmkgYmVyYmFzaXMgUHl0aG9uCuKUnOKUgOKUgCBMSUNFTlNFICAgICAgICAgICAgICAgICAgICAgICAgICAjIExpc2Vuc2kgUG9seUZvcm0gTm9uY29tbWVyY2lhbCAoc2tpbGwgR3JhdGlzKQrilJzilIDilIAgTElDRU5TRS1DT01NRVJDSUFMLm1kICAgICAgICAgICAgIyBMaXNlbnNpIGtvbWVyc2lhbCAocGFrZXQgUHJvKQrilJzilIDilIAgUFJJQ0lORy5tZCAgICAgICAgICAgICAgICAgICAgICAgIyBIYXJnYSBQcm8gKHVzdWxhbikK4pSU4pSA4pSAIFJFQURNRS5tZCAgICAgICAgICAgICAgICAgICAgICAgICMgRG9rdW1lbnRhc2kgdGVrbmlzIHByb3llawpgYGAKCi0tLQoKIyMgPGltZyBzcmM9ImFzc2V0cy9pY29ucy9saWNlbnNlLnN2ZyIgd2lkdGg9IjIyIiBoZWlnaHQ9IjIyIiBhbGlnbj0iY2VudGVyIiBhbHQ9IkxpY2Vuc2UiIC8+IExpc2Vuc2kKClNraWxsIEdyYXRpcyBkaSByZXBvc2l0b3JpIGluaSBkaWxpc2Vuc2lrYW4gZGkgYmF3YWgKW1BvbHlGb3JtIE5vbmNvbW1lcmNpYWwgMS4wLjBdKExJQ0VOU0UpLiBCZWJhcyBkaWd1bmFrYW4sIGRpdWJhaCwgZGFuCmRpYmFnaWthbiB1bnR1ayB0dWp1YW4gbm9ua29tZXJzaWFsIChiZWxhamFyLCByaXNldCwgcHJveWVrIHByaWJhZGkpLgpQZW5nZ3VuYWFuIGtvbWVyc2lhbCDigJQgdGVybWFzdWsgbWVuanVhbCwgYXRhdSBtZW1ha2FpIHNraWxsIGluaSB1bnR1awptZW5naGFzaWxrYW4gdWFuZyDigJQgbWVtZXJsdWthbiBsaXNlbnNpIFBybwooW0xJQ0VOU0UtQ09NTUVSQ0lBTC5tZF0oTElDRU5TRS1DT01NRVJDSUFMLm1kKSkuCgpQYWtldCBQcm8gKHJlcG8gcHJpdmF0ClthcmJkZXZhaS9hbmRyb2lkLWNvbXBvc2UtYnVpbGRlci1wcm9dKGh0dHBzOi8vZ2l0aHViLmNvbS9hcmJkZXZhaS9hbmRyb2lkLWNvbXBvc2UtYnVpbGRlci1wcm8pKQpkaWxpc2Vuc2lrYW4gc2VjYXJhIHRlcnBpc2FoIGRpIGJhd2FoCltMSUNFTlNFLUNPTU1FUkNJQUwubWRdKExJQ0VOU0UtQ09NTUVSQ0lBTC5tZCkgZGFuIHRpZGFrIGJvbGVoCmRpZGlzdHJpYnVzaWthbiB1bGFuZy4K
+<p align="center">
+  <img src="assets/banner.svg" alt="Android Compose Builder Banner" width="100%">
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-PolyForm%20Noncommercial-blue.svg?style=flat-square" alt="License: PolyForm Noncommercial"></a>
+  <a href="https://developer.android.com/jetpack/compose"><img src="https://img.shields.io/badge/Platform-Android%20%7C%20Jetpack%20Compose-3DDC84.svg?style=flat-square&logo=android&logoColor=white" alt="Platform"></a>
+  <a href="https://kotlinlang.org/"><img src="https://img.shields.io/badge/Kotlin-2.0+-7F52FF.svg?style=flat-square&logo=kotlin&logoColor=white" alt="Kotlin"></a>
+  <a href="#kompatibilitas-multi-cli"><img src="https://img.shields.io/badge/AI%20Agents-Antigravity%20%7C%20Claude%20%7C%20Codex-CCFF00.svg?style=flat-square&logo=google&logoColor=black" alt="AI Agents"></a>
+  <a href="https://github.com/arbdevai/android-compose-builder/actions"><img src="https://img.shields.io/badge/CI%2FCD-100%25%20GitHub%20Actions-2088FF.svg?style=flat-square&logo=githubactions&logoColor=white" alt="CI/CD"></a>
+</p>
+
+---
+
+## Gratis vs Pro
+
+Skill ini tersedia dalam dua versi. Versi **Gratis tetap gratis selamanya**
+(PolyForm Noncommercial) sebagai portofolio — tidak ada fitur yang diambil.
+
+| | Gratis (PolyForm Noncommercial) | Pro (berbayar) |
+| --- | --- | --- |
+| `SKILL.md` + 9 standar rekayasa | Ya | Ya |
+| 6 referensi mendalam | Ya | Ya |
+| 6 script otomasi (linter, generator, keystore, ikon) | Ya | Ya |
+| Installer multi-CLI (Muse, Antigravity, Claude, Codex) | Ya | Ya |
+| **Template Kasir lengkap** (Room, checkout atomik, riwayat) | — | Ya |
+| **Script scaffold Pro** | — | Ya |
+| **Panduan Play Store & Monetisasi** | — | Ya |
+| **Panduan Production Hardening** | — | Ya |
+| Update | Selamanya | 12 bulan |
+
+**Harga Pro (usulan): Rp149.000 sekali bayar** (Indonesia) / **$29**
+(internasional). Detail harga di [PRICING.md](PRICING.md), lisensi Pro di
+[LICENSE-COMMERCIAL.md](LICENSE-COMMERCIAL.md). Isi paket Pro ada di repo
+privat [arbdevai/android-compose-builder-pro](https://github.com/arbdevai/android-compose-builder-pro)
+(akses diberikan setelah pembelian). Tautan pembelian (Gumroad / Lemon Squeezy)
+akan dipasang setelah listing dibuat.
+
+> Catatan distribusi: paket Pro tidak ada di repositori publik ini dan tidak
+> ikut terpasang oleh installer Gratis — Pro hanya didistribusikan sebagai
+> paket ZIP berbayar dari repo privat.
+
+---
+
+## <img src="assets/icons/overview.svg" width="22" height="22" align="center" alt="Overview" /> Konsep Inti: Bikin APK Tanpa Build Lokal (100% Cloud CI)
+
+**Android Compose Builder** adalah spesifikasi standar rekayasa agen (*Agent Engineering Standard*) resmi untuk merancang, membangun, dan merilis aplikasi Android modern (**Kotlin + Jetpack Compose Material 3**) **tanpa perlu kompilasi Gradle lokal**.
+
+### Mengapa Nol Kompilasi Lokal (Zero Local Build)?
+Biasanya, mengembangkan aplikasi Android membutuhkan Android Studio, Android SDK (~15-30 GB), dan proses `gradlew assembleRelease` lokal yang menguras 8-16 GB RAM serta memicu CPU throttling. Dalam lingkungan AI agent, cloud container, atau remote devbox, proses kompilasi lokal sering menyebabkan memori habis (*out of memory*) atau sesi coding macet total.
+
+Skill ini mengubah paradigma tersebut:
+1. **Mesin Lokal Murni untuk Rekayasa Kode**: AI agent dan developer fokus 100% menulis arsitektur Kotlin, Jetpack Compose UI, Coroutines, dan logika aplikasi.
+2. **Pre-Flight Linter Ringan (`verify_kotlin_syntax.py`)**: Memverifikasi keseimbangan sintaks, batas coroutine suspend, memory leak, dan simbol impor secara instan di lokal dalam hitungan milidetik tanpa perlu memanggil Gradle.
+3. **Pendelegasian Penuh ke GitHub Actions**: Setiap `git push` dengan pesan commit rilis otomatis memicu runner cloud GitHub Actions yang memiliki caching cepat, kompilasi headless terisolasi, penandatanganan release keystore otomatis, dan pembuatan rilis GitHub Release berisikan file APK siap unduh.
+
+---
+
+## <img src="assets/icons/install.svg" width="22" height="22" align="center" alt="Install" /> Instalasi Cepat (1-Line Auto-Detect)
+
+Jalankan perintah berikut di terminal untuk memasang atau memperbarui skill ini secara otomatis:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/arbdevai/android-compose-builder/main/install.sh | bash
+```
+
+> **Mekanisme Otomatis:** Skrip installer secara cerdas memindai CLI yang terpasang di sistem (`agy`, `claude`, `codex`) dan mengaitkan symlink *live-sync* langsung ke direktori konfigurasi masing-masing agent.
+
+---
+
+## <img src="assets/icons/architecture.svg" width="22" height="22" align="center" alt="Architecture" /> Alur Kerja Produksi (Local Code to Cloud APK)
+
+```text
+[ LOCAL DEVBOX / AGENT ]
+   │
+   ├── 1. Tulis UI & Logic (Kotlin + Jetpack Compose Material 3)
+   ├── 2. Validasi Pre-Flight (python3 scripts/verify_kotlin_syntax.py)
+   └── 3. Git Commit ("Release v1.0.0 - Deskripsi fitur") & Git Push
+            │
+            ▼
+[ GITHUB ACTIONS CLOUD RUNNER ]
+   │
+   ├── 1. Setup Headless JDK & Android SDK Cache
+   ├── 2. Ekstrak Changelog Git Dinamis (generate_release_notes.py)
+   ├── 3. Build Signed Production APK (gradlew assembleRelease)
+   └── 4. Publish GitHub Release (Aset APK + Dynamic Release Notes)
+            │
+            ▼
+[ SMARTPHONE PENGGUNA ]
+   └── In-App Updater (OkHttp direct stream download + 4-tier APK deep validation)
+```
+
+---
+
+## <img src="assets/icons/architecture.svg" width="22" height="22" align="center" alt="Architecture" /> 9 Standar Rekayasa Industri
+
+Skill ini menetapkan 9 aturan ketat yang wajib dipatuhi oleh setiap AI agent:
+
+### 1. Zero Local Gradle Build & Autopilot Delivery
+- **Larangan Keras:** Dilarang menjalankan `./gradlew build`, `./gradlew assembleDebug`, atau `./gradlew assembleRelease` di terminal lokal.
+- **Standar:** Seluruh kompilasi didelegasikan ke GitHub Actions. Setelah lolos `verify_kotlin_syntax.py`, AI langsung commit (`Release vX.Y.Z`), push, memantau CI (`gh run watch --interval 60`), melakukan *CI Failure Pattern Loop* jika gagal, dan menyerahkan link APK Release ke pengguna.
+
+### 2. Skeleton Screen & Shimmer Native (Anti-Spinner Kosong)
+- **Larangan:** Dilarang menampilkan `CircularProgressIndicator` di tengah layar kosong saat transisi data.
+- **Standar:** Wajib menggunakan layout skeleton yang menyerupai bentuk konten asli dengan animasi kilau (*shimmer effect*) halus berbasis API Jetpack Compose murni (`rememberInfiniteTransition` + `Brush.linearGradient`) tanpa library pihak ketiga.
+- **Modul Tersedia:** `SkeletonBox`, `SkeletonCard`, `SkeletonDashboard`, `SkeletonListItem`.
+
+### 3. Resiliensi Konkurensi & Mutex (Anti-Deadlock Hardware/Router)
+- **Otentikasi Atomik:** Seluruh siklus login atau request token ke router/hardware dilindungi dengan `Mutex.withLock` guna mencegah *session thrashing*.
+- **Larangan Re-entrancy Semaphore:** Tidak boleh mengakuisisi permit `Semaphore` bersarang dari dalam blok permit yang sama demi mencegah *deadlock*.
+- **Sekuensial Pre-Auth:** Token atau sesi aktif wajib diselesaikan secara berurutan sebelum memicu coroutine paralel (`async`).
+
+### 4. Kebijakan Anti Data Dummy (Zero Dummy Data)
+- **Larangan:** Dilarang menyematkan data palsu statis (*mock data*) pada layar produksi.
+- **Standar:** Wajib menelusuri endpoint autentik, mendekode skema otentikasi (cookie, token, payload terenkripsi), serta memetakan model data yang toleran terhadap evolusi field (`ignoreUnknownKeys = true`).
+
+### 5. In-App Updater Standar Industri (Anti-APK Korup & Streaming Buffer)
+- **Larangan `DownloadManager`:** Dilarang mengandalkan `DownloadManager` sistem yang rentan macet saat sinyal lemah atau gagal menangani HTTP redirect GitHub CDN.
+- **Direct OkHttp Streaming:** Wajib menggunakan streaming HTTP langsung dengan buffer 64 KB, timeout tangguh (30s connect, 60s read/write), dan penghitungan persentase presisi.
+- **Isolasi File Sementara (`.part`):** Mengunduh ke file sementara `app-${version}-${flavor}.apk.part`. File hanya di-rename menjadi `.apk` setelah 100% byte terunduh dan lolos validasi. Jika terjadi gangguan jaringan, file `.part` langsung dihapus otomatis.
+- **Validasi Integritas 4 Lapis (`isApkValid`):**
+  1. Verifikasi ukuran fisik minimum (> 10 MB) dan exact match ukuran aset GitHub.
+  2. Deep archive & DEX parsing melalui `getPackageArchiveInfo(..., GET_SIGNING_CERTIFICATES or GET_ACTIVITIES)`.
+  3. Strict package name & flavor matching (`pkg.packageName == context.packageName`).
+  4. Monotonic version code progression (`pkg.longVersionCode > BuildConfig.VERSION_CODE`).
+- **Pembersihan Otomatis Storage:** Hapus seluruh file installer APK usang dari direktori unduhan sebelum mengunduh rilis baru atau setelah pembaruan sukses dipasang.
+
+### 6. Formula Monotonik SemVer & Otomasi Rilis Bebas Emoji
+- **Formula Monotonik `versionCode`:**
+  $$\text{versionCode} = \text{MAJOR} \times 10000 + \text{MINOR} \times 100 + \text{PATCH}$$
+- **Zero-Emoji Policy:** Dilarang menyematkan emoji dekoratif pada catatan rilis, changelog, dan dialog update dalam aplikasi (mengacu pada standar teknis resmi AOSP / Linux Kernel).
+- **Zero-Hardcoded Changelog:** Seluruh poin catatan rilis diekstrak secara dinamis 100% dari commit git riil melalui skrip `.github/scripts/generate_release_notes.py`.
+- **Rilis Satu Siklus:** Rilis dipicu otomatis via pesan commit `Release v...` tanpa manual tagging lokal.
+
+### 7. Pre-Flight Linter & Deteksi Kebocoran Memori (Zero-CI-Failure)
+- Skrip mandiri `verify_kotlin_syntax.py` wajib dijalankan sebelum setiap git commit:
+  - Validasi pre-flight kelengkapan `gradlew`, `gradle/wrapper/`, `gradle.properties` (`android.useAndroidX=true` & `ksp.useKSP2=false` bila proyek memakai KSP), serta isolasi `.gitignore` pada folder `scripts/`.
+  - Deteksi API `ExperimentalMaterial3Api` tanpa `@OptIn(ExperimentalMaterial3Api::class)` dan pemakaian `Modifier.` / `remember` / `mutableStateOf` tanpa import Compose inti.
+  - Validasi XML `aapt2`: mendeteksi `android:pathData=""` kosong serta format warna `#hex` tidak valid pada `<vector>` XML.
+  - Validasi keseimbangan tanda kurung dan blok kode dengan string parsing yang sadar escape literal.
+  - Deteksi pemanggilan fungsi `suspend` di dalam lambda Compose non-suspending.
+  - Deteksi fungsi `@Dao` `suspend` dengan `@Query("DELETE ...")` atau `@Query("UPDATE ...")` yang tidak mendeklarasikan tipe kembalian `: Int` (mencegah crash KSP2 `unexpected jvm signature V`).
+  - Validasi pembongkaran anggota `kotlin.Result<T>`, impor ekstensi modifier (`Modifier.border`, `Modifier.clip`, dsb.), dan kewajiban blok `onDispose { ... }` pada `DisposableEffect`.
+  - Advisory peringatan memori non-blocking (`collectAsStateWithLifecycle`, leak `Context`, deteksi `GlobalScope`).
+  - Dukungan non-blind suppression (`// @validator-ignore`, `// @validator-ignore-file`, `@Suppress`).
+
+### 8. Otomasi Keystore & Signing CI (Anti-Muter-Muter)
+- Skrip `setup_release_keystore.py` mendeteksi dan menginstal `keytool` otomatis jika belum ada (`openjdk-17-jre-headless`).
+- Pembuatan release keystore non-interaktif, konversi Base64 instan, dan konfigurasi 4 secrets signing ke GitHub repository (`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`) dalam hitungan detik.
+
+### 9. Paten Bebas "AI Slop" pada Ikon & UI
+- Dilarang keras menggunakan gambar hasil generasi AI 3D hiperbolis yang pecah atau tidak simetris.
+- Wajib menggunakan Android Adaptive Vector Icons (XML SVG bersih pada canvas 108x108 dp dengan safe zone 66–72 dp) beserta `ic_launcher_monochrome.xml` untuk Material You Themed Icons, dengan preset default `brand` (monogram vektor murni).
+- Generator raster PNG terintegrasi (`mdpi` hingga `xxxhdpi`) berbasis Python zlib murni tanpa dependensi library eksternal.
+
+---
+
+## <img src="assets/icons/compatibility.svg" width="22" height="22" align="center" alt="Compatibility" /> Kompatibilitas Multi-CLI
+
+Skill ini mematuhi **Agent Skills Standard** dan kompatibel langsung di berbagai platform AI agent:
+
+| Agent / LLM CLI | Status | Lokasi Integrasi |
+| :--- | :---: | :--- |
+| **Antigravity CLI (`agy`)** | Native | `~/.gemini/config/skills/android-compose-builder/` |
+| **Claude Code (`claude`)** | Native | `~/.claude/skills/android-compose-builder/` |
+| **OpenAI Codex CLI (`codex`)** | Native | `~/.codex/skills/android-compose-builder/` |
+| **Cursor / Copilot / Windsurf** | Native | Aturan universal via [AGENTS.md](AGENTS.md) & [GEMINI.md](GEMINI.md) |
+
+---
+
+## <img src="assets/icons/tools.svg" width="22" height="22" align="center" alt="Tools" /> Tooling & Skrip Otomasi
+
+### 1. Inisiasi Proyek Compose Baru Lengkap dengan GitHub Actions CI
+Untuk membuat repositori aplikasi Android Jetpack Compose baru yang sudah terkonfigurasi workflow build APK cloud:
+
+```bash
+python3 scripts/init_compose_project.py --dir /path/ke/proyek/baru --name "My Application" --package com.example.myapp
+```
+
+### 2. Setup Keystore & GitHub Secrets dalam 1 Langkah
+Membuat file keystore produksi lokal dan otomatis mengunggah 4 rahasia signing ke repositori GitHub via `gh secret set`:
+
+```bash
+python3 scripts/setup_release_keystore.py
+```
+
+### 3. Verifikasi Pre-Flight Linter Sebelum Commit
+Memeriksa keseimbangan kurung, pemanggilan suspend, dan potensi memory leak:
+
+```bash
+python3 scripts/verify_kotlin_syntax.py
+```
+
+### 4. Pembuatan Ikon Adaptif Android (Vector & PNG Mipmap)
+Menghasilkan aset XML Adaptive Icon dan raster PNG siap pakai tanpa library eksternal (default preset `brand` monogram vektor murni):
+
+```bash
+python3 scripts/generate_launcher_icons.py app/src/main/res --app-name "MyApp" --bg "#000000" --elements "#ECEFF4"
+```
+
+### 5. Smoke Test Kesehatan Skill (< 5 Detik)
+Memvalidasi end-to-end bahwa generator proyek, template CI, Adaptive Icon XML, dan linter sintaksis berfungsi normal di `/tmp`:
+
+```bash
+python3 scripts/smoke_test_skill.py
+```
+
+---
+
+## <img src="assets/icons/advanced.svg" width="22" height="22" align="center" alt="Advanced" /> Pilihan Instalasi Lanjutan
+
+### Instalasi Khusus Lingkungan
+```bash
+./install.sh --antigravity       # Pasang khusus Antigravity CLI (agy)
+./install.sh --claude            # Pasang khusus Claude Code CLI
+./install.sh --codex             # Pasang khusus Codex CLI
+./install.sh --all               # Pasang ke semua CLI yang tersedia
+```
+
+### Pembatasan Per-Proyek (*Workspace Scope*)
+```bash
+cd /path/ke/proyek/android
+/path/ke/android-compose-builder/install.sh --workspace
+```
+
+### Pembaruan Otomatis di Background
+Aktifkan sinkronisasi otomatis agar definisi skill selalu mutakhir setiap terminal dibuka:
+
+```bash
+./install.sh --auto-update       # Mengaktifkan background hook di profil shell
+./install.sh --update            # Melakukan update instan ke commit GitHub terbaru
+./install.sh --disable-auto-update
+```
+
+---
+
+## <img src="assets/icons/structure.svg" width="22" height="22" align="center" alt="Structure" /> Struktur Repositori
+
+```text
+android-compose-builder/
+├── assets/
+│   ├── banner.svg                   # Banner arsitektur resmi (Matte Charcoal x Lime Neon)
+│   ├── gradle/                      # Bundel standar gradlew & gradle-wrapper (8.9)
+│   └── icons/                       # Paket ikon visual SVG vektor mandiri (Bebas Emoji)
+├── scripts/
+│   ├── init_compose_project.py      # Generator proyek Jetpack Compose + CI workflow
+│   ├── setup_release_keystore.py    # Otomasi keystore & upload GitHub secrets signing
+│   ├── generate_launcher_icons.py   # Generator Adaptive Vector XML & PNG Mipmap
+│   ├── verify_kotlin_syntax.py      # Pre-flight linter sintaks & pola kegagalan CI
+│   └── smoke_test_skill.py          # Smoke test end-to-end untuk kesehatan skill
+├── SKILL.md                         # Single Source of Truth instruksi & aturan skill
+├── AGENTS.md                        # Pointer universal AI coding agents -> SKILL.md
+├── GEMINI.md                        # Pointer Gemini & Antigravity -> SKILL.md
+├── CLAUDE.md                        # Pointer Claude Code CLI -> SKILL.md
+├── CODEX.md                         # Pointer OpenAI Codex CLI -> SKILL.md
+├── install.sh                       # Installer otomatis multi-CLI berbasis Bash
+├── install.py                       # Installer alternatif mandiri berbasis Python
+├── LICENSE                          # Lisensi PolyForm Noncommercial (skill Gratis)
+├── LICENSE-COMMERCIAL.md            # Lisensi komersial (paket Pro)
+├── PRICING.md                       # Harga Pro (usulan)
+└── README.md                        # Dokumentasi teknis proyek
+```
+
+---
+
+## <img src="assets/icons/license.svg" width="22" height="22" align="center" alt="License" /> Lisensi
+
+Skill Gratis di repositori ini dilisensikan di bawah
+[PolyForm Noncommercial 1.0.0](LICENSE). Bebas digunakan, diubah, dan
+dibagikan untuk tujuan nonkomersial (belajar, riset, proyek pribadi).
+Penggunaan komersial — termasuk menjual, atau memakai skill ini untuk
+menghasilkan uang — memerlukan lisensi Pro
+([LICENSE-COMMERCIAL.md](LICENSE-COMMERCIAL.md)).
+
+Paket Pro (repo privat
+[arbdevai/android-compose-builder-pro](https://github.com/arbdevai/android-compose-builder-pro))
+dilisensikan secara terpisah di bawah
+[LICENSE-COMMERCIAL.md](LICENSE-COMMERCIAL.md) dan tidak boleh
+didistribusikan ulang.
