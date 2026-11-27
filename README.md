@@ -12,6 +12,36 @@
 
 ---
 
+## Gratis vs Pro
+
+Skill ini tersedia dalam dua versi. Versi **Gratis tetap gratis selamanya**
+(MIT) sebagai portofolio — tidak ada fitur yang diambil.
+
+| | Gratis (MIT) | Pro (berbayar) |
+| --- | --- | --- |
+| `SKILL.md` + 9 standar rekayasa | Ya | Ya |
+| 6 referensi mendalam | Ya | Ya |
+| 6 script otomasi (linter, generator, keystore, ikon) | Ya | Ya |
+| Installer multi-CLI (Muse, Antigravity, Claude, Codex) | Ya | Ya |
+| **Template Kasir lengkap** (Room, checkout atomik, riwayat) | — | Ya |
+| **Script scaffold Pro** | — | Ya |
+| **Panduan Play Store & Monetisasi** | — | Ya |
+| **Panduan Production Hardening** | — | Ya |
+| Update | Selamanya | 12 bulan |
+
+**Harga Pro (usulan): Rp149.000 sekali bayar** (Indonesia) / **$29**
+(internasional). Detail harga di [PRICING.md](PRICING.md), lisensi Pro di
+[LICENSE-COMMERCIAL.md](LICENSE-COMMERCIAL.md). Isi paket Pro ada di repo
+privat [arbdevai/android-compose-builder-pro](https://github.com/arbdevai/android-compose-builder-pro)
+(akses diberikan setelah pembelian). Tautan pembelian (Gumroad / Lemon Squeezy)
+akan dipasang setelah listing dibuat.
+
+> Catatan distribusi: paket Pro tidak ada di repositori publik ini dan tidak
+> ikut terpasang oleh installer Gratis — Pro hanya didistribusikan sebagai
+> paket ZIP berbayar dari repo privat.
+
+---
+
 ## <img src="assets/icons/overview.svg" width="22" height="22" align="center" alt="Overview" /> Konsep Inti: Bikin APK Tanpa Build Lokal (100% Cloud CI)
 
 **Android Compose Builder** adalah spesifikasi standar rekayasa agen (*Agent Engineering Standard*) resmi untuk merancang, membangun, dan merilis aplikasi Android modern (**Kotlin + Jetpack Compose Material 3**) **tanpa perlu kompilasi Gradle lokal**.
@@ -225,7 +255,9 @@ android-compose-builder/
 ├── CODEX.md                         # Pointer OpenAI Codex CLI -> SKILL.md
 ├── install.sh                       # Installer otomatis multi-CLI berbasis Bash
 ├── install.py                       # Installer alternatif mandiri berbasis Python
-├── LICENSE                          # Lisensi resmi MIT
+├── LICENSE                          # Lisensi resmi MIT (skill Gratis)
+├── LICENSE-COMMERCIAL.md            # Lisensi komersial (paket Pro)
+├── PRICING.md                       # Harga Pro (usulan)
 └── README.md                        # Dokumentasi teknis proyek
 ```
 
@@ -233,4 +265,12 @@ android-compose-builder/
 
 ## <img src="assets/icons/license.svg" width="22" height="22" align="center" alt="License" /> Lisensi
 
-Repositori ini dilisensikan di bawah lisensi terbuka [MIT](LICENSE). Bebas digunakan, diintegrasikan, dan disesuaikan untuk proyek komersial maupun open-source.
+Skill Gratis di repositori ini dilisensikan di bawah lisensi terbuka
+[MIT](LICENSE). Bebas digunakan, diintegrasikan, dan disesuaikan untuk
+proyek komersial maupun open-source.
+
+Paket Pro (repo privat
+[arbdevai/android-compose-builder-pro](https://github.com/arbdevai/android-compose-builder-pro))
+dilisensikan secara terpisah di bawah
+[LICENSE-COMMERCIAL.md](LICENSE-COMMERCIAL.md) dan tidak boleh
+didistribusikan ulang.
