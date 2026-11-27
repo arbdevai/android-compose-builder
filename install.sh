@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # Android Compose Builder Skill - Multi-CLI Auto-Detect Installer
-# Compatible with: Antigravity CLI (agy), Claude Code (claude), Codex CLI (codex)
+# Compatible with: Muse, Antigravity CLI (agy), Claude Code (claude), Codex CLI (codex)
 # Supports: Symlink live-sync, Git auto-pull, and background shell auto-updates
 # ==============================================================================
 
@@ -24,7 +24,7 @@ print_header() {
     echo -e "${CYAN}${BOLD}"
     echo "  ╔═══════════════════════════════════════════════════════════╗"
     echo "  ║        Android Compose Builder - Multi-CLI Installer      ║"
-    echo "  ║  Antigravity CLI (agy) • Claude CLI • Codex CLI Compat    ║"
+    echo "  ║  Muse • Antigravity CLI (agy) • Claude • Codex Compat      ║"
     echo "  ║      Live-Sync Symlinks • Instant Background Auto-Update  ║"
     echo "  ╚═══════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
@@ -49,6 +49,7 @@ DISABLE_AUTOUPDATE=false
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
         --all) TARGET_ENV="all" ;;
+        --muse) TARGET_ENV="muse" ;;
         --agy|--antigravity) TARGET_ENV="antigravity" ;;
         --claude) TARGET_ENV="claude" ;;
         --codex) TARGET_ENV="codex" ;;
@@ -65,7 +66,8 @@ while [[ "$#" -gt 0 ]]; do
             echo "Usage: ./install.sh [OPTIONS]"
             echo ""
             echo "Installation Options:"
-            echo "  --all                 Install to all supported CLIs (Antigravity, Claude, Codex)"
+            echo "  --all                 Install to all supported CLIs (Muse, Antigravity, Claude, Codex)"
+            echo "  --muse                Install specifically for Muse"
             echo "  --antigravity, --agy  Install specifically for Antigravity CLI"
             echo "  --claude              Install specifically for Claude Code CLI"
             echo "  --codex               Install specifically for OpenAI Codex CLI"
@@ -157,6 +159,7 @@ fi
 DETECTED_AGY=false
 DETECTED_CLAUDE=false
 DETECTED_CODEX=false
+DETECTED_MUSE=false
 
 if command -v agy >/dev/null 2>&1 || command -v antigravity >/dev/null 2>&1 || [ -d "$HOME/.gemini" ]; then
     DETECTED_AGY=true
@@ -170,10 +173,15 @@ if command -v codex >/dev/null 2>&1 || [ -d "$HOME/.codex" ]; then
     DETECTED_CODEX=true
 fi
 
+if [ -d "$HOME/workspace/custom-skills" ]; then
+    DETECTED_MUSE=true
+fi
+
 echo -e "${BOLD}Detected AI Agent CLI Environments:${NC}"
 echo -e "  • Antigravity CLI (agy): $([ "$DETECTED_AGY" = true ] && echo -e "${GREEN}Detected${NC}" || echo -e "${YELLOW}Not detected${NC}")"
 echo -e "  • Claude CLI (claude)  : $([ "$DETECTED_CLAUDE" = true ] && echo -e "${GREEN}Detected${NC}" || echo -e "${YELLOW}Not detected${NC}")"
 echo -e "  • Codex CLI (codex)    : $([ "$DETECTED_CODEX" = true ] && echo -e "${GREEN}Detected${NC}" || echo -e "${YELLOW}Not detected${NC}")"
+echo -e "  • Muse                  : $([ "$DETECTED_MUSE" = true ] && echo -e "${GREEN}Detected${NC}" || echo -e "${YELLOW}Not detected${NC}")"
 echo ""
 
 if [ "$CHECK_ONLY" = true ]; then
@@ -181,6 +189,7 @@ if [ "$CHECK_ONLY" = true ]; then
     echo -e "  • Antigravity Global: $([ -e "$HOME/.gemini/config/skills/$SKILL_NAME/SKILL.md" ] && echo -e "${GREEN}Installed (Live)${NC}" || echo -e "${YELLOW}Missing${NC}")"
     echo -e "  • Claude Global     : $([ -e "$HOME/.claude/skills/$SKILL_NAME/SKILL.md" ] && echo -e "${GREEN}Installed (Live)${NC}" || echo -e "${YELLOW}Missing${NC}")"
     echo -e "  • Codex Global      : $([ -e "$HOME/.codex/skills/$SKILL_NAME/SKILL.md" ] && echo -e "${GREEN}Installed (Live)${NC}" || echo -e "${YELLOW}Missing${NC}")"
+    echo -e "  • Muse              : $([ -e "$HOME/workspace/custom-skills/$SKILL_NAME/SKILL.md" ] && echo -e "${GREEN}Installed${NC}" || echo -e "${YELLOW}Missing${NC}")"
     
     HAS_HOOK=false
     if grep -q "android-compose-builder auto-update" "$HOME/.bashrc" 2>/dev/null || grep -q "android-compose-builder auto-update" "$HOME/.zshrc" 2>/dev/null; then
@@ -238,6 +247,7 @@ if [ "$UNINSTALL" = true ]; then
     rm -rf "$HOME/.gemini/config/skills/$SKILL_NAME"
     rm -rf "$HOME/.claude/skills/$SKILL_NAME"
     rm -rf "$HOME/.codex/skills/$SKILL_NAME"
+    rm -rf "$HOME/workspace/custom-skills/$SKILL_NAME"
     if [ "$INSTALL_SCOPE" = "workspace" ]; then
         rm -rf ".agents/skills/$SKILL_NAME"
         rm -rf ".claude/skills/$SKILL_NAME"
@@ -257,6 +267,7 @@ copy_skill_files() {
     local target_dir="$1"
     mkdir -p "$target_dir/scripts"
     cp "$SOURCE_DIR/SKILL.md" "$target_dir/SKILL.md"
+    [ -f "$SOURCE_DIR/skill.yaml" ] && cp "$SOURCE_DIR/skill.yaml" "$target_dir/skill.yaml"
     cp "$SOURCE_DIR"/scripts/*.py "$target_dir/scripts/"
     chmod +x "$target_dir"/scripts/*.py
     if [ -d "$SOURCE_DIR/references" ]; then
@@ -317,6 +328,27 @@ install_claude() {
     echo -e "${GREEN}[✓] Claude Code / Claude CLI compatibility active.${NC}"
 }
 
+install_muse() {
+    local target="$HOME/workspace/custom-skills/$SKILL_NAME"
+    echo -e "${BLUE}[*] Installing to Muse: $target${NC}"
+    mkdir -p "$(dirname "$target")"
+    rm -rf "$target"
+    mkdir -p "$target/scripts" "$target/references"
+    cp "$SOURCE_DIR/SKILL.md" "$target/SKILL.md"
+    [ -f "$SOURCE_DIR/skill.yaml" ] && cp "$SOURCE_DIR/skill.yaml" "$target/skill.yaml"
+    [ -f "$SOURCE_DIR/AGENTS.md" ] && cp "$SOURCE_DIR/AGENTS.md" "$target/AGENTS.md"
+    cp "$SOURCE_DIR"/scripts/*.py "$target/scripts/"
+    chmod +x "$target"/scripts/*.py
+    if [ -d "$SOURCE_DIR/references" ]; then
+        cp -r "$SOURCE_DIR/references"/* "$target/references/"
+    fi
+    if [ -d "$SOURCE_DIR/assets" ]; then
+        mkdir -p "$target/assets"
+        cp -r "$SOURCE_DIR/assets"/* "$target/assets/"
+    fi
+    echo -e "${GREEN}[✓] Muse compatibility active.${NC}"
+}
+
 install_codex() {
     if [ "$INSTALL_SCOPE" = "workspace" ]; then
         local target=".codex/skills/$SKILL_NAME"
@@ -355,11 +387,17 @@ if [ "$TARGET_ENV" = "codex" ] || [ "$TARGET_ENV" = "all" ] || { [ "$TARGET_ENV"
     INSTALL_COUNT=$((INSTALL_COUNT + 1))
 fi
 
+if [ "$TARGET_ENV" = "muse" ] || [ "$TARGET_ENV" = "all" ] || { [ "$TARGET_ENV" = "auto" ] && [ "$DETECTED_MUSE" = true ]; }; then
+    install_muse
+    INSTALL_COUNT=$((INSTALL_COUNT + 1))
+fi
+
 if [ "$INSTALL_COUNT" -eq 0 ] && [ "$TARGET_ENV" = "auto" ]; then
-    echo -e "${YELLOW}[i] No specific CLI detected. Installing globally to Antigravity, Claude, and Codex standards...${NC}"
+    echo -e "${YELLOW}[i] No specific CLI detected. Installing globally to Antigravity, Claude, Codex, and Muse standards...${NC}"
     install_antigravity
     install_claude
     install_codex
+    install_muse
 fi
 
 # Enable shell auto-update if requested

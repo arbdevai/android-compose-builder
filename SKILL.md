@@ -18,9 +18,9 @@ Skill arsitektur dan pengembangan aplikasi Android modern berbasis Jetpack Compo
 ### A. Alur Kerja Chroot HP: Zero Local Build, Autopilot Push & CI Failure Loop
 - **DILARANG BUILD GRADLE LOKAL:** Jangan pernah menjalankan perintah `./gradlew` (seperti `assembleRelease`, `compileDebugKotlin`) di dalam chroot lokal. Kompilasi lokal akan membebani RAM/CPU HP dan memicu OOM-kill.
 - **DILARANG PUSH SETENGAH JALAN:** Jangan melakukan `git push` untuk setiap perbaikan 1–2 baris saat masih ngoding.
-- **AUTOPILOT DELIVERY (JANGAN SURUH USER PUSH):** Begitu satu rangkaian fitur selesai dan lolos `python3 scripts/verify_kotlin_syntax.py .` (0 hard error), AI **WAJIB** langsung menjalankan `git add`, `git commit`, `git push`, memantau GitHub Actions (`gh run watch <RUN_ID> --interval 60`), dan menyerahkan **link download APK jadi dari GitHub Release** ke pengguna. Dilarang berhenti di lokal dan menyuruh pengguna melakukan `git push` manual (kecuali `gh` belum login / remote tidak ada).
+- **AUTOPILOT DELIVERY (JANGAN SURUH USER PUSH):** Begitu satu rangkaian fitur selesai dan lolos `python3 scripts/verify_kotlin_syntax.py .` (0 hard error), AI **WAJIB** langsung menjalankan `git add`, `git commit`, `git push`, memantau GitHub Actions (`gh run watch <RUN_ID> --interval 60`), dan menyerahkan **link download APK jadi dari GitHub Release** ke pengguna. Dilarang berhenti di lokal dan menyuruh pengguna melakukan `git push` manual (kecuali `gh` belum login / remote tidak ada). Di Muse: cek dulu `gh auth status`; kalau `gh` belum login, pakai konektor GitHub Muse untuk memantau CI dan Release, dan minta persetujuan push sekali dari user sebelum `git push` pertama di sesi itu, karena Muse butuh izin untuk aksi keluar. Jangan anggap `gh` belum login sebagai alasan berhenti.
   - **Format Commit Rilis:** Untuk memicu `Publish tagged release` di `build-apk.yml`, commit final rilis **WAJIB** diawali `Release vX.Y.Z` (misal `Release v1.0.0`).
-  - **Keystore Repo Baru:** Sebelum push pertama di repo baru, cek `gh secret list` untuk memastikan `KEYSTORE_BASE64` tersedia; jika belum ada, jalankan `python3 scripts/setup_release_keystore.py`.
+  - **Keystore Repo Baru:** Sebelum push pertama di repo baru, cek `gh secret list` untuk memastikan `KEYSTORE_BASE64` tersedia; jika belum ada, jalankan `python3 scripts/setup_release_keystore.py`. Di Muse, pakai path lengkap `~/workspace/custom-skills/android-compose-builder/scripts/setup_release_keystore.py`, dan kalau `gh secret list` gagal karena belum login, cek secret lewat konektor GitHub Muse.
 - **CI FAILURE PATTERN LOOP:** Jika build CI gagal, AI wajib membaca log kegagalan (`gh run view <RUN_ID> --log-failed`), mengidentifikasi pola error utamanya (misal: `Unresolved reference`, `KSP`, `aapt2`, `OptIn`), mencatat pola tersebut di `docs/STATE.md` agar tidak terulang, memperbaiki kode, memverifikasi ulang dengan `verify_kotlin_syntax.py`, dan push perbaikan sampai Release APK hijau. Jika pola tersebut sudah dijadikan rule deterministik di `verify_kotlin_syntax.py`, hapus dari `docs/STATE.md` agar konteks tetap ramping.
 
 ### B. Anti-Fitur Setengah Jadi (Tuntas Hulur ke Hilir)
@@ -50,6 +50,7 @@ Skill arsitektur dan pengembangan aplikasi Android modern berbasis Jetpack Compo
   ```bash
   python3 scripts/verify_kotlin_syntax.py .
   ```
+  Di Muse, jalankan dari path lengkap skill: `python3 ~/workspace/custom-skills/android-compose-builder/scripts/verify_kotlin_syntax.py .` karena `scripts/` tidak ada di root proyek. Di CLI lain, pakai path instalasi skill masing-masing.
 - **Kondisional Cerdas:** Eksekusi validator ini **HANYA** jika commit melibatkan perubahan pada berkas kode Android (`.kt` atau `.xml`).
 - Jika perubahan hanya mencakup aset web (`web/`), dokumentasi (`.md`), atau skrip konfigurasi shell/installer, **lewati validator Kotlin** agar tidak menjadi formalitas buta (mengecek 0 file).
 - Jika ada file Kotlin/XML yang diubah, pastikan menghasilkan **0 Hard Errors** sebelum memicu workflow CI. Jika terdapat error, AI wajib melakukan *self-healing* otomatis sebelum staging/commit.
@@ -85,6 +86,8 @@ Saat menangani alur kerja spesifik, AI wajib membaca dokumen panduan teknis terk
 
 Gunakan skrip Python yang telah tersedia untuk operasi instan tanpa membebani resource lokal:
 
+Di Muse, ganti `scripts/` dengan `~/workspace/custom-skills/android-compose-builder/scripts/`. Contoh: `python3 ~/workspace/custom-skills/android-compose-builder/scripts/verify_kotlin_syntax.py .`
+
 - **Verifikasi Sintaks:**
   `python3 scripts/verify_kotlin_syntax.py .`
   (Mengecek kurung kurawal, XML well-formedness, boundary coroutine suspend, unhandled Result extraction, dan import Compose).
@@ -97,3 +100,13 @@ Gunakan skrip Python yang telah tersedia untuk operasi instan tanpa membebani re
 - **Generate Launcher Icons (Vector to PNG):**
   `python3 scripts/generate_launcher_icons.py app/src/main/res`
   (Merender seluruh densitas mipmap Android secara otomatis).
+
+---
+
+## 4. Catatan Kompatibilitas Muse
+
+- Skill ini terpasang di Muse lewat `skill.yaml` di `~/workspace/custom-skills/android-compose-builder/skill.yaml` dan `SKILL.md` ini. Frontmatter di atas dipertahankan untuk Antigravity, Claude Code, dan Codex.
+- Jalankan semua perintah lewat `muse.exec`, baca file lewat `muse.read`, dan cari skill lewat `muse.skill_search`.
+- Semua skrip helper ada di `~/workspace/custom-skills/android-compose-builder/scripts/`. Jangan jalankan `python3 scripts/...` dari root proyek di Muse, karena folder itu tidak ada di sana.
+- Untuk push dan CI: cek `gh auth status` dulu. Kalau `gh` belum login, gunakan konektor GitHub Muse untuk membaca status workflow, log, dan Release. Minta persetujuan push sekali sebelum push pertama di sesi itu.
+- Installer mendukung Muse lewat `./install.sh --muse` dan `python3 install.py --muse`, target `~/workspace/custom-skills/android-compose-builder`.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Android Compose Builder Skill - Multi-CLI Auto-Detect Installer (Python)
-Compatible with: Antigravity CLI (agy), Claude Code (claude), Codex CLI (codex)
+Compatible with: Muse, Antigravity CLI (agy), Claude Code (claude), Codex CLI (codex)
 Supports: Symlink live-sync, Git auto-pull, and background shell auto-updates
 """
 
@@ -19,7 +19,7 @@ def print_header():
     print("\033[1;36m")
     print("  ╔═══════════════════════════════════════════════════════════╗")
     print("  ║        Android Compose Builder - Multi-CLI Installer      ║")
-    print("  ║  Antigravity CLI (agy) • Claude CLI • Codex CLI Compat    ║")
+    print("  ║  Muse • Antigravity CLI (agy) • Claude • Codex Compat      ║")
     print("  ║      Live-Sync Symlinks • Instant Background Auto-Update  ║")
     print("  ╚═══════════════════════════════════════════════════════════╝")
     print("\033[0m")
@@ -30,6 +30,7 @@ def detect_environments():
         "antigravity": shutil.which("agy") is not None or shutil.which("antigravity") is not None or (home / ".gemini").exists(),
         "claude": shutil.which("claude") is not None or (home / ".claude").exists(),
         "codex": shutil.which("codex") is not None or (home / ".codex").exists(),
+        "muse": (home / "workspace" / "custom-skills").exists(),
     }
     return detected
 
@@ -39,6 +40,12 @@ def copy_skill(source_dir: Path, target_dir: Path):
     scripts_target.mkdir(parents=True, exist_ok=True)
 
     shutil.copy2(source_dir / "SKILL.md", target_dir / "SKILL.md")
+    if (source_dir / "skill.yaml").exists():
+        shutil.copy2(source_dir / "skill.yaml", target_dir / "skill.yaml")
+    if (source_dir / "AGENTS.md").exists():
+        shutil.copy2(source_dir / "AGENTS.md", target_dir / "AGENTS.md")
+    if (source_dir / "assets").exists():
+        shutil.copytree(source_dir / "assets", target_dir / "assets", dirs_exist_ok=True)
     for script_file in (source_dir / "scripts").glob("*.py"):
         dest = scripts_target / script_file.name
         shutil.copy2(script_file, dest)
@@ -132,7 +139,8 @@ def disable_autoupdate_hook():
 
 def main():
     parser = argparse.ArgumentParser(description="Android Compose Builder Skill Installer")
-    parser.add_argument("--all", action="store_true", help="Install to all CLIs (Antigravity, Claude, Codex)")
+    parser.add_argument("--all", action="store_true", help="Install to all CLIs (Muse, Antigravity, Claude, Codex)")
+    parser.add_argument("--muse", action="store_true", help="Install specifically for Muse")
     parser.add_argument("--antigravity", "--agy", action="store_true", help="Install specifically for Antigravity CLI")
     parser.add_argument("--claude", action="store_true", help="Install specifically for Claude Code")
     parser.add_argument("--codex", action="store_true", help="Install specifically for OpenAI Codex")
@@ -172,6 +180,7 @@ def main():
         print(f"  • Antigravity: {'\033[32mInstalled (Live)\033[0m' if (home / '.gemini' / 'config' / 'skills' / SKILL_NAME / 'SKILL.md').exists() else '\033[33mMissing\033[0m'}")
         print(f"  • Claude     : {'\033[32mInstalled (Live)\033[0m' if (home / '.claude' / 'skills' / SKILL_NAME / 'SKILL.md').exists() else '\033[33mMissing\033[0m'}")
         print(f"  • Codex      : {'\033[32mInstalled (Live)\033[0m' if (home / '.codex' / 'skills' / SKILL_NAME / 'SKILL.md').exists() else '\033[33mMissing\033[0m'}")
+        print(f"  • Muse       : {'\033[32mInstalled\033[0m' if (home / 'workspace' / 'custom-skills' / SKILL_NAME / 'SKILL.md').exists() else '\033[33mMissing\033[0m'}")
         has_hook = False
         for rc_name in [".bashrc", ".zshrc"]:
             p = home / rc_name
@@ -187,6 +196,7 @@ def main():
             home / ".gemini" / "config" / "skills" / SKILL_NAME,
             home / ".claude" / "skills" / SKILL_NAME,
             home / ".codex" / "skills" / SKILL_NAME,
+            home / "workspace" / "custom-skills" / SKILL_NAME,
         ]
         for t in targets:
             if t.is_symlink():
@@ -209,13 +219,15 @@ def main():
 
     targets_to_install = []
     if args.all:
-        targets_to_install = ["antigravity", "claude", "codex"]
+        targets_to_install = ["antigravity", "claude", "codex", "muse"]
     elif args.antigravity:
         targets_to_install.append("antigravity")
     elif args.claude:
         targets_to_install.append("claude")
     elif args.codex:
         targets_to_install.append("codex")
+    elif args.muse:
+        targets_to_install.append("muse")
     else:
         # Auto-detect mode
         targets_to_install = [k for k, v in detected.items() if v]
@@ -238,11 +250,13 @@ def main():
                 t_dir = home / ".gemini" / "config" / "skills" / SKILL_NAME
             elif cli == "claude":
                 t_dir = home / ".claude" / "skills" / SKILL_NAME
+            elif cli == "muse":
+                t_dir = home / "workspace" / "custom-skills" / SKILL_NAME
             else:
                 t_dir = home / ".codex" / "skills" / SKILL_NAME
 
         print(f"\033[34m[*] Installing for {cli.capitalize()}: {t_dir}\033[0m")
-        deploy_skill(source_dir, t_dir, use_symlink=use_symlink)
+        deploy_skill(source_dir, t_dir, use_symlink=(use_symlink and cli != "muse"))
         print(f"\033[32m[✓] {cli.capitalize()} skill active.\033[0m")
 
     if args.auto_update:

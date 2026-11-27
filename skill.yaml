@@ -1,0 +1,5 @@
+name: "android_compose_builder"
+title: "Android Compose Builder"
+description: "Build Kotlin + Jetpack Compose Android apps with NDK/Rust, zero local Gradle builds, and GitHub Actions CI."
+category: "Work and knowledge"
+include_in_prompt: true
